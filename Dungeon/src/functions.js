@@ -2,9 +2,9 @@ const diceBut = document.getElementById('diceBut')
 const monsterBut = document.getElementById('monsterBut')
 
 
-var canvas = document.getElementById("board");
+var canvas = document.getElementById("dice_6");
 var ctx = canvas.getContext("2d");
-// ctx.font = "50px Roboto";
+ctx.font = "50px Arial";
 
 diceBut.onclick = function() {drawDice()};
 
