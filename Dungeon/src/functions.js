@@ -1,4 +1,4 @@
-fetch("../data/character.JSON")
+fetch("https://johnmogi.github.io/Dungeon/data/character.json")
 .then(res => res.json())
 .then(data => console.log(data))
 
