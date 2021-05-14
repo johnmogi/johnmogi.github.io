@@ -1,0 +1,16 @@
+{
+  "name": "Dungeon",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/johnmogi/Dungeon.git",
+  "author": "johnmogi <anguru@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "git": "git add . && git commit -m",
+    "postgit": "git push --all"
+  },
+  "dependencies": {
+    "bootstrap": "^5.0.1",
+    "unique-names-generator": "^4.5.0"
+  }
+}
