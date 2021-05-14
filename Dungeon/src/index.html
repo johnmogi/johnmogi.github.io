@@ -1,28 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>The Dungeon</title>
-    <link rel="stylesheet" href="./style.css">
-    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
-</head>
-<body class="container">
-<div class="jumbottron">
-    <h1>The Dungeon Generator</h1>
-</div>
-    <hr/>
+    <link rel="stylesheet" href="./style.css" />
+    <link
+      rel="stylesheet"
+      href="../node_modules/bootstrap/dist/css/bootstrap.min.css"
+    />
+  </head>
+  <body class="container">
+    <div class="jumbottron">
+      <h1>The Dungeon Generator</h1>
+    </div>
+    <hr />
     <div class="row">
-        <div class="col-4"><button class="btn btn-primary" id="diceBut">roll dice </button>
-        <canvas id="dice_6"></canvas>
+      <div class="col-4">
+        <button class="btn btn-primary" id="diceBut6">roll dice - 6</button>
+        <button class="btn btn-primary" id="diceBut10">roll dice - 10</button>
+        <button class="btn btn-primary" id="diceBut20">roll dice - 20</button>
+        <br />
+        <br />
+        <div id="dice_6"></div>
+      </div>
+      <div class="col-4">
+        <button class="btn btn-primary" id="monsterBut">
+          generate monster
+        </button>
+      </div>
+      <div class="col-4">
+          
+        <div id="monster-board"></div>
+      </div>
     </div>
-    <div class="col-4"> <button class="btn btn-primary" id="monsterBut">generate monster </button></div>
-        <div class="col-4"><canvas id="dice_6"></canvas></div>
-    </div>
-    
-   
-    
+
     <script src="./functions.js"></script>
     <!-- <script src="./draw.js"></script> -->
-</body>
+  </body>
 </html>
