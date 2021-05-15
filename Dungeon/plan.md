@@ -10,3 +10,11 @@ monster generator
 equipment
 
 --- Dungeon generator ---
+
+
+tech issue - the whole cors situation.
+
+https://javascript.info/fetch-crossorigin
+
+bottom line: 
+if not working with mimic server- no cors allowed- use local json.

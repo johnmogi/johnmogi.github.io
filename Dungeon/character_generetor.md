@@ -1,5 +1,4 @@
-character :{
-
+characters :{
     name: '',
     type: '',
     age: '',
@@ -11,9 +10,7 @@ character :{
     experience: '',
     equipment: '',
     limitations: '',
-    weakness: '',
-
-
+    weakness: ''
 }
 
 data pool:
@@ -42,3 +39,8 @@ proffesion:
 {
   'magician', 'witch', 'warrior', 'monk' , 'thief', 'bard', 'pirate', 'acrobat'
 }
+
+
+   "firstName": ["og", "zorg", "bran", "bill", "john", "danny", "sam", "skip", "koko", "sal", "roger", "roe",
+      "simson", "soso", "jany"
+   ]
