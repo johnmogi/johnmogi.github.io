@@ -10,38 +10,53 @@
       href="../node_modules/bootstrap/dist/css/bootstrap.min.css"
     />
   </head>
-  <body class="container">
-    <div class="jumbottron">
-      <h1>The Dungeon Generator</h1>
-    </div>
-    <hr />
+  <body class="container-fluid">
+    <nav class="navbar navbar navbar-light bg-light">
+      <div class="container">
+        <a class="navbar-brand" href="/">
+          <img src="./images/Dungeon.jpg" alt ="dungeon game" width="200"/>
+          Dungeon Generator</a>
+          
+        </div>
+          
+        </nav>
+<section class="container" id="main-board">
     <div class="row">
       <div class="card col-4 ">
-        <div class="row">
-        <button class="btn btn-primary col-4" id="diceBut6"> 6</button>
-        <button class="btn btn-primary col-4" id="diceBut10">10</button>
-        <button class="btn btn-primary col-4" id="diceBut20"> 20</button>
+        <div class="row justify-content-md-center">
+        <button class="btn btn-outline-secondary col-4" id="diceBut6">6</button>
+        <button class="btn btn-outline-secondary col-4" id="diceBut10">10</button>
+        <button class="btn btn-outline-secondary col-4" id="diceBut20">20</button>
+      </div>
+      <div class="row">
+        <button class="btn btn-outline-secondary col-4" id="diceBut4">4</button>
+        <button class="btn btn-outline-secondary col-4" id="diceBut12">12</button>
+        <button class="btn btn-outline-secondary col-4" id="diceBut100">100</button>
       </div>
         <br />
         <br />
-        <div id="dice_6"></div>
+        <h3>Dice Results: </h3>
+        <div id="dice_results" class="card"></div>
       </div>
       <div class="card col-4">
-        <button class="btn btn-primary" id="characterBut">
+        <button class="btn btn-outline-secondary" id="characterBut">
           generate Hero
         </button>
         <br />
-        <div id="character-board"></div>
+        <div id="character-board" class="card"></div>
       </div>
       <div class="card col-4">
-        <button class="btn btn-primary" id="monsterBut">
+        <button class="btn btn-outline-secondary" id="monsterBut">
           generate monster
         </button>
         <div id="monster-board"></div>
       </div>
     </div>
+  </section>
+  <footer>
 
     <script src="./functions.js"></script>
     <!-- <script src="./draw.js"></script> -->
+  </footer>
   </body>
 </html>

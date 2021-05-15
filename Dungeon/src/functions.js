@@ -80,12 +80,8 @@ const chars = {
   weakness: "",
 };
 
-
-const diceBut6 = document.getElementById("diceBut6");
 const monsterBut = document.getElementById("monsterBut");
 const charBut = document.getElementById("characterBut");
-
-const dice_6 = document.getElementById("dice_6");
 const monsterBoard = document.getElementById("monster-board");
 const characterBoard = document.getElementById("character-board");
 
@@ -98,6 +94,15 @@ diceBut10.onclick = function () {
 diceBut20.onclick = function () {
   drawDice(20);
 };
+diceBut4.onclick = function () {
+  drawDice(4);
+};
+diceBut12.onclick = function () {
+  drawDice(12);
+};
+diceBut100.onclick = function () {
+  drawDice(100);
+};
 charBut.onclick = function () {
   generetaHero();
 };
@@ -106,10 +111,11 @@ function genereteNum(num, base) {
   return Math.floor(Math.random() * num + base);
 }
 
-function drawDice(num) {
-  `dice_${num}`.innerText = "";
+function drawDice(num) { 
+  // `dice_${num}`
+  dice_results.innerText = "";
   let res = Math.floor(Math.random() * num + 1);
-  return (dice_6.innerText = res);
+  return (dice_results.innerText = res);
 }
 function randomValue(key) {
   return key[
