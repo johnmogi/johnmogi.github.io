@@ -119,11 +119,15 @@ function randomValue(key) {
 }
 function generetaHero() {
   characterBoard.innerText = "";
-  let boyName = randomValue(chars.maleFirstNames);
-  console.log(boyName);
-  //   characterBoard.innerText += boyName;
+const br = '<br/>';
+const charName = 'Character Name: '
+const girlName = 'Girl Name: '
+const lastName = 'Family Name: '
+const charType = 'Character Type: '
 
-  randomValue(chars.girlFirstName);
-  randomValue(chars.lastName);
-  randomValue(chars.type);
+characterBoard.innerHTML += charName + randomValue(chars.boyFirstName) + br;
+characterBoard.innerHTML += girlName + randomValue(chars.girlFirstName)+ br;
+characterBoard.innerHTML += lastName + randomValue(chars.lastName)+ br;
+characterBoard.innerHTML += charType + randomValue(chars.type)+ br;
+
 }
