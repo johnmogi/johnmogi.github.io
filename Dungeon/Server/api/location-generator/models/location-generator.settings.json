@@ -1,0 +1,18 @@
+{
+  "kind": "singleType",
+  "collectionName": "location_generators",
+  "info": {
+    "name": "locationGenerator"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "location": {
+      "type": "string"
+    }
+  }
+}

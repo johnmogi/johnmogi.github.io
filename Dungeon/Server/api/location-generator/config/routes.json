@@ -1,0 +1,28 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/location-generator",
+      "handler": "location-generator.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/location-generator",
+      "handler": "location-generator.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/location-generator",
+      "handler": "location-generator.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

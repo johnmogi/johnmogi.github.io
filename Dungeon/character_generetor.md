@@ -44,3 +44,7 @@ proffesion:
    "firstName": ["og", "zorg", "bran", "bill", "john", "danny", "sam", "skip", "koko", "sal", "roger", "roe",
       "simson", "soso", "jany"
    ]
+
+
+locations:
+'forest', 'swamp', 'mountains', 'hills', 'volcano', 'islands', 'clouds', 'castle', 'cliffs', 'jungle', 'old market', 'desert', 'tunnels', 'village', 'festival', 'carnival', 'circus', 'arena', 'wagon caravan', 'military base', 'monastery', 'lake', 'beach' , 'river' 

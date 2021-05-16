@@ -29,7 +29,7 @@ function validate(boxNumber){
         messageBoard.style.border = '1px solid red';
         messageBoard.innerHTML = 'enter a number'
     } 
-    if(boxNumber === 5 || boxNumber === 7){
+    if(boxNumber == 5 || boxNumber == 7){
        return boxNumber = boxNumber--
     }
 }
@@ -37,6 +37,8 @@ function validate(boxNumber){
 function draw(boxNumber){
     boardMaker.innerHTML= '';
     !boxNumber ? boxNumber = 4 : validate(boxNumber);
+
+
     generateBoard(boxNumber)
     createEntrance(boxNumber)
 }

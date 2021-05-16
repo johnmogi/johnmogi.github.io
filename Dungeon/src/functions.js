@@ -133,13 +133,13 @@ function genereteNum(num, base) {
 }
 
 function innerDice(num){
-  let res = Math.floor(Math.random() * num + 1);
+  let res = Math.ceil(Math.random() * num );
   return res;
 }
 function drawDice(num) { 
   // `dice_${num}`
   dice_results.innerText = "";
-  let res = Math.floor(Math.random() * num + 1);
+  let res = Math.ceil(Math.random() * num);
   return (dice_results.innerText = res);
 }
 function randomValue(key) {
