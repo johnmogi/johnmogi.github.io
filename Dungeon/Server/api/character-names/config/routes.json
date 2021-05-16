@@ -1,0 +1,28 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/character-names",
+      "handler": "character-names.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/character-names",
+      "handler": "character-names.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/character-names",
+      "handler": "character-names.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

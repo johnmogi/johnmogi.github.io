@@ -32,7 +32,6 @@ const femaleFirstNames = [
   "entrapta",
   "sugar",
 ];
-
 const charsTypes = [
   "human",
   "orc",
@@ -48,7 +47,6 @@ const charsTypes = [
   "centaur",
   "mech",
 ];
-
 const lastName = [
   "banana",
   "cohen",
@@ -61,8 +59,19 @@ const lastName = [
   "poka",
   "rigalux",
 ];
-const proffession = [  'magician', 'witch', 'monk' ,'warrior',  'thief', 'bard', 'pirate', 'acrobat'
+const proffession = [  
+  'magician', 'witch', 'monk' ,'warrior',  'thief', 'bard', 'pirate', 'acrobat'
 ]
+
+const monsterName = [
+  'Reghar', 'dolor', 'fox the sly', 'gorb', 'zorg', 'brrir', 'phloox', 'reduxo', 'petito', 'inigo',
+  'fezik', 'gruffalo', 'murlockio', 'sach', 'zapp'
+];
+const monsterType = [
+  'spider', 'baboon', 'skeleton', 'ogre', 'undead', 'slime', 'giant', 'pixie', 'minotaur',
+'tiny-man', 'fire-elemental', 'earth-elemental', 'water-elemental', 'air-elemental', 'lizard'
+];
+
 const chars = {
   boyFirstName: maleFirstNames,
   girlFirstName: femaleFirstNames,
@@ -79,7 +88,13 @@ const chars = {
   limitations: "",
   weakness: "",
 };
-
+const monsters = {
+  monster_Name: monsterName,
+  monstr_Type: monsterType
+};
+const locations = [
+  
+]
 const monsterBut = document.getElementById("monsterBut");
 const charBut = document.getElementById("characterBut");
 const monsterBoard = document.getElementById("monster-board");
@@ -87,6 +102,9 @@ const characterBoard = document.getElementById("character-board");
 
 diceBut6.onclick = function () {
   drawDice(6);
+};
+diceBut10.onclick = function () {
+  drawDice(10);
 };
 diceBut10.onclick = function () {
   drawDice(10);
@@ -103,14 +121,21 @@ diceBut12.onclick = function () {
 diceBut100.onclick = function () {
   drawDice(100);
 };
+
 charBut.onclick = function () {
   generetaHero();
 };
-
+monsterBut.onclick = function () {
+  generetaMonster();
+};
 function genereteNum(num, base) {
   return Math.floor(Math.random() * num + base);
 }
 
+function innerDice(num){
+  let res = Math.floor(Math.random() * num + 1);
+  return res;
+}
 function drawDice(num) { 
   // `dice_${num}`
   dice_results.innerText = "";
@@ -131,24 +156,36 @@ const lastName = 'Family Name: '
 const charType = 'Type: '
 const charAge = 'Age: '
 const charPro = 'Proffession: '
-let magicCaster = 
+
 characterBoard.innerHTML += charName + randomValue(chars.boyFirstName) + br;
 characterBoard.innerHTML += girlName + randomValue(chars.girlFirstName)+ br;
 characterBoard.innerHTML += lastName + randomValue(chars.lastName)+ br;
 characterBoard.innerHTML += charType +  randomValue(chars.type)+ br;
 characterBoard.innerHTML += charAge + genereteNum(75,12) + br;
 characterBoard.innerHTML += charPro + randomValue(chars.proffession) + br;
-characterBoard.innerHTML += "life : " + genereteNum(drawDice(6),6) + br;
-console.log(chars.proffession );
+characterBoard.innerHTML += "life : " + genereteNum(innerDice(6),6) + br;
 if (chars.proffession == proffession[0]){
-  
+
 }
-characterBoard.innerHTML += "Magic : " + genereteNum(drawDice(6),6);
+characterBoard.innerHTML += "Magic : " + genereteNum(innerDice(6),6);
 }
+
+function generetaMonster() {
+  monsterBoard.innerText = "";
+const br = '<br/>';
+const monsterName = 'Monster Name: '
+const monsterType = 'Monster Type: '
+monsterBoard.innerHTML += monsterName + randomValue(monsters.monster_Name) + br;
+ monsterBoard.innerHTML += monsterType + randomValue(monsters.monstr_Type) + br;
+monsterBoard.innerHTML += "life : " + genereteNum(innerDice(6),6) ;
+}
+
+
 
 function init(){
   drawDice(6)
   generetaHero();
+  generetaMonster();
 }
 
 init();
