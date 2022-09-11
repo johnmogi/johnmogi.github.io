@@ -1,0 +1,30 @@
+{
+  "kind": "singleType",
+  "collectionName": "monster_generators",
+  "info": {
+    "name": "monsterGenerator"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "monsterName": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "abilities": {
+      "type": "string"
+    },
+    "life": {
+      "type": "string"
+    },
+    "weakness": {
+      "type": "string"
+    }
+  }
+}

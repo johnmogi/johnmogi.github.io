@@ -1,0 +1,37 @@
+{
+  "kind": "singleType",
+  "collectionName": "character_names",
+  "info": {
+    "name": "characterGenerator",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "boyFirstName": {
+      "type": "string"
+    },
+    "girlFirstName": {
+      "type": "string"
+    },
+    "familyName": {
+      "type": "string"
+    },
+    "types": {
+      "type": "string"
+    },
+    "profession": {
+      "type": "string"
+    },
+    "limitations": {
+      "type": "string"
+    },
+    "weakness": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Portfolio" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/fa62c117c7.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="styles.css" />
+    <title>John Mogi 2022 Portfolio</title>
+    <link rel="icon" href="https://johnmogi.com/wp-content/uploads/2021/11/cropped-JM-logo-1-32x32.png" sizes="32x32" />
+    <link rel="icon" href="https://johnmogi.com/wp-content/uploads/2021/11/cropped-JM-logo-1-192x192.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="https://johnmogi.com/wp-content/uploads/2021/11/cropped-JM-logo-1-180x180.png" />
+    <meta name="msapplication-TileImage" content="https://johnmogi.com/wp-content/uploads/2021/11/cropped-JM-logo-1-270x270.png" />
+    <meta http-equiv='cache-control' content='no-cache'> 
+<meta http-equiv='expires' content='0'> 
+<meta http-equiv='pragma' content='no-cache'>
+  </head>
+  <body class="light" id="top">
+    <header class="header center">
+      <h3>
+        <a href="https://johnmogi.github.io/" class="link" 
+          >JohnMogi</a
+        >
+      </h3>
+
+      <nav class="nav center">
+        <ul class="nav__list center">
+          <li class="nav__list-item">
+            <a class="link link--nav" href="#projects">Projects</a>
+          </li>
+          <li class="nav__list-item">
+            <a class="link link--nav" href="#skills">Skills</a>
+          </li>
+          <li class="nav__list-item">
+            <a class="link link--nav" href="#contact">Contact</a>
+          </li>
+        </ul>
+
+        <button type="button" aria-label="toggle theme" class="btn btn--icon">
+          <i aria-hidden="true" id="btn-theme" class="fas fa-moon"></i>
+        </button>
+
+        <button
+          type="button"
+          aria-label="toggle navigation"
+          class="btn btn--icon nav__hamburger"
+        >
+          <i aria-hidden="true" class="fas fa-bars"></i>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- About -->
+      <div class="about center">
+        <h1>Hi, I am <span class="about__name">John Mogi.</span></h1>
+        <h2 class="about__role">A Devops & Full Stack Developer.</h2>
+        <p class="about__desc">
+          I am passionate about building scalable, secure, and reliable systems.
+        </p>
+
+        <div class="about__contact center">
+         
+          <a href="https://johnmogi.com/wp-content/uploads/2022/07/JohnMogi_DevOps_FullStack.pdf" target="_blank">
+            <span class="btn btn--outline">Resume</span>
+          </a>
+
+          <a
+            href="https://github.com/johnmogi/"
+            aria-label="github"
+            class="link link--icon"
+            target="_blank"
+          >
+            <i aria-hidden="true" class="fab fa-github"></i>
+          </a>
+
+          <a
+            href="https://www.linkedin.com/in/johnmogi/"
+            aria-label="linkedin"
+            class="link link--icon"
+            target="_blank"
+          >
+            <i aria-hidden="true" class="fab fa-linkedin"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Projects -->
+      <section id="projects" class="section projects">
+        <h2 class="section__title">Devops Projects</h2>
+
+        <div class="projects__grid">
+          <div class="project">
+            <h3>Password Validator</h3>
+            <br/>
+            <img src="https://github.com/johnmogi/password/raw/feature/feature.png?raw=true?style=centerme" alt="todo list" class="project__image" width="240">
+            <p class="project__description">
+              In this project, I was responsible for building a password validator using both Bash and Powershell.
+            </p>
+            
+            <ul class="project__stack">
+              <li class="project__stack-item">Bash</li>
+              <li class="project__stack-item">PowerShell</li>
+              <li class="project__stack-item">Git</li>
+            </ul>
+
+            <a
+              href="https://github.com/johnmogi/password"
+              aria-label="source code"
+              class="link link--icon"
+            >
+              <i aria-hidden="true" class="fab fa-github"></i>
+            </a>
+     
+          </div>
+
+          <div class="project">
+            <h3>From Terraform to Azure Cloud</h3>
+            <p class="project__description">
+              In this project I deploy 2 enviroments into azure cloud using terraform. with Infracost we can see the price change between the 2 different enviroments.
+              last but not least it's a complete network with a load balanced into a private and public subnets.
+            </p>
+            <ul class="project__stack">
+              <li class="project__stack-item">Terraform</li>
+              <li class="project__stack-item">Infracost</li>
+              <li class="project__stack-item">Azure Cloud</li>
+            </ul>
+
+            <a
+              href="https://github.com/johnmogi/CICD_pipeline1_terraform_build"
+              aria-label="source code"
+              class="link link--icon"
+              target="_blank"
+            >
+              <i aria-hidden="true" class="fab fa-github"></i>
+            </a>
+ 
+          </div>
+
+          <div class="project">
+            <h3>Docker CI CD </h3>
+
+            <p class="project__description">
+              <b>Azure Devops </b> 
+              A CI pipeline that deploys the docker app into a staging enviroment.<br/>
+              A CD pipeline depends on feature branch merge with manual approval, once approved deploys into production. 
+            </p>
+            <ul class="project__stack">
+              <li class="project__stack-item">Docker</li>
+              <li class="project__stack-item">CI CD</li>
+              <li class="project__stack-item">Azure Devops</li>
+            </ul>
+
+            <a
+              href="https://github.com/johnmogi/Docker_CI-CD"
+              aria-label="source code"
+              class="link link--icon"
+              target="_blank"
+
+            >
+              <i aria-hidden="true" class="fab fa-github"></i>
+            </a>
+            
+          </div>
+        </div>
+      </section>
+
+
+        <!-- Projects -->
+        <section id="projects" class="section projects">
+          <h2 class="section__title">Fullstack Projects</h2>
+  
+          <div class="projects__grid">
+            
+            <div class="project">
+              <h3>Angular Marketplace</h3>
+              <br/>
+          <img src="https://johnmogi.github.io/images/angular.png" alt="todo list" class="project__image" width="240">
+              <p class="project__description">
+                this is a full blown ecommerce angular site I built and devised from scratch, using Angular and mysql database with express nodeJs.
+              </p>
+              <ul class="project__stack">
+                <li class="project__stack-item">Material UI</li>
+                <li class="project__stack-item">TypeScript</li>
+                <li class="project__stack-item">Angular</li>
+                <li class="project__stack-item">Redux</li>
+              </ul>
+              
+              <a
+              href="https://github.com/johnmogi/webstore_1.1"
+              aria-label="source code"
+              class="link link--icon"
+              >
+              <i aria-hidden="true" class="fab fa-github"></i>
+            </a>
+           
+        </div>
+        <div class="project">
+          <h3>Todo List</h3>
+          <br/>
+          <img src="https://johnmogi.github.io/images/tasks.jpg" alt="todo list" class="project__image" width="260">
+          <p class="project__description">
+            a one page todo tasks list application that allows you to utilize CRUD operations : add, delete, and edit tasks.
+          </p>
+          <ul class="project__stack">
+            <li class="project__stack-item">JQuery</li>
+            <li class="project__stack-item">Js</li>
+            <li class="project__stack-item">HTML</li>
+            <li class="project__stack-item">CSS</li>
+          </ul>
+
+          <a
+            href="https://github.com/johnmogi/tasks_op"
+            aria-label="source code"
+            class="link link--icon"
+            target="_blank"
+
+          >
+            <i aria-hidden="true" class="fab fa-github"></i>
+          </a>
+          <a
+            href="https://johnmogi.github.io/rebuild_tasks_project"
+            aria-label="live preview"
+            class="link link--icon"
+          >
+            <i aria-hidden="true" class="fas fa-external-link-alt"></i>
+          </a>
+        </div>
+  
+            <div class="project">
+              <h3>React SPA</h3>
+              <br/>
+              <img src="https://johnmogi.github.io/images/vacations.png" alt="todo list" class="project__image" width="260">
+           
+              <p class="project__description">
+                single page application - vacations... a part from digital ocean deploy on a real mysql server with nginx and a deployment script - this cute fictional vacation site pulls user and preferences ...
+              </p>
+              <ul class="project__stack">
+                <li class="project__stack-item">React</li>
+                <li class="project__stack-item">MySql</li>
+                <li class="project__stack-item">Nginx</li>
+              </ul>
+  
+              <a
+                href="https://github.com/johnmogi/vacations_deploy"
+                aria-label="source code"
+                class="link link--icon"
+              target="_blank"
+
+              >
+                <i aria-hidden="true" class="fab fa-github"></i>
+              </a>
+              
+            </div>
+          </div>
+        </section>
+        <section class="about center" id="more">
+            <p class="about__desc">
+              I am also highly passionate about web-design, </br>
+               wordpress elementor and project managment.
+            </p>
+
+          </br>
+              <a href="https://johnmogi.com/gallery/" target="_blank">
+                <span class="btn btn--outline secondary">Check out my Wordpress portfolio</span>
+              </a>
+           
+
+        </section>
+
+      <!-- Skills -->
+      <section class="section skills" id="skills">
+        <div class="projects__grid">
+          <div>
+
+            <h2 class="section__title">Devops</h2>
+            <ul class="skills__list">
+              <li class="skills__list-item btn btn--plain">IAC</li>
+              <li class="skills__list-item btn btn--plain">Ansible</li>
+              <li class="skills__list-item btn btn--plain">Bash</li>
+              <li class="skills__list-item btn btn--plain">Docker</li>
+              <li class="skills__list-item btn btn--plain">Azure Cloud</li>
+              <li class="skills__list-item btn btn--plain">Azure Devops</li>
+              <li class="skills__list-item btn btn--plain">CI/CD</li>
+              <li class="skills__list-item btn btn--plain">Git</li>
+              <li class="skills__list-item btn btn--plain">Terraform</li>
+            </ul>
+          </div>
+          <div>
+
+        <h2 class="section__title">Full Stack</h2>
+        <ul class="skills__list">
+          <li class="skills__list-item btn btn--plain">HTML</li>
+          <li class="skills__list-item btn btn--plain">SCSS</li>
+          <li class="skills__list-item btn btn--plain">JavaScript</li>
+          <li class="skills__list-item btn btn--plain">TypeScript</li>
+          <li class="skills__list-item btn btn--plain">React</li>
+          <li class="skills__list-item btn btn--plain">Angular</li>
+          <li class="skills__list-item btn btn--plain">Strapi</li>
+          <li class="skills__list-item btn btn--plain">Mongo</li>
+          <li class="skills__list-item btn btn--plain">PostgreSql</li>
+          <li class="skills__list-item btn btn--plain">Mysql</li>
+
+        </ul>
+      </div>
+        
+      </div>
+      </section>
+
+      <!-- Contact -->
+      <section class="section contact center" id="contact">
+        <h2 class="section__title">Contact</h2>
+        <a href="mailto:dev@johnmogi.com">
+          <span class="btn btn--outline">Email me</span>
+        </a>
+      </section>
+    </main>
+
+    <footer class="footer">
+      credit:
+      <a href='https://github.com/rajshekhar26/portfolio' >
+        Raj</a> | 
+        <a
+        href="https://johnmogi.com"
+        class="link footer__link"
+        target="_blank"
+        >
+        JohnMogi 
+      </a>
+      2022 © All rights reversed.
+    </footer>
+
+    <div class="scroll-container">
+    <div class="scroll-top">
+      <a aria-label="Scroll up" href="#top">
+        <i aria-hidden="true" class="fas fa-arrow-up"></i>
+      </a>
+    </div>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>

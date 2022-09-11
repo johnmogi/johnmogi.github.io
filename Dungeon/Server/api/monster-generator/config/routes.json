@@ -1,0 +1,28 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/monster-generator",
+      "handler": "monster-generator.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/monster-generator",
+      "handler": "monster-generator.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/monster-generator",
+      "handler": "monster-generator.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

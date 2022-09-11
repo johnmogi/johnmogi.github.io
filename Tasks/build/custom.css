@@ -1,0 +1,153 @@
+body {
+	background: url(./images/tile.jpg);
+	font-size: 125%;
+	font-family: "Roboto", arial, sans-serif;
+}
+
+.space {
+	height: 25px;
+}
+
+.jumbotron h1 {
+	font-size: 25px;
+}
+
+.jumbotron {
+	padding: 1em;
+	padding-right: 1em;
+	padding-left: 1em;
+	text-align: center;
+	margin-bottom: 1.4em;
+}
+
+#stage {
+	padding-right: 3px;
+	padding-left: 3px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+#stage .card {
+	overflow: auto;
+	min-height: 300px;
+	background: #ffffff42;
+	background: url(images/notebg.png) 5% -5px;
+	background-repeat: no-repeat;
+	background-position: 50%;
+}
+
+#headCard .card-body {
+	background: #ffffffbd;
+}
+
+.wrapper {
+	background: url(images/formbg.jpg);
+}
+
+#stage .card-body {
+	overflow: inherit;
+	min-width: 149px;
+	max-height: 100px;
+	margin: 10px 15%;
+	padding: 0px;
+	font-size: 0.8em;
+}
+
+.topArea .jumbotron,
+.topArea .card-header {
+	background-color: rgba(248, 249, 131, 0.73);
+	text-align: center;
+	font-size: 1.3em;
+}
+
+.col-3 {
+	min-width: 250px !important;
+}
+
+.far.fa-trash-alt {
+	float: right;
+	margin: 5px;
+	opacity: 0.5;
+	position: absolute;
+	top: 45px;
+	right: 60px;
+	font-size: 0.7em;
+	color: #f00;
+}
+
+.far.fa-trash-alt:hover {
+	opacity: 1;
+}
+
+#stage .card-header {
+	padding: 10px 35px 0;
+	line-height: 2em;
+	margin: 45px 0 0 0;
+	font-size: 0.9em;
+}
+
+.date-body {
+	padding: 0 10px;
+	margin: 0 25px;
+	font-size: 0.8em;
+	text-align: left;
+}
+
+.far {
+	margin-right: 5px;
+}
+
+.Complete {
+	padding: 0;
+	background-color: transparent;
+	border: 0;
+	-webkit-appearance: none;
+	float: right;
+	font-size: 1.2rem;
+	font-weight: 700;
+	line-height: 1;
+	color: #000;
+	text-shadow: 0 1px 0 #fff;
+	width: 80px;
+	position: absolute;
+	right: 55px;
+	top: 50px;
+}
+
+.completed {
+	opacity: .5;
+}
+
+button:focus {
+	outline: initial;
+}
+
+.far.fa-check-circle {
+	color: #28a745;
+	width: 0;
+	margin-right: 10px;
+	opacity: .5;
+	cursor: pointer;
+}
+
+.far.fa-check-circle:hover {
+	opacity: 1;
+}
+
+button.close {
+	z-index: 5;
+}
+
+/* MQ */
+@media screen and (max-width: 767px) {
+
+	.col-8,
+	.col-4 {
+		width: 100%;
+		display: block;
+		clear: both;
+		flex: 100%;
+		max-width: 100%;
+		margin: 10px 0;
+	}
+}

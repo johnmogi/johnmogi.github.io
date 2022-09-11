@@ -1,0 +1,6 @@
+monster{
+    name: '',
+    type: '',
+    clan: '',
+    
+}

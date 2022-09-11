@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>📝 Task Board Maker</title>
+    <link rel="stylesheet" href="./style/bulma.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style/custom.css">
+  </head>
+  <body>
+  <section class="section">
+    <div class="container bulma-overlay-mixin">
+      <h1 class="title">
+        📝 MyTask organiser
+      </h1>
+      <p class="subtitle">
+   
+          </span>Hi, wellcome to MyTask, Captain's log on: <span id="todate">what's up for today...</span>
+      </p>
+      
+      <div class="message is-info box bulma-overlay-mixin ">
+        <div class="message-body" id="output-box">
+            may you find all the <strong>focus</strong> you need...
+        </div>
+      </div>
+
+     
+    </div>
+  </section>
+
+<section class="section">
+    <div class="container" id="main">
+    <div class="box bulma-overlay-mixin " >
+        <h2 class="subtitle">
+            Tasks Creator: 
+          </h2>
+        <form id="taskCreator" ame="taskCreator" novalidate>
+            <div class="field is-grouped is-grouped-multiline">
+                <div class="field-body">
+
+            <div class="field">
+                <label class="label is-normal">Task Name</label>
+                <div class="control">
+                    <input class="input is-medium" id="taskName" type="text" placeholder="Task Name" required>
+                </div>
+            </div>
+        </div>
+        <div class="field-body">
+
+            <div class="field">
+                <label class="label is-normal">Task Date</label>
+                <div class="control">
+    <input  class="input is-medium" type="date" id="taskDate" value="" min="" required>
+                </div>
+            </div>
+            </div>
+        </div>
+            <div class="field is-grouped is-grouped-multiline ">
+                <div class="field-body">
+
+            <div class="field">
+                <label class="label is-normal">Task Description</label>
+                <div class="control">
+                    <textarea class="textarea is-medium"  id="taskDesc"  placeholder="Task Description" rows ='4' required></textarea>
+
+                </div>
+            </div>
+            </div>
+            <div class="field-body">
+
+                <div class="field">
+                    <label class="label is-normal">Task Due Time</label>
+                    <div class="control">
+                        <input id="taskTime" type="time" class="input is-medium" data-provide="timepicker"
+                        data-defaultTime="current" placeholder="">
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="field is-grouped is-grouped-multiline">
+                <div class="control">
+                    <button class="button is-success is-link is-medium" id="taskSubmit" onclick="return false">Submit</button>
+                </div>
+                <div class="control">
+                    <button class="button is-link is-light is-medium" onclick="clean()" type="reset">Clean</button>
+                </div>
+                <!-- <div class="control">
+                    <button class="button is-link is-light is-medium" onclick="return false" type="reset">Delete all</button>
+                </div> -->
+            </div>
+        </div>
+        </div>
+    </form>
+</div>
+    </section>
+    <section class="section stage">
+        <div class="container">
+            <div class="card">
+
+                <div class="container bulma-overlay-mixin">
+            <h4 class="subtitle">
+                Active Tasks: 
+              </h4>
+            <div class="columns is-multiline bulma-overlay-mixin" id="task-box">
+        </div>
+    </div>
+        </div>
+    </div>
+    </section>
+    <footer>
+          <script src="./js/draw.js" ></script>
+    </footer>
+
+  </body>
+</html>

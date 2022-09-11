@@ -1,0 +1,70 @@
+{
+  "kind": "collectionType",
+  "collectionName": "characters",
+  "info": {
+    "name": "character",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "girlName": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "age": {
+      "type": "integer"
+    },
+    "proffession": {
+      "type": "string"
+    },
+    "life": {
+      "type": "string"
+    },
+    "magic": {
+      "type": "string"
+    },
+    "strength": {
+      "type": "string"
+    },
+    "rank": {
+      "type": "string"
+    },
+    "experience": {
+      "type": "string"
+    },
+    "equipment": {
+      "type": "string"
+    },
+    "limitations": {
+      "type": "string"
+    },
+    "weakness": {
+      "type": "string"
+    },
+    "history": {
+      "type": "richtext"
+    },
+    "heroImage": {
+      "model": "file",
+      "via": "related",
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos"
+      ],
+      "plugin": "upload",
+      "required": false,
+      "pluginOptions": {}
+    }
+  }
+}

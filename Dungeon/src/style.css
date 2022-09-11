@@ -1,0 +1,36 @@
+.container {
+
+    display: block;
+}
+
+#dice_results,
+#character-board, 
+    #monster-board {
+    border: 1px solid #ccc;
+    padding: 15px;
+    width: 100%;
+
+}
+
+#character-board, #monster-board  {
+    height: 250px;
+
+}
+
+#dice_6 {
+
+    height: 50px;
+}
+#boardMaker {
+    margin: 10px auto;
+}
+
+#boardMaker .card-square{
+min-height:100px;
+border: 1px solid #000;
+}   
+
+#messageBoard{
+    min-height:30px;
+    border: 1px solid #000;  
+}
