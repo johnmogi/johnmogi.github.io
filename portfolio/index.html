@@ -3,7 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To-Do Portfolio</title>
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="To-Do Portfolio" />
+    <meta property="og:description" content="A modern task management application built with HTML, CSS, and JavaScript" />
+    <meta property="og:image" content="/portfolio/assets/og-image.svg" />
+    <meta property="og:url" content="https://johnmogi.github.io/index-portfolio.html" />
+    <meta property="og:type" content="website" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="To-Do Portfolio" />
+    <meta name="twitter:description" content="A modern task management application built with HTML, CSS, and JavaScript" />
+    <meta name="twitter:image" content="/portfolio/assets/og-image.svg" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/portfolio/assets/logo.svg" />
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -40,15 +54,37 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
+                    <img src="/portfolio/assets/logo.svg" alt="Logo" class="w-10 h-10 mr-3">
                     <h1 class="text-xl font-bold text-white">To-Do Portfolio</h1>
                 </div>
-                <div class="flex items-center space-x-4">
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-4">
                     <button id="darkModeToggle" class="text-white hover:text-gray-200 transition-colors duration-200">
                         <i class="fas fa-moon"></i>
                         <span class="ml-2">Dark Mode</span>
                     </button>
                     <button id="addTaskBtn" class="bg-white text-primary-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200">
                         <i class="fas fa-plus mr-2"></i>Add Task
+                    </button>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobileMenuBtn" class="text-white hover:text-gray-200 transition-colors duration-200">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="md:hidden hidden border-t border-primary-700">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <button id="mobileDarkModeToggle" class="block w-full text-left text-white hover:text-gray-200 px-3 py-2 rounded-md transition-colors duration-200">
+                        <i class="fas fa-moon mr-2"></i>Toggle Dark Mode
+                    </button>
+                    <button id="mobileAddTaskBtn" class="block w-full text-left bg-white text-primary-600 px-3 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors duration-200">
+                        <i class="fas fa-plus mr-2"></i>Add New Task
                     </button>
                 </div>
             </div>
@@ -240,6 +276,62 @@
 
     <!-- App JS -->
     <script src="assets/app-enhanced.js"></script>
+
+    <!-- Mobile Menu JavaScript -->
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileDarkModeToggle = document.getElementById('mobileDarkModeToggle');
+            const mobileAddTaskBtn = document.getElementById('mobileAddTaskBtn');
+
+            // Toggle mobile menu
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                    const icon = mobileMenuBtn.querySelector('i');
+                    if (mobileMenu.classList.contains('hidden')) {
+                        icon.className = 'fas fa-bars text-xl';
+                    } else {
+                        icon.className = 'fas fa-times text-xl';
+                    }
+                });
+            }
+
+            // Mobile dark mode toggle
+            if (mobileDarkModeToggle) {
+                mobileDarkModeToggle.addEventListener('click', function() {
+                    document.getElementById('darkModeToggle').click();
+                });
+            }
+
+            // Mobile add task button
+            if (mobileAddTaskBtn) {
+                mobileAddTaskBtn.addEventListener('click', function() {
+                    document.getElementById('addTaskBtn').click();
+                });
+            }
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (mobileMenu && !mobileMenu.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+                    mobileMenu.classList.add('hidden');
+                    const icon = mobileMenuBtn.querySelector('i');
+                    icon.className = 'fas fa-bars text-xl';
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768 && mobileMenu) {
+                    mobileMenu.classList.add('hidden');
+                    const icon = mobileMenuBtn.querySelector('i');
+                    icon.className = 'fas fa-bars text-xl';
+                }
+            });
+        });
+    </script>
 
     <!-- Set current year -->
     <script>
