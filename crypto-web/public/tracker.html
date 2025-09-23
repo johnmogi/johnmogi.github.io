@@ -77,8 +77,21 @@
 
     <!-- JavaScript -->
     <script>
-        // API functions
-        const COINGECKO_API_BASE = 'https://api.codetabs.com/v1/proxy?quest=https://api.coingecko.com/api/v3';
+        // API Configuration - Multiple providers with fallbacks
+        const API_PROVIDERS = [
+            {
+                name: 'cryptocompare',
+                baseUrl: 'https://min-api.cryptocompare.com/data',
+                useProxy: false
+            },
+            {
+                name: 'coingecko',
+                baseUrl: 'https://api.codetabs.com/v1/proxy?quest=https://api.coingecko.com/api/v3',
+                useProxy: true
+            }
+        ];
+
+        let currentApiProvider = 0;
 
         // Toast notification system
         function showToast(message, type = 'info') {
@@ -121,45 +134,77 @@
         }
 
         async function getMarketChart(coinId, days = 30) {
-            const url = `${COINGECKO_API_BASE}/coins/${coinId}/market_chart?vs_currency=usd&days=${days}&interval=daily`;
-            try {
-                console.log('Fetching chart data for:', coinId);
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const data = await response.json();
+            // Try each API provider in sequence
+            for (let i = currentApiProvider; i < API_PROVIDERS.length; i++) {
+                try {
+                    const provider = API_PROVIDERS[i];
+                    console.log(`Trying ${provider.name} API for ${coinId}...`);
 
-                console.log('Chart data received for', coinId, ':', data);
+                    let url;
+                    if (provider.name === 'cryptocompare') {
+                        // CryptoCompare format: https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=30
+                        url = `${provider.baseUrl}/v2/histoday?fsym=${coinId.toUpperCase()}&tsym=USD&limit=${days}`;
+                    } else if (provider.name === 'coingecko') {
+                        // CoinGecko format
+                        url = `${provider.baseUrl}/coins/${coinId}/market_chart?vs_currency=usd&days=${days}&interval=daily`;
+                    }
 
-                // Handle different response formats
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log(`Chart data received for ${coinId} from ${provider.name}:`, data);
+
+                    // Transform data based on provider
+                    const transformedData = await transformChartData(data, provider.name, coinId);
+                    console.log(`Successfully loaded chart data for ${coinId} from ${provider.name}`);
+
+                    // If successful, update current provider and return data
+                    currentApiProvider = i;
+                    return transformedData;
+
+                } catch (error) {
+                    console.warn(`${API_PROVIDERS[i].name} API failed for ${coinId}:`, error.message);
+                    continue;
+                }
+            }
+
+            // If all APIs fail, throw error
+            throw new Error('All API providers failed');
+        }
+
+        async function transformChartData(data, providerName, coinId) {
+            if (providerName === 'cryptocompare') {
+                // Transform CryptoCompare format to match CoinGecko format
+                if (data.Data && Array.isArray(data.Data)) {
+                    return {
+                        prices: data.Data.map(item => [item.time * 1000, item.close])
+                    };
+                }
+            } else if (providerName === 'coingecko') {
+                // Handle CoinGecko format (existing logic)
                 if (data && data.status && data.status.error_code) {
                     throw new Error(`API Error ${data.status.error_code}: ${data.status.error_message || 'Unknown error'}`);
                 }
 
-                // If it's an object with status, it might be an error response
                 if (data && typeof data === 'object' && data.status && !Array.isArray(data)) {
                     throw new Error(`API returned error status: ${JSON.stringify(data.status)}`);
                 }
 
-                // Validate the response structure
                 if (!data || typeof data !== 'object') {
                     throw new Error('Invalid response format');
                 }
 
                 if (!data.prices || !Array.isArray(data.prices)) {
-                    console.warn('No prices data found for', coinId, data);
                     throw new Error('No price data available');
                 }
 
-                if (data.prices.length === 0) {
-                    throw new Error('No price data points available');
-                }
-
-                console.log('Successfully loaded chart data for', coinId, 'with', data.prices.length, 'data points');
                 return data;
-            } catch (error) {
-                console.error('Error fetching market chart for', coinId, ':', error);
-                throw error;
             }
+
+            throw new Error(`Unknown provider: ${providerName}`);
         }
 
         // Favorites management
@@ -258,8 +303,8 @@
                         }
                     } catch (error) {
                         console.error(`Failed to load data for ${coinId}:`, error);
-                        // Return null for failed coins
-                        return { id: coinId, data: null, error: error.message };
+                        // Return dummy data as fallback for failed coins
+                        return { id: coinId, data: generateDummyData(coinId, 30), fallback: true };
                     }
                 });
 
@@ -270,21 +315,21 @@
                     throw new Error('No coin data could be loaded');
                 }
 
-                // Show warnings for failed coins
-                const failedCoins = results.filter(result => result.data === null);
-                if (failedCoins.length > 0) {
-                    showToast(`Failed to load data for ${failedCoins.length} coin(s)`, 'warning');
-                    console.warn('Failed coins:', failedCoins.map(c => c.id));
+                // Show warnings for fallback coins
+                const fallbackCoins = results.filter(result => result.fallback);
+                if (fallbackCoins.length > 0) {
+                    showToast(`Using demo data for ${fallbackCoins.length} coin(s) - API may be unavailable`, 'warning');
+                    console.warn('Using fallback data for coins:', fallbackCoins.map(c => c.id));
                 }
 
                 // Update favorites pills
                 favoritesContainerEl.innerHTML = favorites.map(coinId => {
-                    const failed = failedCoins.some(f => f.id === coinId);
-                    const errorClass = failed ? 'opacity-50' : '';
-                    const title = failed ? `title="Failed to load data"` : '';
+                    const fallback = fallbackCoins.some(f => f.id === coinId);
+                    const errorClass = fallback ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800';
+                    const title = fallback ? `title="Using demo data"` : '';
 
                     return `
-                        <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center ${errorClass}" ${title}>
+                        <div class="${errorClass} px-3 py-1 rounded-full text-sm flex items-center" ${title}>
                             <span class="capitalize">${coinId}</span>
                             <button onclick="removeFromFavorites('${coinId}')" class="ml-2 text-blue-600 hover:text-blue-800">×</button>
                         </div>
@@ -300,8 +345,26 @@
                 document.getElementById('lastRefresh').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
             } catch (error) {
                 console.error('Error loading tracker data:', error);
-                errorStateEl.classList.remove('hidden');
-                showToast('Error loading portfolio data', 'error');
+                // Use dummy data as complete fallback
+                console.warn('Using complete dummy data fallback');
+                const dummyData = favorites.map(coinId => ({
+                    id: coinId,
+                    data: generateDummyData(coinId, 30)
+                }));
+
+                // Update favorites pills
+                favoritesContainerEl.innerHTML = favorites.map(coinId => `
+                    <div class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm flex items-center" title="Using demo data">
+                        <span class="capitalize">${coinId}</span>
+                        <button onclick="removeFromFavorites('${coinId}')" class="ml-2 text-blue-600 hover:text-blue-800">×</button>
+                    </div>
+                `).join('');
+
+                updateChart(dummyData);
+                favoritesContainerEl.classList.remove('hidden');
+                chartContainerEl.classList.remove('hidden');
+                document.getElementById('lastRefresh').textContent = `Last updated: ${new Date().toLocaleTimeString()} (Demo Mode)`;
+                showToast('Using demo data - API connection failed', 'warning');
             } finally {
                 loadingEl.classList.add('hidden');
             }

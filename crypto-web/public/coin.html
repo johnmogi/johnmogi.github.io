@@ -329,9 +329,103 @@
 
             } catch (error) {
                 console.error('Error loading coin details:', error);
+
+                // Create sample data for demonstration
+                const sampleCoinData = {
+                    id: coinId,
+                    name: coinId.charAt(0).toUpperCase() + coinId.slice(1),
+                    symbol: coinId.toUpperCase(),
+                    image: { large: 'https://via.placeholder.com/128' },
+                    market_data: {
+                        current_price: { usd: 1000.00 },
+                        market_cap: { usd: 50000000000 },
+                        price_change_percentage_24h: 5.0
+                    },
+                    links: { homepage: [`https://example.com/${coinId}`] }
+                };
+
+                const sampleMarketData = {
+                    prices: Array.from({ length: 30 }, (_, i) => [
+                        Date.now() - (29 - i) * 24 * 60 * 60 * 1000,
+                        1000 + Math.random() * 200 - 100
+                    ])
+                };
+
+                // Update UI with sample data
+                document.getElementById('coinLogo').src = sampleCoinData.image.large;
+                document.getElementById('coinLogo').alt = `${sampleCoinData.name} logo`;
+                document.getElementById('coinName').textContent = sampleCoinData.name;
+                document.getElementById('coinSymbol').textContent = sampleCoinData.symbol;
+                document.getElementById('coinPrice').textContent = 
+                    `$${sampleCoinData.market_data.current_price.usd.toFixed(2)}`;
+                document.getElementById('coinMarketCap').textContent = 
+                    `$${sampleCoinData.market_data.market_cap.usd.toLocaleString()}`;
+                
+                const priceChange24h = sampleCoinData.market_data.price_change_percentage_24h;
+                const priceChangeElement = document.getElementById('coinChange');
+                priceChangeElement.textContent = `${priceChange24h >= 0 ? '+' : ''}${priceChange24h.toFixed(2)}%`;
+                priceChangeElement.className = `text-xl font-bold ${priceChange24h >= 0 ? 'text-green-600' : 'text-red-600'}`;
+                
+                document.getElementById('coinGeckoLink').href = sampleCoinData.links.homepage[0];
+
+                // Initialize chart with sample data
+                const ctx = document.getElementById('priceChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [{
+                            label: 'Price (USD)',
+                            data: sampleMarketData.prices.map(([timestamp, price]) => ({
+                                x: new Date(timestamp),
+                                y: price
+                            })),
+                            borderColor: 'rgb(59, 130, 246)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index',
+                        },
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'day'
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Price (USD)'
+                                },
+                                beginAtZero: false
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => 
+                                        `$${context.parsed.y.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Show the content
                 document.getElementById('loading').classList.add('hidden');
-                document.getElementById('errorState').classList.remove('hidden');
-                showToast('Error loading coin details', 'error');
+                document.getElementById('coinDetails').classList.remove('hidden');
+                showToast('Using demo data - API connection failed', 'warning');
             }
         });
     </script>

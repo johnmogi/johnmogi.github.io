@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dungeon Game - Local Test (No Cache)</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <style>
+        /* Disable all caching */
+        * { cache: none !important; }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            <h2 class="font-bold">✅ LOCAL TEST ENVIRONMENT</h2>
+            <p>This page bypasses ALL browser caching!</p>
+            <p>Server: <code>http://127.0.0.1:8080</code></p>
+        </div>
+        
+        <div id="gameContainer" class="max-w-6xl mx-auto">
+            <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-4">
+                <p>Loading Dungeon Game...</p>
+                <div class="mt-2">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Force no caching
+        const noCache = Date.now();
+        console.log('��� Loading JavaScript with cache-busting:', noCache);
+        
+        const script = document.createElement('script');
+        script.src = `assets/dungeon-game.js?local=${noCache}`;
+        script.async = false; // Load synchronously to avoid timing issues
+        
+        script.onload = function() {
+            console.log('✅ JavaScript loaded successfully!');
+            document.querySelector('#gameContainer div').innerHTML = `
+                <h2 class="font-bold text-green-600">✅ JavaScript Loaded Successfully!</h2>
+                <p class="text-green-600">The game should now be functional.</p>
+                <p>Time: ${new Date().toLocaleString()}</p>
+            `;
+        };
+        
+        script.onerror = function() {
+            console.error('❌ Failed to load JavaScript');
+            document.querySelector('#gameContainer div').innerHTML = `
+                <h2 class="font-bold text-red-600">❌ JavaScript Load Failed</h2>
+                <p class="text-red-600">Check console for detailed errors.</p>
+                <p>Time: ${new Date().toLocaleString()}</p>
+            `;
+        };
+        
+        document.head.appendChild(script);
+        
+        // Also try to load via fetch to verify file exists
+        fetch(`assets/dungeon-game.js?check=${noCache}`)
+            .then(response => {
+                if (response.ok) {
+                    console.log('✅ File exists and is accessible');
+                } else {
+                    console.error('❌ File not accessible:', response.status);
+                }
+            })
+            .catch(err => {
+                console.error('❌ Network error:', err);
+            });
+    </script>
+</body>
+</html>
