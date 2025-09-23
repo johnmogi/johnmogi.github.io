@@ -350,10 +350,80 @@
                     </span>
                 </div>
             </div>
+        <!-- Story Generator Section -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                <i class="fas fa-book-open text-purple-600 mr-2"></i>
+                Adventure Stories
+            </h2>
+            <button id="generateStoryBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold mb-4 transition-colors duration-200">
+                <i class="fas fa-scroll mr-2"></i>Generate Random Story
+            </button>
+            <div id="storyCard" class="hidden bg-gradient-to-br from-purple-500 to-pink-600 text-white rounded-lg p-4">
+                <h3 class="text-xl font-bold mb-3">Adventure Awaits...</h3>
+                <div id="storyContent" class="text-sm leading-relaxed"></div>
+            </div>
         </div>
 
-        <!-- Combat Arena -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <!-- Player Mode Section -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                <i class="fas fa-dungeon text-red-600 mr-2"></i>
+                Dungeon Master Crawler
+            </h2>
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <h3 class="text-lg font-semibold mb-3">Player Stats</h3>
+                    <div id="playerStats" class="space-y-2">
+                        <div class="flex justify-between">
+                            <span>Health:</span>
+                            <span id="playerHP">100/100</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Level:</span>
+                            <span id="playerLevel">1</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Gold:</span>
+                            <span id="playerGold">50</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Experience:</span>
+                            <span id="playerXP">0/100</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-3">Current Room</h3>
+                    <div id="currentRoom" class="bg-gray-100 dark:bg-gray-700 p-3 rounded">
+                        <div class="text-center text-gray-600 dark:text-gray-400">
+                            <i class="fas fa-door-closed text-3xl mb-2"></i>
+                            <p>Start your adventure!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 mb-4">
+                <button id="exploreRoomBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-semibold transition-colors duration-200">
+                    <i class="fas fa-search mr-2"></i>Explore Room
+                </button>
+                <button id="restBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold transition-colors duration-200">
+                    <i class="fas fa-bed mr-2"></i>Rest
+                </button>
+                <button id="useItemBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded font-semibold transition-colors duration-200">
+                    <i class="fas fa-flask mr-2"></i>Use Item
+                </button>
+                <button id="checkInventoryBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded font-semibold transition-colors duration-200">
+                    <i class="fas fa-backpack mr-2"></i>Inventory
+                </button>
+            </div>
+            
+            <div id="roomResult" class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg hidden">
+                <h4 class="font-bold mb-2">Room Discovery:</h4>
+                <div id="roomContent"></div>
+            </div>
+        </div>
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
                 <i class="fas fa-swords text-red-600 mr-2"></i>
                 Combat Arena
