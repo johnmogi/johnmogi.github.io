@@ -45,9 +45,16 @@ class DungeonGame {
         // Story generation
         document.getElementById('generateStoryBtn')?.addEventListener('click', () => this.generateStory());
 
+        // Dice roller
+        document.getElementById('rollDiceBtn')?.addEventListener('click', () => this.openDiceModal());
+
+        // Dark mode toggle for dungeon
+        document.getElementById('toggleDarkModeBtn')?.addEventListener('click', () => this.toggleDungeonDarkMode());
+
         // Save/Load
         document.getElementById('saveGameBtn')?.addEventListener('click', () => this.saveGame());
         document.getElementById('loadGameBtn')?.addEventListener('click', () => this.loadGame());
+    }
     }
 
     setupMobileMenu() {
@@ -84,6 +91,7 @@ class DungeonGame {
         }, 200);
 
         this.showToast(`Rolled D${sides}: ${result}`, 'info');
+        this.addStoryEntry(`Rolled D${sides} and got ${result}`, 'info');
         return result;
     }
 
@@ -107,7 +115,9 @@ class DungeonGame {
 
         this.hero = hero;
         this.displayHero(hero);
+        this.updateCharacterSheet();
         this.showToast(`Generated ${hero.name} the ${hero.race} ${hero.characterClass}!`, 'success');
+        this.addStoryEntry(`Created hero: ${hero.name} (${hero.race} ${hero.characterClass})`, 'success');
     }
 
     displayHero(hero) {
@@ -161,6 +171,7 @@ class DungeonGame {
         this.monster = monster;
         this.displayMonster(monster);
         this.showToast(`Generated ${monster.name} (${monster.type})!`, 'warning');
+        this.addStoryEntry(`Monster appeared: ${monster.name} (${monster.type})`, 'warning');
     }
 
     displayMonster(monster) {
@@ -240,6 +251,7 @@ class DungeonGame {
 
         dungeonContainer.classList.remove('hidden');
         this.showToast(`Generated ${this.dungeonSize}x${this.dungeonSize} dungeon with ${rooms.length} rooms!`, 'success');
+        this.addStoryEntry(`Explored a ${this.dungeonSize}x${this.dungeonSize} dungeon with ${rooms.length} rooms`, 'success');
     }
 
     shouldPlaceRoom(x, y, existingRooms) {
@@ -410,6 +422,7 @@ class DungeonGame {
         storyCard.classList.remove('hidden');
         
         this.showToast('Story generated! 📖', 'success');
+        this.addStoryEntry(`Read an ancient story: ${story.substring(0, 50)}...`, 'info');
     }
 
     exploreRoom() {
