@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Tracker - Coin Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Shared Navbar -->
+    <nav class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Crypto Tracker</h1>
+            <div class="flex space-x-4">
+                <a href="index.html" class="hover:bg-blue-700 px-3 py-2 rounded">Grid</a>
+                <a href="coin.html" class="hover:bg-blue-700 px-3 py-2 rounded">Detail</a>
+                <a href="tracker.html" class="hover:bg-blue-700 px-3 py-2 rounded">Tracker</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-6">
+        <!-- Back Button -->
+        <div class="mb-6">
+            <a href="index.html" class="inline-flex items-center text-blue-600 hover:text-blue-800">
+                ← Back to Grid
+            </a>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="text-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p class="mt-2 text-gray-600">Loading coin details...</p>
+        </div>
+
+        <!-- Coin Details Container -->
+        <div id="coinDetails" class="hidden">
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex items-center mb-4">
+                    <img id="coinLogo" src="" alt="" class="w-16 h-16 mr-4 rounded-full">
+                    <div>
+                        <h2 id="coinName" class="text-3xl font-bold text-gray-800"></h2>
+                        <p id="coinSymbol" class="text-gray-600 uppercase text-lg"></p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="bg-gray-50 p-4 rounded">
+                        <h3 class="font-semibold text-gray-700">Current Price</h3>
+                        <p id="coinPrice" class="text-2xl font-bold text-green-600"></p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded">
+                        <h3 class="font-semibold text-gray-700">Market Cap</h3>
+                        <p id="coinMarketCap" class="text-xl font-bold text-gray-800"></p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded">
+                        <h3 class="font-semibold text-gray-700">24h Change</h3>
+                        <p id="coinChange" class="text-xl font-bold"></p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button id="addToFavoritesBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        Add to Tracker
+                    </button>
+                    <a id="coinGeckoLink" href="#" target="_blank" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+                        View on CoinGecko
+                    </a>
+                </div>
+            </div>
+
+            <!-- Chart Container -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">30-Day Price History</h3>
+                <canvas id="priceChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="text-center py-8 hidden">
+            <p class="text-red-600 mb-2">Error loading coin details</p>
+            <a href="index.html" class="text-blue-600 hover:text-blue-800">← Back to Grid</a>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script type="module">
+        import { getCoin, getMarketChart } from '../src/api.js';
+        import { renderCoinDetails, showNotification } from '../src/ui.js';
+        import { addToFavorites } from '../src/tracker.js';
+
+        // Page-specific logic will go here
+        console.log('Coin details page loaded');
+    </script>
+</body>
+</html>
