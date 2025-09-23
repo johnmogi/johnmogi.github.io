@@ -123,11 +123,26 @@
         async function getMarketChart(coinId, days = 30) {
             const url = `${COINGECKO_API_BASE}/coins/${coinId}/market_chart?vs_currency=usd&days=${days}&interval=daily`;
             try {
+                console.log('Fetching chart data for:', coinId);
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return await response.json();
+                const data = await response.json();
+
+                console.log('Chart data received for', coinId, ':', data);
+
+                // Validate the response structure
+                if (!data || typeof data !== 'object') {
+                    throw new Error('Invalid response format');
+                }
+
+                if (!data.prices || !Array.isArray(data.prices)) {
+                    console.warn('No prices data found for', coinId, data);
+                    throw new Error('No price data available');
+                }
+
+                return data;
             } catch (error) {
-                console.error('Error fetching market chart:', error);
+                console.error('Error fetching market chart for', coinId, ':', error);
                 throw error;
             }
         }
@@ -218,21 +233,48 @@
 
             try {
                 const dummyMode = document.getElementById('dummyModeToggle').checked;
-                const coinDataPromises = favorites.map(coinId => 
-                    dummyMode 
-                        ? Promise.resolve({ id: coinId, data: generateDummyData(coinId, 30) })
-                        : getMarketChart(coinId, 30).then(data => ({ id: coinId, data }))
-                );
+                const coinDataPromises = favorites.map(async (coinId) => {
+                    try {
+                        if (dummyMode) {
+                            return { id: coinId, data: generateDummyData(coinId, 30) };
+                        } else {
+                            const data = await getMarketChart(coinId, 30);
+                            return { id: coinId, data };
+                        }
+                    } catch (error) {
+                        console.error(`Failed to load data for ${coinId}:`, error);
+                        // Return null for failed coins
+                        return { id: coinId, data: null, error: error.message };
+                    }
+                });
 
-                const coinsData = await Promise.all(coinDataPromises);
+                const results = await Promise.all(coinDataPromises);
+                const coinsData = results.filter(result => result.data !== null);
+
+                if (coinsData.length === 0) {
+                    throw new Error('No coin data could be loaded');
+                }
+
+                // Show warnings for failed coins
+                const failedCoins = results.filter(result => result.data === null);
+                if (failedCoins.length > 0) {
+                    showToast(`Failed to load data for ${failedCoins.length} coin(s)`, 'warning');
+                    console.warn('Failed coins:', failedCoins.map(c => c.id));
+                }
 
                 // Update favorites pills
-                favoritesContainerEl.innerHTML = favorites.map(coinId => `
-                    <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center">
-                        <span class="capitalize">${coinId}</span>
-                        <button onclick="removeFromFavorites('${coinId}')" class="ml-2 text-blue-600 hover:text-blue-800">×</button>
-                    </div>
-                `).join('');
+                favoritesContainerEl.innerHTML = favorites.map(coinId => {
+                    const failed = failedCoins.some(f => f.id === coinId);
+                    const errorClass = failed ? 'opacity-50' : '';
+                    const title = failed ? `title="Failed to load data"` : '';
+
+                    return `
+                        <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center ${errorClass}" ${title}>
+                            <span class="capitalize">${coinId}</span>
+                            <button onclick="removeFromFavorites('${coinId}')" class="ml-2 text-blue-600 hover:text-blue-800">×</button>
+                        </div>
+                    `;
+                }).join('');
 
                 // Create or update chart
                 updateChart(coinsData);
@@ -261,7 +303,17 @@
                 'rgba(245, 158, 11, 1)'   // yellow
             ];
 
-            const datasets = coinsData.map((coin, index) => ({
+            // Filter out coins with invalid data
+            const validCoinsData = coinsData.filter(coin => {
+                return coin && coin.data && coin.data.prices && Array.isArray(coin.data.prices) && coin.data.prices.length > 0;
+            });
+
+            if (validCoinsData.length === 0) {
+                showToast('No valid chart data available', 'warning');
+                return;
+            }
+
+            const datasets = validCoinsData.map((coin, index) => ({
                 label: coin.id.toUpperCase(),
                 data: coin.data.prices.map(([timestamp, price]) => ({
                     x: new Date(timestamp),
