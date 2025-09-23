@@ -15,6 +15,63 @@ class DungeonGame {
         this.showToast('Welcome to Dungeon Master! 🐉', 'success');
     }
 
+    showToast(message, type = 'info') {
+        const toastContainer = document.getElementById('toastContainer');
+        if (!toastContainer) return;
+
+        const toast = document.createElement('div');
+        const colors = {
+            success: 'bg-green-500',
+            error: 'bg-red-500',
+            warning: 'bg-yellow-500',
+            info: 'bg-blue-500'
+        };
+
+        toast.className = `${colors[type]} text-white px-4 py-2 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300`;
+        toast.innerHTML = `
+            <div class="flex items-center">
+                <span>${message}</span>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-3 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+
+        toastContainer.appendChild(toast);
+
+        // Animate in
+        setTimeout(() => {
+            toast.style.transform = 'translateX(0)';
+        }, 100);
+
+        // Auto remove
+        setTimeout(() => {
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    addStoryEntry(message, type = 'info') {
+        const storyContent = document.getElementById('storyContent');
+        if (!storyContent) return;
+
+        const entry = document.createElement('div');
+        entry.className = `story-entry ${type}`;
+        entry.innerHTML = `<small>${new Date().toLocaleTimeString()}</small><br>${message}`;
+
+        storyContent.appendChild(entry);
+        storyContent.scrollTop = storyContent.scrollHeight;
+    }
+
+    getRandomItem(array) {
+        return array[Math.floor(Math.random() * array.length)];
+    }
+
+    getRandomItems(array, count) {
+        const shuffled = [...array].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count);
+    }
+
     bindEvents() {
         // Dice rolling
         document.querySelectorAll('.diceBtn').forEach(btn => {
@@ -186,18 +243,6 @@ class DungeonGame {
 
         this.showToast('New game started! 🎮', 'success');
         this.addStoryEntry('A new adventure begins...', 'success');
-    }
-
-    addStoryEntry(message, type = 'info') {
-        const storyContent = document.getElementById('storyContent');
-        if (!storyContent) return;
-
-        const entry = document.createElement('div');
-        entry.className = `story-entry ${type}`;
-        entry.innerHTML = `<small>${new Date().toLocaleTimeString()}</small><br>${message}`;
-
-        storyContent.appendChild(entry);
-        storyContent.scrollTop = storyContent.scrollHeight;
     }
 
     updateCharacterSheet() {
