@@ -55,7 +55,6 @@ class DungeonGame {
         document.getElementById('saveGameBtn')?.addEventListener('click', () => this.saveGame());
         document.getElementById('loadGameBtn')?.addEventListener('click', () => this.loadGame());
     }
-    }
 
     setupMobileMenu() {
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -71,6 +70,11 @@ class DungeonGame {
 
         // Dark mode toggle
         document.getElementById('darkModeToggle')?.addEventListener('click', () => this.toggleDarkMode());
+
+        // Mobile save/load/reset buttons
+        document.getElementById('mobileSaveGameBtn')?.addEventListener('click', () => this.saveGame());
+        document.getElementById('mobileLoadGameBtn')?.addEventListener('click', () => this.loadGame());
+        document.getElementById('mobileResetGameBtn')?.addEventListener('click', () => this.resetGame());
     }
 
     toggleDarkMode() {
@@ -79,522 +83,124 @@ class DungeonGame {
         icon.className = document.documentElement.classList.contains('dark') ? 'fas fa-sun' : 'fas fa-moon';
     }
 
-    rollDice(sides) {
-        const result = Math.floor(Math.random() * sides) + 1;
-        const diceResults = document.getElementById('diceResults');
-        diceResults.innerHTML = `<span class="text-2xl font-bold text-primary-600">D${sides}: ${result}</span>`;
-
-        // Animate dice roll
-        diceResults.style.transform = 'scale(1.1)';
-        setTimeout(() => {
-            diceResults.style.transform = 'scale(1)';
-        }, 200);
-
-        this.showToast(`Rolled D${sides}: ${result}`, 'info');
-        this.addStoryEntry(`Rolled D${sides} and got ${result}`, 'info');
-        return result;
-    }
-
-    generateHero() {
-        const hero = {
-            name: this.getRandomItem(this.gameData.heroNames),
-            race: this.getRandomItem(this.gameData.races),
-            characterClass: this.getRandomItem(this.gameData.classes),
-            level: Math.floor(Math.random() * 10) + 1,
-            age: Math.floor(Math.random() * 50) + 18,
-            hp: Math.floor(Math.random() * 50) + 20,
-            stats: {
-                str: Math.floor(Math.random() * 10) + 10,
-                dex: Math.floor(Math.random() * 10) + 10,
-                int: Math.floor(Math.random() * 10) + 10,
-                wis: Math.floor(Math.random() * 10) + 10,
-                con: Math.floor(Math.random() * 10) + 10,
-                cha: Math.floor(Math.random() * 10) + 10
-            }
-        };
-
-        this.hero = hero;
-        this.displayHero(hero);
-        this.updateCharacterSheet();
-        this.showToast(`Generated ${hero.name} the ${hero.race} ${hero.characterClass}!`, 'success');
-        this.addStoryEntry(`Created hero: ${hero.name} (${hero.race} ${hero.characterClass})`, 'success');
-    }
-
-    displayHero(hero) {
-        const heroCard = document.getElementById('heroCard');
-        const heroName = document.getElementById('heroName');
-        const heroRace = document.getElementById('heroRace');
-        const heroClass = document.getElementById('heroClass');
-        const heroLevel = document.getElementById('heroLevel');
-        const heroAge = document.getElementById('heroAge');
-        const heroHP = document.getElementById('heroHP');
-
-        // Stats
-        const heroSTR = document.getElementById('heroSTR');
-        const heroDEX = document.getElementById('heroDEX');
-        const heroINT = document.getElementById('heroINT');
-        const heroSTRBar = document.getElementById('heroSTRBar');
-        const heroDEXBar = document.getElementById('heroDEXBar');
-        const heroINTBar = document.getElementById('heroINTBar');
-
-        if (heroCard && heroName && heroRace && heroClass && heroLevel && heroAge && heroHP) {
-            heroName.textContent = hero.name;
-            heroRace.textContent = hero.race;
-            heroClass.textContent = hero.characterClass;
-            heroLevel.textContent = `Level ${hero.level}`;
-            heroAge.textContent = hero.age;
-            heroHP.textContent = hero.hp;
-
-            heroSTR.textContent = hero.stats.str;
-            heroDEX.textContent = hero.stats.dex;
-            heroINT.textContent = hero.stats.int;
-
-            heroSTRBar.style.width = `${(hero.stats.str / 20) * 100}%`;
-            heroDEXBar.style.width = `${(hero.stats.dex / 20) * 100}%`;
-            heroINTBar.style.width = `${(hero.stats.int / 20) * 100}%`;
-
-            heroCard.classList.remove('hidden');
+    openDiceModal() {
+        const modal = document.getElementById('diceModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
     }
 
-    generateMonster() {
-        const monster = {
-            name: this.getRandomItem(this.gameData.monsterNames),
-            type: this.getRandomItem(this.gameData.monsterTypes),
-            size: this.getRandomItem(['Tiny', 'Small', 'Medium', 'Large', 'Huge']),
-            challengeRating: Math.floor(Math.random() * 5) + 1,
-            armorClass: Math.floor(Math.random() * 10) + 10,
-            hitPoints: Math.floor(Math.random() * 100) + 20,
-            abilities: this.getRandomItems(this.gameData.abilities, 3)
-        };
-
-        this.monster = monster;
-        this.displayMonster(monster);
-        this.showToast(`Generated ${monster.name} (${monster.type})!`, 'warning');
-        this.addStoryEntry(`Monster appeared: ${monster.name} (${monster.type})`, 'warning');
-    }
-
-    displayMonster(monster) {
-        const monsterCard = document.getElementById('monsterCard');
-        const monsterName = document.getElementById('monsterName');
-        const monsterType = document.getElementById('monsterType');
-        const monsterSize = document.getElementById('monsterSize');
-        const monsterCR = document.getElementById('monsterCR');
-        const monsterAC = document.getElementById('monsterAC');
-        const monsterHP = document.getElementById('monsterHP');
-        const monsterAbilities = document.getElementById('monsterAbilities');
-
-        if (monsterCard && monsterName && monsterType && monsterSize && monsterCR && monsterAC && monsterHP && monsterAbilities) {
-            monsterName.textContent = monster.name;
-            monsterType.textContent = monster.type;
-            monsterSize.textContent = monster.size;
-            monsterCR.textContent = `CR ${monster.challengeRating}`;
-            monsterAC.textContent = monster.armorClass;
-            monsterHP.textContent = monster.hitPoints;
-
-            monsterAbilities.innerHTML = monster.abilities.map(ability =>
-                `<span class="inline-block bg-white bg-opacity-20 px-2 py-1 rounded text-xs mr-1 mb-1">${ability}</span>`
-            ).join('');
-
-            monsterCard.classList.remove('hidden');
-        }
-    }
-
-    generateDungeon() {
+    toggleDungeonDarkMode() {
         const dungeonContainer = document.getElementById('dungeonContainer');
-        const dungeonGrid = document.getElementById('dungeonGrid');
-
-        if (!dungeonContainer || !dungeonGrid) return;
-
-        // Clear previous dungeon
-        dungeonGrid.innerHTML = '';
-
-        // Set grid template columns
-        dungeonGrid.style.gridTemplateColumns = `repeat(${this.dungeonSize}, 1fr)`;
-
-        // Generate rooms
-        const rooms = [];
-        for (let i = 0; i < this.dungeonSize; i++) {
-            for (let j = 0; j < this.dungeonSize; j++) {
-                const room = document.createElement('div');
-                room.className = 'dungeon-room';
-
-                // Randomly place rooms (ensuring connectivity)
-                const isRoom = this.shouldPlaceRoom(i, j, rooms);
-                if (isRoom) {
-                    room.innerHTML = `<i class="fas fa-door-closed"></i>`;
-                    room.classList.add('dungeon-entrance');
-
-                    // Add room types
-                    const roomTypes = ['treasure', 'trap', 'empty'];
-                    const roomType = roomTypes[Math.floor(Math.random() * roomTypes.length)];
-
-                    switch (roomType) {
-                        case 'treasure':
-                            room.innerHTML = `<i class="fas fa-coins text-yellow-400"></i>`;
-                            room.classList.add('bg-yellow-900');
-                            break;
-                        case 'trap':
-                            room.innerHTML = `<i class="fas fa-skull text-red-400"></i>`;
-                            room.classList.add('bg-red-900');
-                            break;
-                    }
-
-                    rooms.push({ x: i, y: j, type: roomType });
+        if (dungeonContainer) {
+            dungeonContainer.classList.toggle('dungeon-dark');
+            const button = document.getElementById('toggleDarkModeBtn');
+            if (button) {
+                const icon = button.querySelector('i');
+                if (dungeonContainer.classList.contains('dungeon-dark')) {
+                    icon.className = 'fas fa-eye mr-1';
+                    button.innerHTML = '<i class=\"fas fa-eye mr-1\"></i>Lighten';
+                    this.addStoryEntry('The dungeon grows darker, hiding its secrets...', 'warning');
                 } else {
-                    room.classList.add('dungeon-path');
+                    icon.className = 'fas fa-eye-slash mr-1';
+                    button.innerHTML = '<i class=\"fas fa-eye-slash mr-1\"></i>Darken';
+                    this.addStoryEntry('The dungeon brightens, revealing its layout...', 'info');
                 }
-
-                dungeonGrid.appendChild(room);
             }
         }
-
-        dungeonContainer.classList.remove('hidden');
-        this.showToast(`Generated ${this.dungeonSize}x${this.dungeonSize} dungeon with ${rooms.length} rooms!`, 'success');
-        this.addStoryEntry(`Explored a ${this.dungeonSize}x${this.dungeonSize} dungeon with ${rooms.length} rooms`, 'success');
     }
 
-    shouldPlaceRoom(x, y, existingRooms) {
-        // Always place entrance at top-left
-        if (x === 0 && y === 0) return true;
+    resetGame() {
+        // Reset all game state
+        this.hero = null;
+        this.monster = null;
+        this.dungeonSize = 5;
+        this.roomCount = 6;
 
-        // Ensure minimum connectivity
-        const neighbors = existingRooms.filter(room =>
-            (Math.abs(room.x - x) === 1 && room.y === y) ||
-            (Math.abs(room.y - y) === 1 && room.x === x)
-        );
+        // Clear displays
+        document.getElementById('dungeonContainer').innerHTML = '<div class=\"dungeon-grid\" id=\"dungeonGrid\"></div>';
+        document.getElementById('dungeonContainer').classList.remove('dungeon-dark');
+        document.getElementById('storyContent').innerHTML = '<div class=\"text-center text-gray-500 dark:text-gray-400 py-4\"><i class=\"fas fa-book-open text-2xl mb-2\"></i><p>Your adventure begins...</p></div>';
+        document.getElementById('roomInfo').classList.add('hidden');
 
-        return neighbors.length > 0 && Math.random() < 0.6;
+        // Reset character sheet
+        this.updateCharacterSheet();
+
+        this.showToast('New game started! 🎮', 'success');
+        this.addStoryEntry('A new adventure begins...', 'success');
     }
 
-    startCombat() {
-        if (!this.hero || !this.monster) {
-            this.showToast('Generate a hero and monster first!', 'error');
-            return;
-        }
-
-        const combatLog = document.getElementById('combatLog');
-        const combatHero = document.getElementById('combatHero');
-        const combatMonster = document.getElementById('combatMonster');
-
-        if (!combatLog || !combatHero || !combatMonster) return;
-
-        combatHero.classList.remove('hidden');
-        combatMonster.classList.remove('hidden');
-
-        let heroHP = this.hero.hp;
-        let monsterHP = this.monster.hitPoints;
-
-        combatLog.innerHTML = '<div class="text-center font-bold mb-2">⚔️ COMBAT BEGINS! ⚔️</div>';
-
-        const combatInterval = setInterval(() => {
-            // Hero attacks
-            const heroDamage = Math.floor(Math.random() * 10) + this.hero.stats.str - 10;
-            monsterHP -= heroDamage;
-            this.logCombat(`💙 ${this.hero.name} hits for ${heroDamage} damage!`);
-
-            if (monsterHP <= 0) {
-                this.logCombat(`🎉 ${this.hero.name} defeats ${this.monster.name}!`);
-                clearInterval(combatInterval);
-                this.showToast(`${this.hero.name} wins! 🎉`, 'success');
-                return;
-            }
-
-            // Monster attacks
-            const monsterDamage = Math.floor(Math.random() * 8) + 5;
-            heroHP -= monsterDamage;
-            this.logCombat(`❤️ ${this.monster.name} hits for ${monsterDamage} damage!`);
-
-            if (heroHP <= 0) {
-                this.logCombat(`💀 ${this.monster.name} defeats ${this.hero.name}!`);
-                clearInterval(combatInterval);
-                this.showToast(`${this.monster.name} wins! 💀`, 'error');
-                return;
-            }
-        }, 1000);
-    }
-
-    logCombat(message) {
-        const combatLog = document.getElementById('combatLog');
-        if (combatLog) {
-            const logEntry = document.createElement('div');
-            logEntry.className = 'text-sm';
-            logEntry.textContent = message;
-            combatLog.appendChild(logEntry);
-            combatLog.scrollTop = combatLog.scrollHeight;
-        }
-    }
-
-    saveGame() {
-        const gameState = {
-            hero: this.hero,
-            monster: this.monster,
-            dungeonSize: this.dungeonSize,
-            roomCount: this.roomCount,
-            timestamp: new Date().toISOString()
-        };
-
-        localStorage.setItem('dungeonGameSave', JSON.stringify(gameState));
-        this.showToast('Game saved successfully! 💾', 'success');
-    }
-
-    loadGame() {
-        const savedGame = localStorage.getItem('dungeonGameSave');
-        if (!savedGame) {
-            this.showToast('No saved game found!', 'error');
-            return;
-        }
-
-        try {
-            const gameState = JSON.parse(savedGame);
-
-            if (gameState.hero) {
-                this.hero = gameState.hero;
-                this.displayHero(this.hero);
-            }
-
-            if (gameState.monster) {
-                this.monster = gameState.monster;
-                this.displayMonster(this.monster);
-            }
-
-            this.dungeonSize = gameState.dungeonSize || 5;
-            this.roomCount = gameState.roomCount || 6;
-
-            document.getElementById('dungeonSize').value = this.dungeonSize;
-            document.getElementById('roomCount').value = this.roomCount;
-            document.getElementById('roomCountDisplay').textContent = this.roomCount;
-
-            this.showToast('Game loaded successfully! 🎮', 'success');
-        } catch (error) {
-            this.showToast('Error loading game!', 'error');
-        }
-    }
-
-    showToast(message, type = 'info') {
-        const toastContainer = document.getElementById('toastContainer');
-        if (!toastContainer) return;
-
-        const toast = document.createElement('div');
-        const colors = {
-            success: 'bg-green-500',
-            error: 'bg-red-500',
-            warning: 'bg-yellow-500',
-            info: 'bg-blue-500'
-        };
-
-        toast.className = `${colors[type]} text-white px-4 py-2 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300`;
-        toast.innerHTML = `
-            <div class="flex items-center">
-                <span>${message}</span>
-                <button onclick="this.parentElement.parentElement.remove()" class="ml-3 text-white hover:text-gray-200">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        `;
-
-        toastContainer.appendChild(toast);
-
-        // Animate in
-        setTimeout(() => {
-            toast.style.transform = 'translateX(0)';
-        }, 100);
-
-        // Auto remove
-        setTimeout(() => {
-            toast.style.transform = 'translateX(100%)';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    }
-
-    getRandomItem(array) {
-        return array[Math.floor(Math.random() * array.length)];
-    }
-
-    generateStory() {
-        const storyCard = document.getElementById('storyCard');
+    addStoryEntry(message, type = 'info') {
         const storyContent = document.getElementById('storyContent');
-        
-        if (!storyCard || !storyContent) return;
-        
-        const story = this.getRandomItem(this.gameData.stories);
-        storyContent.textContent = story;
-        storyCard.classList.remove('hidden');
-        
-        this.showToast('Story generated! 📖', 'success');
-        this.addStoryEntry(`Read an ancient story: ${story.substring(0, 50)}...`, 'info');
+        if (!storyContent) return;
+
+        const entry = document.createElement('div');
+        entry.className = `story-entry ${type}`;
+        entry.innerHTML = `<small>${new Date().toLocaleTimeString()}</small><br>${message}`;
+
+        storyContent.appendChild(entry);
+        storyContent.scrollTop = storyContent.scrollHeight;
     }
 
-    exploreRoom() {
-        const roomResult = document.getElementById('roomResult');
-        const roomContent = document.getElementById('roomContent');
-        const currentRoom = document.getElementById('currentRoom');
-        
-        if (!roomResult || !roomContent || !currentRoom) return;
-        
-        // Random room content types
-        const roomTypes = ['monster', 'item', 'trap', 'story', 'merchant', 'rest'];
-        const roomType = this.getRandomItem(roomTypes);
-        
-        let content = '';
-        let icon = '';
-        
-        switch(roomType) {
-            case 'monster':
-                const monster = this.generateMonsterForRoom();
-                content = `<div class="text-red-600">
-                    <i class="fas fa-dragon text-2xl mb-2"></i>
-                    <p><strong>Monster Encounter!</strong></p>
-                    <p>${monster.name} (${monster.type})</p>
-                    <p>HP: ${monster.hitPoints} | AC: ${monster.armorClass}</p>
-                    <button onclick="window.dungeonGame.startCombatWithMonster()" class="bg-red-500 text-white px-3 py-1 rounded text-sm mt-2">Fight!</button>
-                </div>`;
-                icon = 'fas fa-skull text-red-500';
-                break;
-            case 'item':
-                const item = this.getRandomItem(this.gameData.items);
-                content = `<div class="text-yellow-600">
-                    <i class="fas fa-gem text-2xl mb-2"></i>
-                    <p><strong>Found Item!</strong></p>
-                    <p>${item.name}</p>
-                    <p class="text-sm">${item.description}</p>
-                    <button onclick="window.dungeonGame.addItemToInventory('${item.name}')" class="bg-yellow-500 text-white px-3 py-1 rounded text-sm mt-2">Take Item</button>
-                </div>`;
-                icon = 'fas fa-coins text-yellow-500';
-                break;
-            case 'trap':
-                const trap = this.getRandomItem(this.gameData.traps);
-                content = `<div class="text-orange-600">
-                    <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
-                    <p><strong>Trap Triggered!</strong></p>
-                    <p>${trap}</p>
-                    <p class="text-sm text-red-600">You take damage!</p>
-                </div>`;
-                icon = 'fas fa-fire text-orange-500';
-                break;
-            case 'story':
-                const story = this.getRandomItem(this.gameData.stories);
-                content = `<div class="text-purple-600">
-                    <i class="fas fa-book text-2xl mb-2"></i>
-                    <p><strong>Ancient Story</strong></p>
-                    <p class="text-sm italic">${story}</p>
-                </div>`;
-                icon = 'fas fa-scroll text-purple-500';
-                break;
-            case 'merchant':
-                const merchant = this.getRandomItem(this.gameData.merchants);
-                content = `<div class="text-blue-600">
-                    <i class="fas fa-store text-2xl mb-2"></i>
-                    <p><strong>${merchant}</strong></p>
-                    <p class="text-sm">Offers rare goods and services</p>
-                    <button onclick="window.dungeonGame.openMerchant()" class="bg-blue-500 text-white px-3 py-1 rounded text-sm mt-2">Browse Goods</button>
-                </div>`;
-                icon = 'fas fa-shopping-cart text-blue-500';
-                break;
-            case 'rest':
-                const restArea = this.getRandomItem(this.gameData.restAreas);
-                content = `<div class="text-green-600">
-                    <i class="fas fa-bed text-2xl mb-2"></i>
-                    <p><strong>${restArea}</strong></p>
-                    <p class="text-sm">Restore your health and energy</p>
-                    <button onclick="window.dungeonGame.restInArea()" class="bg-green-500 text-white px-3 py-1 rounded text-sm mt-2">Rest Here</button>
-                </div>`;
-                icon = 'fas fa-heart text-green-500';
-                break;
+    updateCharacterSheet() {
+        // Update character sheet with current hero data
+        if (this.hero) {
+            document.getElementById('charName').textContent = this.hero.name;
+            document.getElementById('charRaceClass').textContent = `${this.hero.race} ${this.hero.characterClass}`;
+            document.getElementById('charLevel').textContent = this.hero.level;
+            document.getElementById('charXP').textContent = `0/${this.hero.level * 100}`;
+            document.getElementById('charHP').textContent = `${this.hero.hp}/${this.hero.hp}`;
+            document.getElementById('charHPBar').style.width = '100%';
+            document.getElementById('charMana').textContent = '50/50';
+            document.getElementById('charManaBar').style.width = '100%';
+            document.getElementById('charSTR').textContent = this.hero.stats.str;
+            document.getElementById('charDEX').textContent = this.hero.stats.dex;
+            document.getElementById('charINT').textContent = this.hero.stats.int;
+            document.getElementById('charWIS').textContent = this.hero.stats.wis;
+            document.getElementById('charWeapon').textContent = 'Sword';
+            document.getElementById('charArmor').textContent = 'Leather';
+            document.getElementById('charGold').textContent = '100';
+        } else {
+            document.getElementById('charName').textContent = 'Adventurer';
+            document.getElementById('charRaceClass').textContent = 'Human Fighter';
+            document.getElementById('charLevel').textContent = '1';
+            document.getElementById('charXP').textContent = '0/100';
+            document.getElementById('charHP').textContent = '100/100';
+            document.getElementById('charHPBar').style.width = '100%';
+            document.getElementById('charMana').textContent = '50/50';
+            document.getElementById('charManaBar').style.width = '100%';
+            document.getElementById('charSTR').textContent = '12';
+            document.getElementById('charDEX').textContent = '14';
+            document.getElementById('charINT').textContent = '10';
+            document.getElementById('charWIS').textContent = '13';
+            document.getElementById('charWeapon').textContent = 'Sword';
+            document.getElementById('charArmor').textContent = 'Leather';
+            document.getElementById('charGold').textContent = '100';
         }
-        
-        roomContent.innerHTML = content;
-        currentRoom.innerHTML = `<i class="${icon} text-3xl mb-2"></i><p>Room explored!</p>`;
-        roomResult.classList.remove('hidden');
-        
-        this.showToast(`Found: ${roomType}!`, 'info');
     }
 
-    generateMonsterForRoom() {
-        return {
-            name: this.getRandomItem(this.gameData.monsterNames),
-            type: this.getRandomItem(this.gameData.monsterTypes),
-            hitPoints: Math.floor(Math.random() * 50) + 20,
-            armorClass: Math.floor(Math.random() * 5) + 12
-        };
-    }
-
-    addItemToInventory(itemName) {
-        this.showToast(`Added ${itemName} to inventory!`, 'success');
-    }
-
-    openMerchant() {
-        this.showToast('Merchant interface coming soon!', 'info');
-    }
-
-    restInArea() {
-        this.showToast('Health restored! 💚', 'success');
-    }
-
-    startCombatWithMonster() {
-        this.showToast('Combat system activated!', 'warning');
+    getRandomItems(array, count) {
+        const shuffled = [...array].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count);
     }
 
     rest() {
         this.showToast('You rest and recover your strength! 💤', 'success');
+        this.addStoryEntry('Rested and recovered strength', 'success');
     }
 
     useItem() {
         this.showToast('Select an item from your inventory', 'info');
+        this.addStoryEntry('Attempted to use an item', 'info');
     }
 
     checkInventory() {
         this.showToast('Inventory: Empty (for now)', 'info');
-    }
-
-    saveGame() {
-        const gameState = {
-            hero: this.hero,
-            monster: this.monster,
-            dungeonSize: this.dungeonSize,
-            roomCount: this.roomCount,
-            timestamp: new Date().toISOString()
-        };
-
-        localStorage.setItem('dungeonGameSave', JSON.stringify(gameState));
-        this.showToast('Game saved successfully! 💾', 'success');
-    }
-
-    loadGame() {
-        const savedGame = localStorage.getItem('dungeonGameSave');
-        if (!savedGame) {
-            this.showToast('No saved game found!', 'error');
-            return;
-        }
-
-        try {
-            const gameState = JSON.parse(savedGame);
-
-            if (gameState.hero) {
-                this.hero = gameState.hero;
-                this.displayHero(this.hero);
-            }
-
-            if (gameState.monster) {
-                this.monster = gameState.monster;
-                this.displayMonster(this.monster);
-            }
-
-            this.dungeonSize = gameState.dungeonSize || 5;
-            this.roomCount = gameState.roomCount || 6;
-
-            document.getElementById('dungeonSize').value = this.dungeonSize;
-            document.getElementById('roomCount').value = this.roomCount;
-            document.getElementById('roomCountDisplay').textContent = this.roomCount;
-
-            this.showToast('Game loaded successfully! 🎮', 'success');
-        } catch (error) {
-            this.showToast('Error loading game!', 'error');
-        }
+        this.addStoryEntry('Checked inventory', 'info');
     }
 
     loadGameData() {
-        return {
             heroNames: [
                 'Aragorn', 'Legolas', 'Gimli', 'Frodo', 'Sam', 'Merry', 'Pippin', 'Gandalf', 'Boromir',
                 'Eowyn', 'Faramir', 'Galadriel', 'Elrond', 'Thorin', 'Balin', 'Dwalin', 'Kili', 'Fili',
