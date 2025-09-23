@@ -1,1 +1,406 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>The Dungeon</title><link rel="stylesheet" href="style.caa90a4d.css"><link rel="stylesheet" href="bootstrap.min.0c4b9f2b.css"></head><body class="container-fluid"> <nav class="bg-light navbar navbar-light"> <div class="container"> <a class="navbar-brand" href="/"> <img src="Dungeon.2ee237cd.jpg" alt="dungeon game" width="200"> Dungeon Generator</a> </div> </nav> <section class="container" id="main-board"> <div class="row"> <div class="card col-4"> <div class="justify-content-md-center row"> <button class="btn btn-outline-secondary col-4" id="diceBut6">6</button> <button class="btn btn-outline-secondary col-4" id="diceBut10">10</button> <button class="btn btn-outline-secondary col-4" id="diceBut20">20</button> </div> <div class="row"> <button class="btn btn-outline-secondary col-4" id="diceBut4">4</button> <button class="btn btn-outline-secondary col-4" id="diceBut12">12</button> <button class="btn btn-outline-secondary col-4" id="diceBut100">100</button> </div> <br> <br> <h3>Dice Results: </h3> <div id="dice_results" class="card"></div> </div> <div class="card col-4"> <button class="btn btn-outline-secondary" id="characterBut"> generate Hero </button> <br> <div id="character-board" class="card"></div> </div> <div class="card col-4"> <button class="btn btn-outline-secondary" id="monsterBut"> generate monster </button> <br>  <div id="monster-board" class="card"></div> </div> </div> </section> <section class="container"> <label for="numberOfSquares">Draw A New Board : </label> <input type="text" class="form-control" id="numberOfSquares" aria-describedby="drawBoard" placeholder="Enter the number of desired squares : (9)"> <div id="boardMaker" class="container row"></div> <div id="messageBoard" class="alert alert-dark" role="alert"></div> </section> <footer> <script src="functions.8e9d03c9.js"></script> <script src="board.638dd258.js"></script> </footer> </body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dungeon Master - RPG Game Generator</title>
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Dungeon Master - RPG Game Generator" />
+    <meta property="og:description" content="A comprehensive D&D-style RPG character, monster, and dungeon generator" />
+    <meta property="og:image" content="/GAMES/Dungeon/assets/og-image.svg" />
+    <meta property="og:url" content="https://johnmogi.github.io/GAMES/Dungeon/" />
+    <meta property="og:type" content="website" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Dungeon Master - RPG Game Generator" />
+    <meta name="twitter:description" content="A comprehensive D&D-style RPG character, monster, and dungeon generator" />
+    <meta name="twitter:image" content="/GAMES/Dungeon/assets/og-image.svg" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/GAMES/Dungeon/assets/logo.svg" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        dark: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom styles -->
+    <style>
+        .dice-roll {
+            transition: all 0.3s ease;
+        }
+        .dice-roll:hover {
+            transform: scale(1.05);
+        }
+        .character-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .monster-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .dungeon-grid {
+            display: grid;
+            gap: 2px;
+            border: 2px solid #374151;
+            background: #374151;
+        }
+        .dungeon-room {
+            background: #1f2937;
+            border: 1px solid #4b5563;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d1d5db;
+            font-size: 0.875rem;
+        }
+        .dungeon-path {
+            background: #374151;
+        }
+        .dungeon-entrance {
+            background: #059669;
+            color: white;
+            font-weight: bold;
+        }
+        .stat-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+        .stat-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-primary-800 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <img src="/GAMES/Dungeon/assets/logo.svg" alt="Logo" class="w-10 h-10 mr-3">
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Dungeon Master</h1>
+                        <p class="text-xs text-primary-200">RPG Game Generator</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <button id="darkModeToggle" class="text-white hover:text-yellow-300 transition-colors duration-200">
+                        <i class="fas fa-moon"></i>
+                        <span class="ml-2">Dark Mode</span>
+                    </button>
+                    <button id="saveGameBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors duration-200">
+                        <i class="fas fa-save mr-2"></i>Save Game
+                    </button>
+                    <button id="loadGameBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200">
+                        <i class="fas fa-folder-open mr-2"></i>Load Game
+                    </button>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobileMenuBtn" class="text-white hover:text-yellow-300 transition-colors duration-200">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="md:hidden hidden border-t border-primary-700">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <button id="mobileDarkModeToggle" class="block w-full text-left text-white hover:text-yellow-300 px-3 py-2 rounded-md transition-colors duration-200">
+                        <i class="fas fa-moon mr-2"></i>Toggle Dark Mode
+                    </button>
+                    <button id="mobileSaveGameBtn" class="block w-full text-left bg-green-600 text-white px-3 py-2 rounded-md font-medium hover:bg-green-700 transition-colors duration-200">
+                        <i class="fas fa-save mr-2"></i>Save Game
+                    </button>
+                    <button id="mobileLoadGameBtn" class="block w-full text-left bg-blue-600 text-white px-3 py-2 rounded-md font-medium hover:bg-blue-700 transition-colors duration-200">
+                        <i class="fas fa-folder-open mr-2"></i>Load Game
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                <i class="fas fa-dragon text-primary-600 mr-3"></i>
+                Dungeon Master
+            </h1>
+            <p class="text-lg text-gray-600 dark:text-gray-300">
+                Create epic adventures with our comprehensive D&D-style RPG generator
+            </p>
+        </div>
+
+        <!-- Dice Roller Section -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                <i class="fas fa-dice-d20 text-primary-600 mr-2"></i>
+                Dice Roller
+            </h2>
+            <div class="grid grid-cols-3 md:grid-cols-6 gap-3 mb-4">
+                <button class="diceBtn bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-bold dice-roll" data-sides="4">
+                    <i class="fas fa-dice-d4"></i> D4
+                </button>
+                <button class="diceBtn bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg font-bold dice-roll" data-sides="6">
+                    <i class="fas fa-dice-d6"></i> D6
+                </button>
+                <button class="diceBtn bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded-lg font-bold dice-roll" data-sides="8">
+                    <i class="fas fa-dice-d8"></i> D8
+                </button>
+                <button class="diceBtn bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-lg font-bold dice-roll" data-sides="10">
+                    <i class="fas fa-dice-d10"></i> D10
+                </button>
+                <button class="diceBtn bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-lg font-bold dice-roll" data-sides="12">
+                    <i class="fas fa-dice-d12"></i> D12
+                </button>
+                <button class="diceBtn bg-purple-500 hover:bg-purple-600 text-white px-4 py-3 rounded-lg font-bold dice-roll" data-sides="20">
+                    <i class="fas fa-dice-d20"></i> D20
+                </button>
+            </div>
+            <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
+                <h3 class="font-semibold mb-2">Results:</h3>
+                <div id="diceResults" class="text-lg font-mono text-center"></div>
+            </div>
+        </div>
+
+        <!-- Character and Monster Generators -->
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+            <!-- Character Generator -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                    <i class="fas fa-user text-primary-600 mr-2"></i>
+                    Hero Generator
+                </h2>
+                <button id="generateHeroBtn" class="w-full bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold mb-4 transition-colors duration-200">
+                    <i class="fas fa-magic mr-2"></i>Generate Hero
+                </button>
+                <div id="heroCard" class="hidden bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 id="heroName" class="text-xl font-bold"></h3>
+                        <span id="heroLevel" class="bg-white bg-opacity-20 px-2 py-1 rounded text-sm"></span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                            <strong>Race:</strong> <span id="heroRace"></span>
+                        </div>
+                        <div>
+                            <strong>Class:</strong> <span id="heroClass"></span>
+                        </div>
+                        <div>
+                            <strong>Age:</strong> <span id="heroAge"></span>
+                        </div>
+                        <div>
+                            <strong>HP:</strong> <span id="heroHP"></span>
+                        </div>
+                    </div>
+                    <div class="mt-3 space-y-2">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>STR</span>
+                                <span id="heroSTR"></span>
+                            </div>
+                            <div class="stat-bar">
+                                <div id="heroSTRBar" class="stat-fill bg-red-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>DEX</span>
+                                <span id="heroDEX"></span>
+                            </div>
+                            <div class="stat-bar">
+                                <div id="heroDEXBar" class="stat-fill bg-green-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>INT</span>
+                                <span id="heroINT"></span>
+                            </div>
+                            <div class="stat-bar">
+                                <div id="heroINTBar" class="stat-fill bg-blue-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monster Generator -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                    <i class="fas fa-skull text-red-600 mr-2"></i>
+                    Monster Generator
+                </h2>
+                <button id="generateMonsterBtn" class="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold mb-4 transition-colors duration-200">
+                    <i class="fas fa-fire mr-2"></i>Generate Monster
+                </button>
+                <div id="monsterCard" class="hidden bg-gradient-to-br from-red-500 to-pink-600 text-white rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 id="monsterName" class="text-xl font-bold"></h3>
+                        <span id="monsterCR" class="bg-white bg-opacity-20 px-2 py-1 rounded text-sm">CR 1</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                            <strong>Type:</strong> <span id="monsterType"></span>
+                        </div>
+                        <div>
+                            <strong>Size:</strong> <span id="monsterSize"></span>
+                        </div>
+                        <div>
+                            <strong>AC:</strong> <span id="monsterAC"></span>
+                        </div>
+                        <div>
+                            <strong>HP:</strong> <span id="monsterHP"></span>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <strong>Abilities:</strong>
+                        <div id="monsterAbilities" class="text-sm mt-1"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dungeon Generator -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                <i class="fas fa-dungeon text-gray-600 mr-2"></i>
+                Dungeon Generator
+            </h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Grid Size:</label>
+                    <select id="dungeonSize" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                        <option value="3">3x3 (Small)</option>
+                        <option value="4">4x4 (Medium)</option>
+                        <option value="5" selected>5x5 (Large)</option>
+                        <option value="6">6x6 (Epic)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Room Count:</label>
+                    <input type="range" id="roomCount" min="3" max="12" value="6" class="w-full">
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        Rooms: <span id="roomCountDisplay">6</span>
+                    </div>
+                </div>
+                <div class="flex items-end">
+                    <button id="generateDungeonBtn" class="w-full bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200">
+                        <i class="fas fa-map mr-2"></i>Generate Dungeon
+                    </button>
+                </div>
+            </div>
+            <div id="dungeonContainer" class="mt-6 hidden">
+                <div class="dungeon-grid" id="dungeonGrid"></div>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <span class="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-sm">
+                        <i class="fas fa-door-open"></i> Entrance
+                    </span>
+                    <span class="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded text-sm">
+                        <i class="fas fa-square"></i> Room
+                    </span>
+                    <span class="px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded text-sm">
+                        <i class="fas fa-coins"></i> Treasure
+                    </span>
+                    <span class="px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded text-sm">
+                        <i class="fas fa-skull"></i> Trap
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Combat Arena -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                <i class="fas fa-swords text-red-600 mr-2"></i>
+                Combat Arena
+            </h2>
+            <div class="grid md:grid-cols-2 gap-6 mb-4">
+                <div id="combatHero" class="hidden bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+                    <h3 class="font-bold text-blue-800 dark:text-blue-200">Hero in Combat</h3>
+                    <div id="combatHeroStats"></div>
+                </div>
+                <div id="combatMonster" class="hidden bg-red-50 dark:bg-red-900 p-4 rounded-lg">
+                    <h3 class="font-bold text-red-800 dark:text-red-200">Monster in Combat</h3>
+                    <div id="combatMonsterStats"></div>
+                </div>
+            </div>
+            <div class="text-center">
+                <button id="startCombatBtn" class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-200">
+                    <i class="fas fa-fist-raised mr-2"></i>Start Combat
+                </button>
+                <div id="combatLog" class="mt-4 text-sm text-gray-600 dark:text-gray-400 max-h-32 overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 dark:bg-gray-900 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <p class="text-gray-400">
+                    © <span id="currentYear"></span>
+                    <a href="https://johnmogi.com" target="_blank" class="text-primary-400 hover:text-primary-300 transition-colors duration-200 ml-1">johnmogi.com</a>
+                </p>
+                <p class="text-gray-500 text-sm mt-2">
+                    Built with ❤️ using modern web technologies
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div class="fixed top-4 right-4 z-50 space-y-2" id="toastContainer"></div>
+
+    <!-- JavaScript -->
+    <script src="assets/dungeon-game.js"></script>
+
+    <!-- Set current year -->
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
