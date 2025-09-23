@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Syntax Test</title>
+</head>
+<body>
+    <h1>JavaScript Syntax Test</h1>
+    <div id="result"></div>
+    <script>
+        try {
+            // Load the dungeon game file
+            const script = document.createElement('script');
+            script.src = 'assets/dungeon-game.js';
+            script.onload = function() {
+                document.getElementById('result').innerHTML = '<p style="color: green;">✅ JavaScript loaded successfully!</p>';
+                // Try to create the game instance
+                if (typeof DungeonGame !== 'undefined') {
+                    window.testGame = new DungeonGame();
+                    document.getElementById('result').innerHTML += '<p style="color: green;">✅ DungeonGame class instantiated!</p>';
+                } else {
+                    document.getElementById('result').innerHTML += '<p style="color: red;">❌ DungeonGame class not found</p>';
+                }
+            };
+            script.onerror = function() {
+                document.getElementById('result').innerHTML = '<p style="color: red;">❌ Failed to load JavaScript file</p>';
+            };
+            document.head.appendChild(script);
+        } catch(e) {
+            document.getElementById('result').innerHTML = '<p style="color: red;">❌ Error: ' + e.message + '</p>';
+        }
+    </script>
+</body>
+</html>

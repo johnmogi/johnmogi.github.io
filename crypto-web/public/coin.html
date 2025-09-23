@@ -134,7 +134,30 @@
             try {
                 const response = await fetch(`${COINGECKO_API_BASE}/coins/${coinId}`);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return await response.json();
+                const data = await response.json();
+
+                console.log('Coin data received for', coinId, ':', data);
+
+                // Handle different response formats
+                if (data && data.status && data.status.error_code) {
+                    throw new Error(`API Error ${data.status.error_code}: ${data.status.error_message || 'Unknown error'}`);
+                }
+
+                // If it's an object with status, it might be an error response
+                if (data && typeof data === 'object' && data.status && !Array.isArray(data)) {
+                    throw new Error(`API returned error status: ${JSON.stringify(data.status)}`);
+                }
+
+                // Validate the response structure
+                if (!data || typeof data !== 'object') {
+                    throw new Error('Invalid response format');
+                }
+
+                if (!data.market_data) {
+                    throw new Error('No market data available');
+                }
+
+                return data;
             } catch (error) {
                 console.error('Error fetching coin:', error);
                 throw error;
@@ -147,7 +170,30 @@
                     `${COINGECKO_API_BASE}/coins/${coinId}/market_chart?vs_currency=usd&days=${days}&interval=daily`
                 );
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return await response.json();
+                const data = await response.json();
+
+                console.log('Chart data received for', coinId, ':', data);
+
+                // Handle different response formats
+                if (data && data.status && data.status.error_code) {
+                    throw new Error(`API Error ${data.status.error_code}: ${data.status.error_message || 'Unknown error'}`);
+                }
+
+                // If it's an object with status, it might be an error response
+                if (data && typeof data === 'object' && data.status && !Array.isArray(data)) {
+                    throw new Error(`API returned error status: ${JSON.stringify(data.status)}`);
+                }
+
+                // Validate the response structure
+                if (!data || typeof data !== 'object') {
+                    throw new Error('Invalid response format');
+                }
+
+                if (!data.prices || !Array.isArray(data.prices)) {
+                    throw new Error('No price data available');
+                }
+
+                return data;
             } catch (error) {
                 console.error('Error fetching market chart:', error);
                 throw error;

@@ -53,14 +53,88 @@
     <!-- JavaScript -->
     <script>
         // API functions
-        const COINGECKO_API_BASE = 'https://api.codetabs.com/v1/proxy?quest=https://api.coingecko.com/api/v3';
+        // Fallback sample data when API is unavailable
+        function getSampleCoinsData() {
+            return [
+                {
+                    id: 'bitcoin',
+                    symbol: 'btc',
+                    name: 'Bitcoin',
+                    image: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
+                    current_price: 43250.75,
+                    market_cap: 847500000000,
+                    price_change_percentage_24h: 2.45
+                },
+                {
+                    id: 'ethereum',
+                    symbol: 'eth',
+                    name: 'Ethereum',
+                    image: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
+                    current_price: 2650.32,
+                    market_cap: 318900000000,
+                    price_change_percentage_24h: -1.23
+                },
+                {
+                    id: 'tether',
+                    symbol: 'usdt',
+                    name: 'Tether',
+                    image: 'https://assets.coingecko.com/coins/images/325/large/Tether.png',
+                    current_price: 1.00,
+                    market_cap: 91500000000,
+                    price_change_percentage_24h: 0.01
+                },
+                {
+                    id: 'solana',
+                    symbol: 'sol',
+                    name: 'Solana',
+                    image: 'https://assets.coingecko.com/coins/images/4128/large/solana.png',
+                    current_price: 98.45,
+                    market_cap: 45200000000,
+                    price_change_percentage_24h: 5.67
+                },
+                {
+                    id: 'mantle',
+                    symbol: 'mnt',
+                    name: 'Mantle',
+                    image: 'https://assets.coingecko.com/coins/images/30980/large/token-logo.png',
+                    current_price: 0.85,
+                    market_cap: 2750000000,
+                    price_change_percentage_24h: 12.34
+                }
+            ];
+        }
 
         async function listMarkets() {
             const url = `${COINGECKO_API_BASE}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h`;
             try {
+                console.log('Fetching markets from:', url);
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
+
+                console.log('Raw API response:', data);
+
+                // Handle different response formats
+                if (data && data.status && data.status.error_code) {
+                    throw new Error(`API Error ${data.status.error_code}: ${data.status.error_message || 'Unknown error'}`);
+                }
+
+                // If it's an object with status, it might be an error response
+                if (data && typeof data === 'object' && data.status && !Array.isArray(data)) {
+                    throw new Error(`API returned error status: ${JSON.stringify(data.status)}`);
+                }
+
+                // Ensure we have an array
+                if (!Array.isArray(data)) {
+                    console.error('API response is not an array:', data);
+                    throw new Error('API did not return expected data format');
+                }
+
+                if (data.length === 0) {
+                    throw new Error('No coin data available');
+                }
+
+                console.log('Successfully loaded', data.length, 'coins');
                 return data;
             } catch (error) {
                 console.error('Error fetching markets:', error);
@@ -177,7 +251,13 @@
         // Initialize the page
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                const coins = await listMarkets();
+                let coins = await listMarkets();
+                // Use sample data if API fails or returns empty data
+                if (!coins || coins.length === 0) {
+                    console.warn('Using sample data due to API issues');
+                    coins = getSampleCoinsData();
+                    showNotification('Using demo data - API may be unavailable', 'warning');
+                }
                 renderCoinsGrid(coins);
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('coinsGrid').classList.remove('hidden');
@@ -196,8 +276,13 @@
                 });
             } catch (error) {
                 console.error('Error initializing page:', error);
+                // Use sample data as fallback
+                console.warn('Using sample data due to error:', error.message);
+                const coins = getSampleCoinsData();
+                renderCoinsGrid(coins);
                 document.getElementById('loading').classList.add('hidden');
-                document.getElementById('emptyState').classList.remove('hidden');
+                document.getElementById('coinsGrid').classList.remove('hidden');
+                showNotification('Using demo data - API connection failed', 'warning');
             }
         });
     </script>
