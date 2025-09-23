@@ -77,10 +77,20 @@ class DungeonGame {
         document.getElementById('mobileResetGameBtn')?.addEventListener('click', () => this.resetGame());
     }
 
-    toggleDarkMode() {
-        document.documentElement.classList.toggle('dark');
-        const icon = document.querySelector('#darkModeToggle i');
-        icon.className = document.documentElement.classList.contains('dark') ? 'fas fa-sun' : 'fas fa-moon';
+    rollDice(sides) {
+        const result = Math.floor(Math.random() * sides) + 1;
+        const diceResults = document.getElementById('diceResults');
+        diceResults.innerHTML = `<span class="text-2xl font-bold text-primary-600">D${sides}: ${result}</span>`;
+
+        // Animate dice roll
+        diceResults.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+            diceResults.style.transform = 'scale(1)';
+        }, 200);
+
+        this.showToast(`Rolled D${sides}: ${result}`, 'info');
+        this.addStoryEntry(`Rolled D${sides} and got ${result}`, 'info');
+        return result;
     }
 
     openDiceModal() {
@@ -91,24 +101,71 @@ class DungeonGame {
         }
     }
 
-    toggleDungeonDarkMode() {
+    generateDungeon() {
         const dungeonContainer = document.getElementById('dungeonContainer');
-        if (dungeonContainer) {
-            dungeonContainer.classList.toggle('dungeon-dark');
-            const button = document.getElementById('toggleDarkModeBtn');
-            if (button) {
-                const icon = button.querySelector('i');
-                if (dungeonContainer.classList.contains('dungeon-dark')) {
-                    icon.className = 'fas fa-eye mr-1';
-                    button.innerHTML = '<i class=\"fas fa-eye mr-1\"></i>Lighten';
-                    this.addStoryEntry('The dungeon grows darker, hiding its secrets...', 'warning');
+        const dungeonGrid = document.getElementById('dungeonGrid');
+
+        if (!dungeonContainer || !dungeonGrid) return;
+
+        // Clear previous dungeon
+        dungeonGrid.innerHTML = '';
+
+        // Set grid template columns
+        dungeonGrid.style.gridTemplateColumns = `repeat(${this.dungeonSize}, 1fr)`;
+
+        // Generate rooms
+        const rooms = [];
+        for (let i = 0; i < this.dungeonSize; i++) {
+            for (let j = 0; j < this.dungeonSize; j++) {
+                const room = document.createElement('div');
+                room.className = 'dungeon-room';
+
+                // Randomly place rooms (ensuring connectivity)
+                const isRoom = this.shouldPlaceRoom(i, j, rooms);
+                if (isRoom) {
+                    room.innerHTML = `<i class="fas fa-door-closed"></i>`;
+                    room.classList.add('dungeon-entrance');
+
+                    // Add room types
+                    const roomTypes = ['treasure', 'trap', 'empty'];
+                    const roomType = roomTypes[Math.floor(Math.random() * roomTypes.length)];
+
+                    switch (roomType) {
+                        case 'treasure':
+                            room.innerHTML = `<i class="fas fa-coins text-yellow-400"></i>`;
+                            room.classList.add('bg-yellow-900');
+                            break;
+                        case 'trap':
+                            room.innerHTML = `<i class="fas fa-skull text-red-400"></i>`;
+                            room.classList.add('bg-red-900');
+                            break;
+                    }
+
+                    rooms.push({ x: i, y: j, type: roomType });
                 } else {
-                    icon.className = 'fas fa-eye-slash mr-1';
-                    button.innerHTML = '<i class=\"fas fa-eye-slash mr-1\"></i>Darken';
-                    this.addStoryEntry('The dungeon brightens, revealing its layout...', 'info');
+                    room.classList.add('dungeon-path');
                 }
+
+                dungeonGrid.appendChild(room);
             }
         }
+
+        dungeonContainer.classList.remove('hidden');
+        this.showToast(`Generated ${this.dungeonSize}x${this.dungeonSize} dungeon with ${rooms.length} rooms!`, 'success');
+        this.addStoryEntry(`Explored a ${this.dungeonSize}x${this.dungeonSize} dungeon with ${rooms.length} rooms`, 'success');
+    }
+
+    shouldPlaceRoom(x, y, existingRooms) {
+        // Always place entrance at top-left
+        if (x === 0 && y === 0) return true;
+
+        // Ensure minimum connectivity
+        const neighbors = existingRooms.filter(room =>
+            (Math.abs(room.x - x) === 1 && room.y === y) ||
+            (Math.abs(room.y - y) === 1 && room.x === x)
+        );
+
+        return neighbors.length > 0 && Math.random() < 0.6;
     }
 
     resetGame() {
@@ -201,6 +258,7 @@ class DungeonGame {
     }
 
     loadGameData() {
+        return {
             heroNames: [
                 'Aragorn', 'Legolas', 'Gimli', 'Frodo', 'Sam', 'Merry', 'Pippin', 'Gandalf', 'Boromir',
                 'Eowyn', 'Faramir', 'Galadriel', 'Elrond', 'Thorin', 'Balin', 'Dwalin', 'Kili', 'Fili',
