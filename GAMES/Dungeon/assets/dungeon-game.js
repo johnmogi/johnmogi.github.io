@@ -16,6 +16,12 @@ class DungeonGame {
         this.revealedTiles = new Set();
         this.encounterInProgress = false;
         this.experience = 0;
+        this.gameLevel = 1;
+        this.gameInventory = [];
+        this.gameGold = 100;
+        this.revealedTiles = new Set();
+        this.encounterInProgress = false;
+        this.experience = 0;
         this.init();
     }
 
@@ -352,6 +358,12 @@ class DungeonGame {
         if (this.gameLevel > oldLevel) {
             this.showToast(`Level up! You are now level ${this.gameLevel}!`, 'success');
             this.gameHP = 100;
+        this.gameLevel = 1;
+        this.gameInventory = [];
+        this.gameGold = 100;
+        this.revealedTiles = new Set();
+        this.encounterInProgress = false;
+        this.experience = 0;
             this.updateGameUI();
         }
         
