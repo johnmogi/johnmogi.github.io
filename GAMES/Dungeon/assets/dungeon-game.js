@@ -26,7 +26,7 @@ class DungeonGame {
     }
 
     init() {
-        this.showToast('Welcome to Dungeon Master! í°‰', 'success');
+        this.showToast('Welcome to Dungeon Master! ï¿½ï¿½ï¿½', 'success');
         this.bindEvents();
         this.initializeGlobalAccess();
     }
@@ -162,7 +162,7 @@ class DungeonGame {
         gameplayScreen.classList.add('flex');
 
         this.initializeGameplay();
-        this.showToast('Entered Play Mode! í¾®', 'success');
+        this.showToast('Entered Play Mode! ï¿½ï¿½ï¿½', 'success');
         this.addStoryEntry('Started dungeon adventure', 'success');
     }
 
@@ -209,7 +209,7 @@ class DungeonGame {
             playerSprite = document.createElement('div');
             playerSprite.id = 'playerSprite';
             playerSprite.className = 'absolute w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold';
-            playerSprite.innerHTML = 'í·™';
+            playerSprite.innerHTML = 'ï¿½ï¿½ï¿½';
             gameplayScreen.appendChild(playerSprite);
         }
 
@@ -261,7 +261,7 @@ class DungeonGame {
         this.updateGameUI();
         this.updatePlayerPosition();
         this.addCombatLog('Adventure begins! Explore the dungeon and face its challenges!');
-        this.showToast('Good luck, adventurer! í½€', 'success');
+        this.showToast('Good luck, adventurer! ï¿½ï¿½ï¿½', 'success');
     }
 
     // Enhanced Combat System
@@ -286,11 +286,11 @@ class DungeonGame {
         this.displayMonster(this.monster);
 
         if (this.gameHP <= 0) {
-            this.addCombatLog(`${this.hero.name} has fallen! í²€`);
+            this.addCombatLog(`${this.hero.name} has fallen! ï¿½ï¿½ï¿½`);
             this.showToast('You have been defeated!', 'error');
             this.exitPlayMode();
         } else if (this.monster.hp <= 0) {
-            this.addCombatLog(`${this.monster.name} defeated! í¾‰`);
+            this.addCombatLog(`${this.monster.name} defeated! ï¿½ï¿½ï¿½`);
             this.showToast(`${this.monster.name} defeated!`, 'success');
             this.resolveEncounter();
             this.gainExperience(this.monster.level * 50);
@@ -497,7 +497,7 @@ class DungeonGame {
 
         this.updateGameUI();
         this.addCombatLog(`Rested and healed ${healAmount} HP. Current HP: ${this.gameHP}/100`);
-        this.showToast(`Healed ${healAmount} HP! í²¤`, 'success');
+        this.showToast(`Healed ${healAmount} HP! ï¿½ï¿½ï¿½`, 'success');
         this.addStoryEntry(`Rested and recovered ${healAmount} HP`, 'success');
     }
 
@@ -544,7 +544,7 @@ class DungeonGame {
 
         if (this.gameHP <= 0) {
             this.addCombatLog(`${this.hero.name} has fallen to a trap!`);
-            this.showToast('You have been defeated by a trap! í²€', 'error');
+            this.showToast('You have been defeated by a trap! ï¿½ï¿½ï¿½', 'error');
             this.exitPlayMode();
         } else {
             this.addCombatLog(`You have ${this.gameHP} HP remaining.`);
@@ -565,7 +565,7 @@ class DungeonGame {
         });
 
         this.addCombatLog(`Found ${goldAmount} gold and ${item}!`);
-        this.showToast(`Treasure collected! í²°`, 'success');
+        this.showToast(`Treasure collected! ï¿½ï¿½ï¿½`, 'success');
         this.gainExperience(25);
     }
 
@@ -661,7 +661,7 @@ class DungeonGame {
         const playerSprite = document.getElementById('playerSprite');
         const gameplayArea = document.querySelector('#gameplayScreen .border-2');
         const rect = gameplayArea.getBoundingClientRect();
-                const cellSize = rect const cellSize = Math.min(rect.width, rect.height) / Math.max(this.dungeonSize, 5);const cellSize = Math.min(rect.width, rect.height) / Math.max(this.dungeonSize, 5); rect.width const cellSize = Math.min(rect.width, rect.height) / Math.max(this.dungeonSize, 5);const cellSize = Math.min(rect.width, rect.height) / Math.max(this.dungeonSize, 5); rect.height ? Math.min(rect.width, rect.height) / Math.max(this.dungeonSize, 5) : 50;
+                const cellSize = rect && rect.width && rect.height ? Math.min(rect.width, rect.height) / Math.max(this.dungeonSize, 5) : 50;
 
         const x = (this.playerPosition.x * cellSize) + (cellSize / 2) - 16;
         const y = (this.playerPosition.y * cellSize) + (cellSize / 2) - 16;
@@ -897,14 +897,14 @@ class DungeonGame {
         };
 
         this.displayMonster(this.monster);
-        this.showToast(`Spawned monster: ${name}! í±¹`, 'warning');
+        this.showToast(`Spawned monster: ${name}! ï¿½ï¿½ï¿½`, 'warning');
         this.addStoryEntry(`Encountered a ${name} (${type})`, 'warning');
     }
 
     generateStory() {
         const story = this.getRandomItem(this.gameData.stories);
         this.addStoryEntry(story, 'info');
-        this.showToast('New story generated! í³–', 'info');
+        this.showToast('New story generated! ï¿½ï¿½ï¿½', 'info');
     }
 
     openDiceModal() {
@@ -920,7 +920,7 @@ class DungeonGame {
         if (dungeonContainer) {
             dungeonContainer.classList.toggle('dungeon-dark');
             const isDark = dungeonContainer.classList.contains('dungeon-dark');
-            this.showToast(`Dungeon ${isDark ? 'darkened' : 'illuminated'}! í¼™`, 'info');
+            this.showToast(`Dungeon ${isDark ? 'darkened' : 'illuminated'}! ï¿½ï¿½ï¿½`, 'info');
         }
     }
 
@@ -959,10 +959,10 @@ class DungeonGame {
         this.monster.hp -= heroDamage;
 
         if (this.hero.hp <= 0) {
-            this.showToast(`${this.hero.name} has fallen! í²€`, 'error');
+            this.showToast(`${this.hero.name} has fallen! ï¿½ï¿½ï¿½`, 'error');
             this.addStoryEntry(`${this.hero.name} was defeated by ${this.monster.name}`, 'error');
         } else if (this.monster.hp <= 0) {
-            this.showToast(`${this.monster.name} defeated! í¾‰`, 'success');
+            this.showToast(`${this.monster.name} defeated! ï¿½ï¿½ï¿½`, 'success');
             this.addStoryEntry(`${this.hero.name} defeated ${this.monster.name}`, 'success');
         } else {
             this.showToast('Combat continues! âš”ï¸', 'info');
@@ -1045,7 +1045,7 @@ class DungeonGame {
         document.body.classList.toggle('dark');
         const isDark = document.body.classList.contains('dark');
         localStorage.setItem('darkMode', isDark);
-        this.showToast(`Switched to ${isDark ? 'dark' : 'light'} mode! ${isDark ? 'í¼™' : 'â˜€ï¸'}`, 'info');
+        this.showToast(`Switched to ${isDark ? 'dark' : 'light'} mode! ${isDark ? 'ï¿½ï¿½ï¿½' : 'â˜€ï¸'}`, 'info');
     }
 
     initializeGlobalAccess() {
