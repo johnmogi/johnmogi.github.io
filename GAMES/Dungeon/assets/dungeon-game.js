@@ -951,3 +951,348 @@ class DungeonGame {
 document.addEventListener('DOMContentLoaded', () => {
     window.dungeonGame = new DungeonGame();
 });
+
+// Enhanced combat features
+useItemInCombat() {
+    if (this.gameInventory.length === 0) {
+        this.addCombatLog('No items available!');
+        return;
+    }
+
+    // Show item selection interface
+    this.showItemSelection();
+}
+
+showItemSelection() {
+    const modal = document.getElementById('encounterModal');
+    const title = document.getElementById('encounterTitle');
+    const content = document.getElementById('encounterContent');
+
+    title.textContent = 'Use Item';
+    content.innerHTML = `
+        <p class="mb-2">Choose an item to use:</p>
+        <div class="space-y-2">
+            ${this.gameInventory.map((item, index) => 
+                `<button onclick="window.dungeonGame.useItemByIndex(${index})" 
+                        class="w-full text-left p-2 bg-gray-700 hover:bg-gray-600 rounded">
+                    ${item.name} - ${item.description || 'No description'}
+                </button>`
+            ).join('')}
+        </div>
+        <button onclick="window.dungeonGame.closeEncounterModal()" 
+                class="mt-4 w-full p-2 bg-red-600 hover:bg-red-700 rounded">
+            Cancel
+        </button>
+    `;
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+useItemByIndex(index) {
+    if (index < 0 || index >= this.gameInventory.length) return;
+
+    const item = this.gameInventory[index];
+    this.gameInventory.splice(index, 1);
+
+    switch (item.type) {
+        case 'healing':
+            const healAmount = 30;
+            this.gameHP = Math.min(100, this.gameHP + healAmount);
+            this.updateGameUI();
+            this.addCombatLog(`Used ${item.name} and healed ${healAmount} HP!`);
+            this.showToast(`Healed ${healAmount} HP!`, 'success');
+            break;
+        case 'utility':
+            this.addCombatLog(`Used ${item.name} in combat!`);
+            break;
+        default:
+            this.addCombatLog(`Used ${item.name} - effect unknown.`);
+    }
+
+    this.closeEncounterModal();
+}
+
+// Enhanced flee system
+attemptFlee() {
+    const fleeChance = 0.6 + (this.hero.stats.dex - 10) * 0.05; // Base 60% + 5% per DEX above 10
+    const success = Math.random() < fleeChance;
+
+    if (success) {
+        this.addCombatLog(`Successfully fled from combat! (Flee chance: ${Math.round(fleeChance * 100)}%)`);
+        this.showToast('Escaped successfully!', 'success');
+        this.resolveEncounter();
+    } else {
+        this.addCombatLog(`Failed to flee! (Flee chance: ${Math.round(fleeChance * 100)}%)`);
+        // Enemy gets a free attack
+        const enemyDamage = Math.floor(Math.random() * 10) + 5;
+        this.gameHP -= enemyDamage;
+        this.gameHP = Math.max(0, this.gameHP);
+        this.updateGameUI();
+        this.addCombatLog(`Took ${enemyDamage} damage while fleeing!`);
+        
+        if (this.gameHP <= 0) {
+            this.addCombatLog(`${this.hero.name} has fallen while fleeing!`);
+            this.showToast('You have been defeated!', 'error');
+            this.exitPlayMode();
+        }
+    }
+}
+
+// Enhanced inventory display
+showInventory() {
+    if (this.gameInventory.length === 0) {
+        this.addCombatLog('Inventory is empty.');
+        return;
+    }
+
+    const inventoryList = this.gameInventory.map((item, index) => 
+        `${index + 1}. ${item.name} - ${item.description || 'No description'}`
+    ).join('\n');
+    
+    this.addCombatLog(`Inventory:\n${inventoryList}\n\nGold: ${this.gameGold} coins`);
+    this.showToast(`Inventory: ${this.gameInventory.length} items`, 'info');
+}
+
+// Enhanced rest system
+restInGame() {
+    if (this.encounterInProgress) {
+        this.addCombatLog('Cannot rest during combat!');
+        return;
+    }
+
+    const healAmount = Math.min(40, 100 - this.gameHP);
+    this.gameHP += healAmount;
+
+    this.updateGameUI();
+    this.addCombatLog(`Rested and healed ${healAmount} HP. Current HP: ${this.gameHP}/100`);
+    this.showToast(`Healed ${healAmount} HP! Ì≤§`, 'success');
+    this.addStoryEntry(`Rested and recovered ${healAmount} HP`, 'success');
+}
+
+// Enhanced search system
+searchRoom() {
+    const currentRoom = this.currentDungeon[this.playerPosition.y][this.playerPosition.x];
+
+    if (currentRoom.type === 'treasure' || currentRoom.type === 'trap') {
+        this.addCombatLog('You already know what\'s in this room.');
+        return;
+    }
+
+    // Chance to find hidden treasure based on WIS
+    const searchChance = 0.4 + (this.hero.stats.wis - 10) * 0.03; // Base 40% + 3% per WIS above 10
+    const foundSomething = Math.random() < searchChance;
+
+    if (foundSomething) {
+        const goldAmount = Math.floor(Math.random() * 25) + 10;
+        this.gameGold += goldAmount;
+        this.addCombatLog(`Found hidden treasure: ${goldAmount} gold! (Search chance: ${Math.round(searchChance * 100)}%)`);
+        this.showToast(`Found ${goldAmount} gold!`, 'success');
+    } else {
+        this.addCombatLog(`Found nothing of interest. (Search chance: ${Math.round(searchChance * 100)}%)`);
+    }
+}
+
+// Enhanced trap system
+triggerTrap() {
+    const trapTypes = ['Spike Pit', 'Arrow Trap', 'Poison Gas', 'Fire Trap'];
+    const trapType = trapTypes[Math.floor(Math.random() * trapTypes.length)];
+    
+    let damage = Math.floor(Math.random() * 20) + 10;
+    
+    // Check for trap resistance (DEX save)
+    const dexSave = Math.random() * 20 + this.hero.stats.dex;
+    if (dexSave > 15) {
+        damage = Math.floor(damage / 2);
+        this.addCombatLog(`Your agility helps you avoid some damage! (DEX save: ${Math.round(dexSave)})`);
+    }
+
+    this.gameHP -= damage;
+    this.gameHP = Math.max(0, this.gameHP);
+
+    this.updateGameUI();
+    this.addCombatLog(`Triggered ${trapType}! Took ${damage} damage!`);
+
+    if (this.gameHP <= 0) {
+        this.addCombatLog(`${this.hero.name} has fallen to a trap!`);
+        this.showToast('You have been defeated by a trap! Ì≤Ä', 'error');
+        this.exitPlayMode();
+    } else {
+        this.addCombatLog(`You have ${this.gameHP} HP remaining.`);
+    }
+}
+
+// Enhanced treasure system
+collectTreasure() {
+    const goldAmount = Math.floor(Math.random() * 50) + 20;
+    this.gameGold += goldAmount;
+
+    // Add random item to inventory
+    const items = ['Health Potion', 'Mana Potion', 'Strength Potion', 'Defense Potion', 'Scroll of Protection'];
+    const item = items[Math.floor(Math.random() * items.length)];
+    this.gameInventory.push({ 
+        name: item, 
+        type: 'consumable',
+        description: this.getItemDescription(item)
+    });
+
+    this.addCombatLog(`Found ${goldAmount} gold and ${item}!`);
+    this.showToast(`Treasure collected! Ì≤∞`, 'success');
+    this.gainExperience(25); // Experience for finding treasure
+}
+
+getItemDescription(itemName) {
+    const descriptions = {
+        'Health Potion': 'Restores 30 HP',
+        'Mana Potion': 'Restores 30 MP',
+        'Strength Potion': 'Temporarily increases STR by 3',
+        'Defense Potion': 'Temporarily increases DEF by 3',
+        'Scroll of Protection': 'Provides temporary damage resistance'
+    };
+    return descriptions[itemName] || 'No description available';
+}
+
+// Make combat log globally accessible
+addCombatLog(message) {
+    const combatLog = document.getElementById('combatLog');
+    if (!combatLog) return;
+
+    const entry = document.createElement('div');
+    entry.className = 'text-xs text-white mb-1';
+    entry.textContent = message;
+
+    combatLog.appendChild(entry);
+    combatLog.scrollTop = combatLog.scrollHeight;
+
+    // Keep only last 15 entries
+    while (combatLog.children.length > 15) {
+        combatLog.removeChild(combatLog.firstChild);
+    }
+}
+
+// Enhanced initialization
+init() {
+    this.showToast('Welcome to Dungeon Master! Ì∞â', 'success');
+    this.bindEvents();
+    this.setupMobileMenu();
+    this.initializeGlobalAccess();
+}
+
+initializeGlobalAccess() {
+    // Make methods globally accessible for HTML onclick handlers
+    window.dungeonGame = this;
+}
+
+// Enhanced hero generation with better stats
+generateHero() {
+    const name = this.getRandomItem(this.gameData.heroNames);
+    const race = this.getRandomItem(this.gameData.races);
+    const characterClass = this.getRandomItem(this.gameData.classes);
+
+    // Generate stats based on class
+    const baseStats = { str: 10, dex: 10, int: 10, wis: 10 };
+    const classBonuses = {
+        'Fighter': { str: 3, dex: 1 },
+        'Wizard': { int: 3, wis: 1 },
+        'Rogue': { dex: 3, int: 1 },
+        'Cleric': { wis: 3, str: 1 },
+        'Ranger': { dex: 2, wis: 2 },
+        'Barbarian': { str: 4 },
+        'Bard': { int: 2, wis: 2 },
+        'Druid': { wis: 3, int: 1 },
+        'Monk': { dex: 3, wis: 1 },
+        'Paladin': { str: 2, wis: 2 },
+        'Sorcerer': { int: 4 },
+        'Warlock': { int: 3, wis: 1 }
+    };
+
+    const bonuses = classBonuses[characterClass] || { str: 1, dex: 1, int: 1, wis: 1 };
+
+    this.hero = {
+        name,
+        race,
+        characterClass,
+        level: 1,
+        hp: 100,
+        maxHp: 100,
+        stats: {
+            str: baseStats.str + bonuses.str + Math.floor(Math.random() * 4),
+            dex: baseStats.dex + bonuses.dex + Math.floor(Math.random() * 4),
+            int: baseStats.int + bonuses.int + Math.floor(Math.random() * 4),
+            wis: baseStats.wis + bonuses.wis + Math.floor(Math.random() * 4)
+        }
+    };
+
+    this.updateCharacterSheet();
+    this.showToast(`Generated hero: ${name} the ${race} ${characterClass}! ‚öîÔ∏è`, 'success');
+    this.addStoryEntry(`Created hero: ${name} (${race} ${characterClass})`, 'success');
+}
+
+// Enhanced monster generation
+generateMonster() {
+    const name = this.getRandomItem(this.gameData.monsterNames);
+    const type = this.getRandomItem(this.gameData.monsterTypes);
+
+    this.monster = {
+        name,
+        type,
+        level: Math.floor(Math.random() * 10) + 1,
+        hp: Math.floor(Math.random() * 60) + 40,
+        maxHp: Math.floor(Math.random() * 60) + 40,
+        abilities: this.getRandomItems(this.gameData.abilities, 3),
+        loot: this.generateMonsterLoot()
+    };
+
+    this.displayMonster(this.monster);
+    this.showToast(`Spawned monster: ${name}! Ì±π`, 'warning');
+    this.addStoryEntry(`Encountered a ${name} (${type})`, 'warning');
+}
+
+// Enhanced UI updates
+updateGameUI() {
+    // Update gameplay UI elements
+    document.getElementById('gameHP')?.textContent = `${this.gameHP}/100`;
+    document.getElementById('gamePosition')?.textContent = `(${this.playerPosition.x + 1},${this.playerPosition.y + 1})`;
+    document.getElementById('gameLevel')?.textContent = this.gameLevel;
+    document.getElementById('gameGold')?.textContent = this.gameGold;
+    document.getElementById('gameInventoryCount')?.textContent = this.gameInventory.length;
+}
+
+// Enhanced character sheet update
+updateCharacterSheet() {
+    // Update character sheet with current hero data
+    if (this.hero) {
+        document.getElementById('charName')?.textContent = this.hero.name;
+        document.getElementById('charRaceClass')?.textContent = `${this.hero.race} ${this.hero.characterClass}`;
+        document.getElementById('charLevel')?.textContent = this.hero.level;
+        document.getElementById('charXP')?.textContent = `0/${this.hero.level * 100}`;
+        document.getElementById('charHP')?.textContent = `${this.hero.hp}/${this.hero.maxHp}`;
+        document.getElementById('charHPBar')?.style.width = `${(this.hero.hp / this.hero.maxHp) * 100}%`;
+        document.getElementById('charMana')?.textContent = '50/50';
+        document.getElementById('charManaBar')?.style.width = '100%';
+        document.getElementById('charSTR')?.textContent = this.hero.stats.str;
+        document.getElementById('charDEX')?.textContent = this.hero.stats.dex;
+        document.getElementById('charINT')?.textContent = this.hero.stats.int;
+        document.getElementById('charWIS')?.textContent = this.hero.stats.wis;
+        document.getElementById('charWeapon')?.textContent = 'Sword';
+        document.getElementById('charArmor')?.textContent = 'Leather';
+        document.getElementById('charGold')?.textContent = this.gameGold;
+    } else {
+        // Default values
+        document.getElementById('charName')?.textContent = 'Adventurer';
+        document.getElementById('charRaceClass')?.textContent = 'Human Fighter';
+        document.getElementById('charLevel')?.textContent = '1';
+        document.getElementById('charXP')?.textContent = '0/100';
+        document.getElementById('charHP')?.textContent = '100/100';
+        document.getElementById('charHPBar')?.style.width = '100%';
+        document.getElementById('charMana')?.textContent = '50/50';
+        document.getElementById('charManaBar')?.style.width = '100%';
+        document.getElementById('charSTR')?.textContent = '12';
+        document.getElementById('charDEX')?.textContent = '14';
+        document.getElementById('charINT')?.textContent = '10';
+        document.getElementById('charWIS')?.textContent = '13';
+        document.getElementById('charWeapon')?.textContent = 'Sword';
+        document.getElementById('charArmor')?.textContent = 'Leather';
+        document.getElementById('charGold')?.textContent = '100';
+    }
+}
