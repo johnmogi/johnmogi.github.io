@@ -3,7 +3,7 @@ const API_PROVIDERS = [
     {
         name: 'cryptocompare',
         baseUrl: 'https://min-api.cryptocompare.com/data',
-        marketUrl: 'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC,ETH,USDT,SOL,MNT&tsyms=USD',
+        marketUrl: 'https://min-api.cryptocompare.com/data/top/mktcapfull?limit=50&tsym=USD',
         useProxy: false,
         retryDelay: 2000, // 2 second retry delay
         maxRetries: 2
@@ -216,22 +216,135 @@ async function getCoinDetail(coinId, forceRefresh = false) {
     throw new Error(`All API providers failed for ${coinId} and no cached data available`);
 }
 
-async function transformMarketData(data, providerName) {
+// Get historical market chart data for a specific coin
+async function getMarketChart(coinId, days = 30, forceRefresh = false) {
+    const cacheKey = `market_chart_${coinId}_${days}`;
+
+    // Check cache first unless force refresh is requested
+    if (!forceRefresh) {
+        const cachedData = apiCache.get(cacheKey);
+        if (cachedData) {
+            console.log(`📦 Using cached chart data for ${coinId} (${days} days)`);
+            return cachedData;
+        }
+    }
+
+    // Try each API provider in sequence
+    for (let i = currentApiProvider; i < API_PROVIDERS.length; i++) {
+        try {
+            const provider = API_PROVIDERS[i];
+            console.log(`🌐 Trying ${provider.name} API for ${coinId} chart data...`);
+
+            let url;
+            if (provider.name === 'cryptocompare') {
+                // CryptoCompare historical data: https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=30
+                url = `${provider.baseUrl}/v2/histoday?fsym=${coinId.toUpperCase()}&tsym=USD&limit=${days}`;
+            } else if (provider.name === 'coingecko') {
+                // CoinGecko historical data: https://api.coingecko.com/api/v3/coins/{id}/market_chart?vs_currency=usd&days={days}&interval=daily
+                url = `${provider.baseUrl}/coins/${coinId}/market_chart?vs_currency=usd&days=${days}&interval=daily`;
+            }
+
+            const response = await fetchWithRetry(url, provider.maxRetries, provider.retryDelay);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(`📡 Chart data received from ${provider.name} for ${coinId}:`, data);
+
+            // Transform data based on provider
+            const transformedData = await transformChartData(data, provider.name);
+            console.log(`✅ Successfully loaded chart data for ${coinId} from ${provider.name}`);
+
+            // Cache the successful data
+            apiCache.set(cacheKey, transformedData);
+
+            // Switch to this provider for future requests
+            currentApiProvider = i;
+            return transformedData;
+
+        } catch (error) {
+            console.warn(`⚠️ ${API_PROVIDERS[i].name} API failed for ${coinId} chart:`, error.message);
+
+            // If it's a rate limit error, wait longer before trying next provider
+            if (error.message.includes('429') || error.message.includes('rate limit')) {
+                console.log('🚦 Rate limit detected, waiting before trying next provider...');
+                await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+            }
+            continue;
+        }
+    }
+
+    // If all APIs fail, try to return cached data if available
+    const cachedData = apiCache.get(cacheKey);
+    if (cachedData) {
+        console.log(`🚨 All APIs failed for ${coinId} chart, using cached data`);
+        return cachedData;
+    }
+
+    throw new Error(`All API providers failed for ${coinId} chart data and no cached data available`);
+}
+
+// Transform chart data from different providers
+async function transformChartData(data, providerName) {
     if (providerName === 'cryptocompare') {
-        // Handle CryptoCompare market data format
+        // Handle CryptoCompare historical data format
         if (data.Response === 'Error') {
             throw new Error(`CryptoCompare API Error: ${data.Message}`);
         }
 
-        if (data.DISPLAY && data.DISPLAY.USD) {
-            return Object.keys(data.DISPLAY.USD).map(symbol => ({
-                id: symbol.toLowerCase(),
-                symbol: symbol,
-                name: data.DISPLAY.USD[symbol].FROMSYMBOL,
-                current_price: parseFloat(data.DISPLAY.USD[symbol].PRICE) || 0,
-                price_change_percentage_24h: parseFloat(data.DISPLAY.USD[symbol].CHANGEPCT24HOUR) || 0,
-                market_cap: parseFloat(data.DISPLAY.USD[symbol].MKTCAP) || 0,
-                total_volume: parseFloat(data.DISPLAY.USD[symbol].VOLUME24HOUR) || 0
+        if (data.Data && Array.isArray(data.Data)) {
+            return {
+                prices: data.Data.map(item => [item.time * 1000, item.close])
+            };
+        }
+
+        throw new Error('Invalid CryptoCompare chart data format');
+    } else if (providerName === 'coingecko') {
+        // Handle CoinGecko chart data format (may be wrapped by proxy)
+        if (data.error) {
+            throw new Error(`CoinGecko API Error: ${data.error}`);
+        }
+
+        // Handle proxy-wrapped response
+        if (typeof data === 'string') {
+            try {
+                data = JSON.parse(data);
+                console.log(`✅ Parsed proxy chart response:`, data);
+            } catch (e) {
+                throw new Error('Invalid JSON response from proxy');
+            }
+        }
+
+        if (data && data.prices && Array.isArray(data.prices)) {
+            return data;
+        }
+
+        throw new Error('Invalid CoinGecko chart data format');
+    }
+
+    throw new Error(`Unknown provider: ${providerName}`);
+}
+
+async function transformMarketData(data, providerName) {
+    console.log(`🔄 Transforming ${providerName} data:`, data);
+
+    if (providerName === 'cryptocompare') {
+        // Handle CryptoCompare top market cap endpoint format
+        if (data.Response === 'Error') {
+            throw new Error(`CryptoCompare API Error: ${data.Message}`);
+        }
+
+        if (data.Data && Array.isArray(data.Data)) {
+            return data.Data.map(coin => ({
+                id: coin.CoinInfo.Name.toLowerCase(),
+                symbol: coin.CoinInfo.Name,
+                name: coin.CoinInfo.FullName,
+                current_price: coin.RAW?.USD?.PRICE || 0,
+                price_change_percentage_24h: coin.RAW?.USD?.CHANGEPCT24HOUR || 0,
+                market_cap: coin.RAW?.USD?.MKTCAP || 0,
+                total_volume: coin.RAW?.USD?.VOLUME24HOUR || 0,
+                image: `https://www.cryptocompare.com${coin.CoinInfo.ImageUrl}`
             }));
         }
 
@@ -246,6 +359,7 @@ async function transformMarketData(data, providerName) {
         if (typeof data === 'string') {
             try {
                 data = JSON.parse(data);
+                console.log(`✅ Parsed proxy response:`, data);
             } catch (e) {
                 throw new Error('Invalid JSON response from proxy');
             }
@@ -259,7 +373,8 @@ async function transformMarketData(data, providerName) {
                 current_price: coin.current_price || 0,
                 price_change_percentage_24h: coin.price_change_percentage_24h || 0,
                 market_cap: coin.market_cap || 0,
-                total_volume: coin.total_volume || 0
+                total_volume: coin.total_volume || 0,
+                image: coin.image || ''
             }));
         }
 

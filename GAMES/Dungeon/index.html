@@ -160,8 +160,12 @@
         .dungeon-dark .dungeon-treasure {
             background: #92400e;
         }
-        .dungeon-dark .dungeon-trap {
-            background: #991b1b;
+        .dungeon-monster {
+            background: #7c3aed;
+            color: white;
+        }
+        .dungeon-dark .dungeon-monster {
+            background: #5b21b6;
         }
         .story-entry {
             padding: 8px;
@@ -342,41 +346,143 @@
             </div>
         </div>
 
-        <!-- Center Panel: Dungeon Board -->
-        <div class="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg m-4 p-4 flex flex-col">
-            <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <h2 class="text-xl font-bold">
-                    <i class="fas fa-dungeon text-gray-600 mr-2"></i>
-                    Dungeon Board
-                </h2>
-                <div class="flex space-x-2">
-                    <select id="dungeonSize" class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm">
-                        <option value="3">3x3</option>
-                        <option value="4">4x4</option>
-                        <option value="5" selected>5x5</option>
-                        <option value="6">6x6</option>
-                    </select>
-                    <button id="generateDungeonBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                        <i class="fas fa-map mr-1"></i>Generate
-                    </button>
-                    <button id="toggleDarkModeBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                        <i class="fas fa-eye-slash mr-1"></i>Darken
-                    </button>
+        <!-- Center Panel Container -->
+        <div id="centerPanelContainer" class="flex-1">
+            <!-- Center Panel: Dungeon Board -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg m-4 p-4 flex flex-col h-full">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h2 class="text-xl font-bold">
+                        <i class="fas fa-dungeon text-gray-600 mr-2"></i>
+                        Dungeon Board
+                    </h2>
+                    <div class="flex space-x-2">
+                        <select id="dungeonSize" class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm">
+                            <option value="3">3x3</option>
+                            <option value="4">4x4</option>
+                            <option value="5" selected>5x5</option>
+                            <option value="6">6x6</option>
+                        </select>
+                        <button id="generateDungeonBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                            <i class="fas fa-map mr-1"></i>Generate
+                        </button>
+                        <button id="togglePlayModeBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                            <i class="fas fa-play mr-1"></i>Play Mode
+                        </button>
+                    </div>
                 </div>
-            </div>
-            
-            <div id="dungeonContainer" class="flex-1 border-2 border-gray-300 dark:border-gray-600 rounded">
-                <div class="dungeon-grid" id="dungeonGrid"></div>
-            </div>
 
-            <!-- Room Info -->
-            <div id="roomInfo" class="mt-3 p-3 bg-gray-50 dark:bg-gray-700 rounded hidden">
-                <h4 class="font-bold mb-2">Current Room:</h4>
-                <div id="roomContent"></div>
+                <div id="dungeonContainer" class="flex-1 border-2 border-gray-300 dark:border-gray-600 rounded">
+                    <div class="dungeon-grid" id="dungeonGrid"></div>
+                </div>
+
+                <!-- Room Info -->
+                <div id="roomInfo" class="mt-3 p-3 bg-gray-50 dark:bg-gray-700 rounded hidden">
+                    <h4 class="font-bold mb-2">Current Room:</h4>
+                    <div id="roomContent"></div>
+                </div>
             </div>
         </div>
 
-        <!-- Right Panel: Scrolling Story Pane -->
+        <!-- Gameplay Screen (Hidden by default) -->
+        <div id="gameplayScreen" class="hidden flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg m-4 p-4 flex flex-col h-full">
+            <!-- Gameplay Header -->
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h2 class="text-xl font-bold">
+                    <i class="fas fa-gamepad text-purple-600 mr-2"></i>
+                    Dungeon Adventure
+                </h2>
+                <div class="flex space-x-2">
+                    <button id="exitPlayModeBtn" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                        <i class="fas fa-times mr-1"></i>Exit
+                    </button>
+                </div>
+            </div>
+
+            <!-- Gameplay Area -->
+            <div class="flex-1 flex flex-col">
+                <!-- Player Status Bar -->
+                <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                        <div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">Health</div>
+                            <div class="text-lg font-bold text-red-600" id="gameHP">100/100</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">Position</div>
+                            <div class="text-lg font-bold text-blue-600" id="gamePosition">(1,1)</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">Level</div>
+                            <div class="text-lg font-bold text-green-600" id="gameLevel">1</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Gameplay Grid -->
+                <div class="flex-1 border-2 border-gray-300 dark:border-gray-600 rounded bg-black relative overflow-hidden">
+                    <!-- Player Character -->
+                    <div id="playerSprite" class="absolute w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm z-10 transition-all duration-300">
+                        @
+                    </div>
+
+                    <!-- Room Content -->
+                    <div id="roomContentDisplay" class="absolute top-2 left-2 text-white text-sm bg-black bg-opacity-50 p-2 rounded hidden">
+                        <div id="roomDescription"></div>
+                    </div>
+
+                    <!-- Encounter Modal -->
+                    <div id="encounterModal" class="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-20">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 text-center relative">
+                            <button id="closeEncounterModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <h3 class="text-xl font-bold mb-4" id="encounterTitle">Encounter!</h3>
+                            <div id="encounterContent" class="mb-4"></div>
+                            <div class="flex space-x-2 justify-center">
+                                <button id="encounterAttack" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Attack</button>
+                                <button id="encounterFlee" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded">Flee</button>
+                                <button id="encounterUseItem" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Use Item</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Combat Log -->
+                    <div id="combatLog" class="absolute bottom-2 left-2 right-2 text-white text-xs bg-black bg-opacity-50 p-2 rounded max-h-20 overflow-y-auto"></div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-4 gap-2 mt-4">
+                    <button id="moveUp" class="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded font-bold text-lg">
+                        <i class="fas fa-arrow-up"></i>
+                    </button>
+                    <button id="moveLeft" class="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded font-bold text-lg">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <button id="moveRight" class="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded font-bold text-lg">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button id="moveDown" class="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded font-bold text-lg">
+                        <i class="fas fa-arrow-down"></i>
+                    </button>
+                </div>
+
+                <!-- Action Row -->
+                <div class="grid grid-cols-4 gap-2 mt-2">
+                    <button id="interactBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm font-medium">
+                        <i class="fas fa-hand-paper mr-1"></i>Interact
+                    </button>
+                    <button id="searchBtn" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm font-medium">
+                        <i class="fas fa-search mr-1"></i>Search
+                    </button>
+                    <button id="restBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded text-sm font-medium">
+                        <i class="fas fa-bed mr-1"></i>Rest
+                    </button>
+                    <button id="inventoryBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded text-sm font-medium">
+                        <i class="fas fa-backpack mr-1"></i>Inventory
+                    </button>
+                </div>
+            </div>
+        </div>
         <div class="w-full lg:w-96 bg-white dark:bg-gray-800 rounded-lg shadow-lg m-4 p-4 flex flex-col">
             <h2 class="text-xl font-bold mb-4 text-center border-b pb-2">
                 <i class="fas fa-scroll text-purple-600 mr-2"></i>

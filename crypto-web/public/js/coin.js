@@ -42,17 +42,19 @@ function updateCoinPage(coinData) {
     const coinHeader = document.getElementById('coinHeader');
     if (coinHeader) {
         coinHeader.innerHTML = `
-            <div class="flex items-center space-x-4">
-                ${coinData.image ? `<img src="${coinData.image}" alt="${coinData.name}" class="w-16 h-16 rounded-full">` : ''}
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">${coinData.name}</h1>
-                    <p class="text-xl text-gray-600 uppercase">${coinData.symbol}</p>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    ${coinData.image ? `<img src="${coinData.image}" alt="${coinData.name}" class="w-16 h-16 rounded-full">` : ''}
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">${coinData.name}</h1>
+                        <p class="text-xl text-gray-600 uppercase">${coinData.symbol}</p>
+                    </div>
                 </div>
-            </div>
-            <div class="text-right">
-                <div class="text-3xl font-bold text-gray-900">$${coinData.current_price.toLocaleString()}</div>
-                <div class="text-lg ${coinData.price_change_percentage_24h >= 0 ? 'text-green-600' : 'text-red-600'}">
-                    ${coinData.price_change_percentage_24h >= 0 ? '↗' : '↘'} ${Math.abs(coinData.price_change_percentage_24h).toFixed(2)}%
+                <div class="text-right">
+                    <div class="text-3xl font-bold text-gray-900">$${coinData.current_price.toLocaleString()}</div>
+                    <div class="text-lg ${coinData.price_change_percentage_24h >= 0 ? 'text-green-600' : 'text-red-600'}">
+                        ${coinData.price_change_percentage_24h >= 0 ? '↗' : '↘'} ${Math.abs(coinData.price_change_percentage_24h).toFixed(2)}%
+                    </div>
                 </div>
             </div>
         `;
@@ -65,7 +67,9 @@ function updateCoinPage(coinData) {
     if (coinData.description) {
         const descriptionEl = document.getElementById('coinDescription');
         if (descriptionEl) {
-            descriptionEl.innerHTML = coinData.description;
+            const descriptionContent = descriptionEl.querySelector('div') || document.createElement('div');
+            descriptionContent.innerHTML = coinData.description;
+            descriptionEl.appendChild(descriptionContent);
         }
     }
 
@@ -79,6 +83,12 @@ function updateCoinPage(coinData) {
                 </a>
             `;
         }
+    }
+
+    // Update CoinGecko link
+    const coinGeckoLink = document.getElementById('coinGeckoLink');
+    if (coinGeckoLink) {
+        coinGeckoLink.href = `https://www.coingecko.com/en/coins/${coinData.id}`;
     }
 }
 
@@ -381,7 +391,7 @@ function addToFavorites(coinId) {
 // Initialize the coin detail page
 function initializeCoinPage() {
     const urlParams = new URLSearchParams(window.location.search);
-    const coinId = urlParams.get('id');
+    const coinId = urlParams.get('coin') || urlParams.get('id');
 
     if (!coinId) {
         showNotification('No coin specified', 'error');
@@ -395,95 +405,32 @@ function initializeCoinPage() {
 async function loadCoinDetails(coinId) {
     try {
         const [coinData, marketData] = await Promise.all([
-            getCoin(coinId),
+            getCoinDetail(coinId),
             getMarketChart(coinId, 30)
         ]);
 
         // Update UI with coin data
-        document.getElementById('coinLogo').src = coinData.image?.large || '';
-        document.getElementById('coinLogo').alt = `${coinData.name} logo`;
-        document.getElementById('coinName').textContent = coinData.name;
-        document.getElementById('coinSymbol').textContent = coinData.symbol.toUpperCase();
-        document.getElementById('coinPrice').textContent =
-            `$${coinData.market_data.current_price.usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}`;
-        document.getElementById('coinMarketCap').textContent =
-            `$${coinData.market_data.market_cap.usd.toLocaleString()}`;
+        updateCoinPage(coinData);
 
-        const priceChange24h = coinData.market_data.price_change_percentage_24h;
-        const priceChangeElement = document.getElementById('coinChange');
-        priceChangeElement.textContent = `${priceChange24h >= 0 ? '+' : ''}${priceChange24h.toFixed(2)}%`;
-        priceChangeElement.className = `text-xl font-bold ${priceChange24h >= 0 ? 'text-green-600' : 'text-red-600'}`;
-
-        document.getElementById('coinGeckoLink').href = coinData.links?.homepage[0] || `https://www.coingecko.com/en/coins/${coinId}`;
+        // Create chart
+        createCoinChart(marketData, coinId);
 
         // Setup add to favorites button
-        document.getElementById('addToFavoritesBtn').addEventListener('click', () => {
-            if (addToFavorites(coinId)) {
-                const button = document.getElementById('addToFavoritesBtn');
-                button.textContent = 'Added to Tracker';
-                button.disabled = true;
-                button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                button.classList.add('bg-green-500', 'cursor-not-allowed');
-            }
-        });
-
-        // Initialize chart
-        const ctx = document.getElementById('priceChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                datasets: [{
-                    label: 'Price (USD)',
-                    data: marketData.prices.map(([timestamp, price]) => ({
-                        x: new Date(timestamp),
-                        y: price
-                    })),
-                    borderColor: 'rgb(59, 130, 246)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.1
-                }]
-            },
-            options: {
-                responsive: true,
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'day'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Date'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Price (USD)'
-                        },
-                        beginAtZero: false
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: (context) =>
-                                `$${context.parsed.y.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}`
-                        }
-                    }
+        const addToFavoritesBtn = document.getElementById('addToFavoritesBtn');
+        if (addToFavoritesBtn) {
+            addToFavoritesBtn.addEventListener('click', () => {
+                if (addToFavorites(coinId)) {
+                    addToFavoritesBtn.textContent = 'Added to Tracker';
+                    addToFavoritesBtn.disabled = true;
+                    addToFavoritesBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    addToFavoritesBtn.classList.add('bg-green-500', 'cursor-not-allowed');
                 }
-            }
-        });
+            });
+        }
 
         // Show the content
         document.getElementById('loading').classList.add('hidden');
-        document.getElementById('coinDetails').classList.remove('hidden');
+        document.getElementById('coinContent').classList.remove('hidden');
 
     } catch (error) {
         console.error('Error loading coin details:', error);
@@ -493,13 +440,15 @@ async function loadCoinDetails(coinId) {
             id: coinId,
             name: coinId.charAt(0).toUpperCase() + coinId.slice(1),
             symbol: coinId.toUpperCase(),
-            image: { large: 'https://via.placeholder.com/128' },
-            market_data: {
-                current_price: { usd: 1000.00 },
-                market_cap: { usd: 50000000000 },
-                price_change_percentage_24h: 5.0
-            },
-            links: { homepage: [`https://example.com/${coinId}`] }
+            image: 'https://via.placeholder.com/128',
+            current_price: 1000.00,
+            price_change_percentage_24h: 5.0,
+            market_cap: 50000000000,
+            total_volume: 1000000000,
+            high_24h: 1050.00,
+            low_24h: 950.00,
+            description: `This is demo data for ${coinId}. In a real application, this would show detailed information about the cryptocurrency.`,
+            homepage: `https://example.com/${coinId}`
         };
 
         const sampleMarketData = {
@@ -510,79 +459,25 @@ async function loadCoinDetails(coinId) {
         };
 
         // Update UI with sample data
-        document.getElementById('coinLogo').src = sampleCoinData.image.large;
-        document.getElementById('coinLogo').alt = `${sampleCoinData.name} logo`;
-        document.getElementById('coinName').textContent = sampleCoinData.name;
-        document.getElementById('coinSymbol').textContent = sampleCoinData.symbol;
-        document.getElementById('coinPrice').textContent =
-            `$${sampleCoinData.market_data.current_price.usd.toFixed(2)}`;
-        document.getElementById('coinMarketCap').textContent =
-            `$${sampleCoinData.market_data.market_cap.usd.toLocaleString()}`;
+        updateCoinPage(sampleCoinData);
+        createCoinChart(sampleMarketData, coinId);
 
-        const priceChange24h = sampleCoinData.market_data.price_change_percentage_24h;
-        const priceChangeElement = document.getElementById('coinChange');
-        priceChangeElement.textContent = `${priceChange24h >= 0 ? '+' : ''}${priceChange24h.toFixed(2)}%`;
-        priceChangeElement.className = `text-xl font-bold ${priceChange24h >= 0 ? 'text-green-600' : 'text-red-600'}`;
-
-        document.getElementById('coinGeckoLink').href = sampleCoinData.links.homepage[0];
-
-        // Initialize chart with sample data
-        const ctx = document.getElementById('priceChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                datasets: [{
-                    label: 'Price (USD)',
-                    data: sampleMarketData.prices.map(([timestamp, price]) => ({
-                        x: new Date(timestamp),
-                        y: price
-                    })),
-                    borderColor: 'rgb(59, 130, 246)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.1
-                }]
-            },
-            options: {
-                responsive: true,
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'day'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Date'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Price (USD)'
-                        },
-                        beginAtZero: false
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: (context) =>
-                                `$${context.parsed.y.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                        }
-                    }
+        // Setup add to favorites button
+        const addToFavoritesBtn = document.getElementById('addToFavoritesBtn');
+        if (addToFavoritesBtn) {
+            addToFavoritesBtn.addEventListener('click', () => {
+                if (addToFavorites(coinId)) {
+                    addToFavoritesBtn.textContent = 'Added to Tracker';
+                    addToFavoritesBtn.disabled = true;
+                    addToFavoritesBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    addToFavoritesBtn.classList.add('bg-green-500', 'cursor-not-allowed');
                 }
-            }
-        });
+            });
+        }
 
         // Show the content
         document.getElementById('loading').classList.add('hidden');
-        document.getElementById('coinDetails').classList.remove('hidden');
+        document.getElementById('coinContent').classList.remove('hidden');
         showNotification('Using demo data - API connection failed', 'warning');
     }
 }

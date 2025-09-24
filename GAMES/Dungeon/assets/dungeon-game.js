@@ -6,6 +6,13 @@ class DungeonGame {
         this.dungeonSize = 5;
         this.roomCount = 6;
         this.gameData = this.loadGameData();
+        this.playMode = false;
+        this.playerPosition = { x: 0, y: 0 };
+        this.currentDungeon = null;
+        this.gameHP = 100;
+        this.gameLevel = 1;
+        this.inventory = [];
+        this.experience = 0;
         this.init();
     }
 
@@ -105,12 +112,29 @@ class DungeonGame {
         // Dice roller
         document.getElementById('rollDiceBtn')?.addEventListener('click', () => this.openDiceModal());
 
-        // Dark mode toggle for dungeon
-        document.getElementById('toggleDarkModeBtn')?.addEventListener('click', () => this.toggleDungeonDarkMode());
+        // Play mode toggle
+        document.getElementById('togglePlayModeBtn')?.addEventListener('click', () => this.togglePlayMode());
 
-        // Save/Load
-        document.getElementById('saveGameBtn')?.addEventListener('click', () => this.saveGame());
-        document.getElementById('loadGameBtn')?.addEventListener('click', () => this.loadGame());
+        // Exit play mode
+        document.getElementById('exitPlayModeBtn')?.addEventListener('click', () => this.exitPlayMode());
+
+        // Gameplay controls
+        document.getElementById('moveUp')?.addEventListener('click', () => this.movePlayer(0, -1));
+        document.getElementById('moveDown')?.addEventListener('click', () => this.movePlayer(0, 1));
+        document.getElementById('moveLeft')?.addEventListener('click', () => this.movePlayer(-1, 0));
+        document.getElementById('moveRight')?.addEventListener('click', () => this.movePlayer(1, 0));
+
+        // Gameplay actions
+        document.getElementById('interactBtn')?.addEventListener('click', () => this.interactWithRoom());
+        document.getElementById('searchBtn')?.addEventListener('click', () => this.searchRoom());
+        document.getElementById('restBtn')?.addEventListener('click', () => this.rest());
+        document.getElementById('inventoryBtn')?.addEventListener('click', () => this.showInventory());
+
+        // Encounter actions
+        document.getElementById('encounterAttack')?.addEventListener('click', () => this.performCombat());
+        document.getElementById('encounterFlee')?.addEventListener('click', () => this.attemptFlee());
+        document.getElementById('encounterUseItem')?.addEventListener('click', () => this.useItemInCombat());
+        document.getElementById('closeEncounterModal')?.addEventListener('click', () => this.closeEncounterModal());
     }
 
     setupMobileMenu() {
@@ -158,11 +182,285 @@ class DungeonGame {
         }
     }
 
+    togglePlayMode() {
+        if (!this.hero || !this.currentDungeon) {
+            this.showToast('Generate a hero and dungeon first!', 'warning');
+            return;
+        }
+
+        this.playMode = !this.playMode;
+
+        // Find the center panel container and gameplay screen
+        const centerPanelContainer = document.getElementById('centerPanelContainer');
+        const gameplayScreen = document.getElementById('gameplayScreen');
+
+        if (this.playMode) {
+            centerPanelContainer.style.display = 'none';
+            gameplayScreen.classList.remove('hidden');
+            gameplayScreen.classList.add('flex');
+            this.initializeGameplay();
+            this.showToast('Entered Play Mode! 🎮', 'success');
+            this.addStoryEntry('Started dungeon adventure', 'success');
+        } else {
+            gameplayScreen.classList.add('hidden');
+            gameplayScreen.classList.remove('flex');
+            centerPanelContainer.style.display = 'flex';
+            this.showToast('Exited Play Mode', 'info');
+        }
+    }
+
+    exitPlayMode() {
+        this.playMode = false;
+        const gameplayScreen = document.getElementById('gameplayScreen');
+        const centerPanelContainer = document.getElementById('centerPanelContainer');
+
+        gameplayScreen.classList.add('hidden');
+        gameplayScreen.classList.remove('flex');
+        centerPanelContainer.style.display = 'flex';
+        this.showToast('Exited Play Mode', 'info');
+    }
+
+    initializeGameplay() {
+        // Reset player position to entrance
+        this.playerPosition = { x: 0, y: 0 };
+        this.gameHP = this.hero ? this.hero.hp : 100;
+        this.gameLevel = this.hero ? this.hero.level : 1;
+        this.updateGameUI();
+        this.updatePlayerPosition();
+        this.addCombatLog('Adventure begins! You stand at the dungeon entrance.');
+    }
+
+    updateGameUI() {
+        document.getElementById('gameHP').textContent = `${this.gameHP}/100`;
+        document.getElementById('gamePosition').textContent = `(${this.playerPosition.x + 1},${this.playerPosition.y + 1})`;
+        document.getElementById('gameLevel').textContent = this.gameLevel;
+    }
+
+    updatePlayerPosition() {
+        const playerSprite = document.getElementById('playerSprite');
+        const gameplayArea = document.querySelector('#gameplayScreen .border-2');
+        const rect = gameplayArea.getBoundingClientRect();
+        const cellSize = Math.min(rect.width, rect.height) / Math.max(this.dungeonSize, 5);
+
+        const x = (this.playerPosition.x * cellSize) + (cellSize / 2) - 16;
+        const y = (this.playerPosition.y * cellSize) + (cellSize / 2) - 16;
+
+        playerSprite.style.left = `${x}px`;
+        playerSprite.style.top = `${y}px`;
+    }
+
+    movePlayer(dx, dy) {
+        const newX = this.playerPosition.x + dx;
+        const newY = this.playerPosition.y + dy;
+
+        // Check boundaries
+        if (newX < 0 || newX >= this.dungeonSize || newY < 0 || newY >= this.dungeonSize) {
+            this.addCombatLog('You cannot move there - edge of dungeon!');
+            return;
+        }
+
+        this.playerPosition.x = newX;
+        this.playerPosition.y = newY;
+        this.updatePlayerPosition();
+        this.updateGameUI();
+
+        // Check for encounters
+        this.checkRoomEncounter();
+        this.addCombatLog(`Moved to position (${newX + 1},${newY + 1})`);
+    }
+
+    checkRoomEncounter() {
+        const room = this.currentDungeon[this.playerPosition.y][this.playerPosition.x];
+        if (room && room.encounter) {
+            this.triggerEncounter(room.encounter);
+        }
+    }
+
+    triggerEncounter(encounter) {
+        const modal = document.getElementById('encounterModal');
+        const title = document.getElementById('encounterTitle');
+        const content = document.getElementById('encounterContent');
+
+        title.textContent = 'Encounter!';
+        content.innerHTML = `
+            <p class="mb-2">${encounter.description}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">What do you do?</p>
+        `;
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    performCombat() {
+        // Roll for attack
+        const playerRoll = this.rollDice(20);
+        const damage = Math.floor(Math.random() * 10) + 1;
+
+        this.addCombatLog(`You attack! Roll: ${playerRoll}, Damage: ${damage}`);
+        this.closeEncounterModal();
+
+        // Check if encounter defeated
+        if (Math.random() < 0.7) { // 70% chance to defeat
+            this.gainExperience(25);
+            this.addCombatLog('Enemy defeated! Gained 25 XP');
+            this.showToast('Victory! 🎉', 'success');
+        } else {
+            // Take damage
+            const enemyDamage = Math.floor(Math.random() * 15) + 5;
+            this.gameHP = Math.max(0, this.gameHP - enemyDamage);
+            this.updateGameUI();
+            this.addCombatLog(`Enemy strikes back! Damage: ${enemyDamage}`);
+
+            if (this.gameHP <= 0) {
+                this.showToast('You have fallen! 💀', 'error');
+                this.addStoryEntry('Died in combat', 'error');
+                this.exitPlayMode();
+            }
+        }
+    }
+
+    attemptFlee() {
+        const fleeRoll = this.rollDice(20);
+        if (fleeRoll >= 10) {
+            this.addCombatLog(`Successfully fled! Roll: ${fleeRoll}`);
+            this.showToast('Escaped successfully! 🏃', 'success');
+            this.closeEncounterModal();
+        } else {
+            this.addCombatLog(`Failed to flee! Roll: ${fleeRoll}`);
+            // Take damage for failed flee attempt
+            const damage = Math.floor(Math.random() * 10) + 5;
+            this.gameHP = Math.max(0, this.gameHP - damage);
+            this.updateGameUI();
+            this.addCombatLog(`Took ${damage} damage while fleeing`);
+        }
+    }
+
+    useItemInCombat() {
+        if (this.inventory.length === 0) {
+            this.showToast('No items in inventory!', 'warning');
+            return;
+        }
+
+        // Use a healing potion if available
+        const potion = this.inventory.find(item => item.type === 'potion');
+        if (potion) {
+            this.gameHP = Math.min(100, this.gameHP + 30);
+            this.inventory = this.inventory.filter(item => item !== potion);
+            this.updateGameUI();
+            this.addCombatLog('Used healing potion! +30 HP');
+            this.showToast('Healed for 30 HP! ✨', 'success');
+            this.closeEncounterModal();
+        } else {
+            this.showToast('No usable items in combat!', 'warning');
+        }
+    }
+
+    interactWithRoom() {
+        const room = this.currentDungeon[this.playerPosition.y][this.playerPosition.x];
+        if (room && room.content) {
+            this.addCombatLog(`Interacting with: ${room.content.description || 'room content'}`);
+            this.showRoomContent(room);
+        } else {
+            this.addCombatLog('Nothing interesting to interact with here');
+        }
+    }
+
+    searchRoom() {
+        const searchRoll = this.rollDice(20);
+        if (searchRoll >= 15) {
+            // Find something!
+            const item = this.getRandomItem(this.gameData.items);
+            this.inventory.push(item);
+            this.addCombatLog(`Found: ${item.name}!`);
+            this.showToast(`Discovered ${item.name}! 🎁`, 'success');
+        } else {
+            this.addCombatLog(`Found nothing. Search roll: ${searchRoll}`);
+        }
+    }
+
+    showInventory() {
+        if (this.inventory.length === 0) {
+            this.showToast('Inventory is empty', 'info');
+            return;
+        }
+
+        const items = this.inventory.map(item => `${item.name} (${item.type})`).join(', ');
+        this.addCombatLog(`Inventory: ${items}`);
+        this.showToast(`Inventory: ${this.inventory.length} items`, 'info');
+    }
+
+    rest() {
+        if (this.gameHP >= 100) {
+            this.showToast('Already at full health!', 'info');
+            return;
+        }
+
+        const healAmount = Math.min(30, 100 - this.gameHP);
+        this.gameHP += healAmount;
+        this.updateGameUI();
+        this.addCombatLog(`Rested and healed ${healAmount} HP`);
+        this.showToast(`Healed ${healAmount} HP! 💤`, 'success');
+    }
+
+    gainExperience(amount) {
+        this.experience += amount;
+        const xpForLevel = this.gameLevel * 100;
+
+        if (this.experience >= xpForLevel) {
+            this.gameLevel++;
+            this.experience -= xpForLevel;
+            this.gameHP = 100; // Full heal on level up
+            this.showToast(`Leveled up to ${this.gameLevel}! 🎉`, 'success');
+            this.addCombatLog(`Reached level ${this.gameLevel}!`);
+        }
+    }
+
+    showRoomContent(room) {
+        const contentDisplay = document.getElementById('roomContentDisplay');
+        const description = document.getElementById('roomDescription');
+
+        description.textContent = room.content.description || 'An interesting room';
+        contentDisplay.classList.remove('hidden');
+        contentDisplay.classList.add('block');
+
+        setTimeout(() => {
+            contentDisplay.classList.add('hidden');
+            contentDisplay.classList.remove('block');
+        }, 3000);
+    }
+
+    addCombatLog(message) {
+        const combatLog = document.getElementById('combatLog');
+        if (!combatLog) return;
+
+        const entry = document.createElement('div');
+        entry.className = 'text-xs text-white mb-1';
+        entry.textContent = message;
+
+        combatLog.appendChild(entry);
+        combatLog.scrollTop = combatLog.scrollHeight;
+
+        // Keep only last 10 entries
+        while (combatLog.children.length > 10) {
+            combatLog.removeChild(combatLog.firstChild);
+        }
+    }
+
+    closeEncounterModal() {
+        const modal = document.getElementById('encounterModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
     generateDungeon() {
+        console.log('Generating dungeon...');
         const dungeonContainer = document.getElementById('dungeonContainer');
         const dungeonGrid = document.getElementById('dungeonGrid');
 
-        if (!dungeonContainer || !dungeonGrid) return;
+        if (!dungeonContainer || !dungeonGrid) {
+            console.log('Missing dungeon elements');
+            return;
+        }
 
         // Clear previous dungeon
         dungeonGrid.innerHTML = '';
@@ -172,35 +470,70 @@ class DungeonGame {
 
         // Generate rooms
         const rooms = [];
-        for (let i = 0; i < this.dungeonSize; i++) {
-            for (let j = 0; j < this.dungeonSize; j++) {
+        this.currentDungeon = [];
+
+        for (let y = 0; y < this.dungeonSize; y++) {
+            this.currentDungeon[y] = [];
+            for (let x = 0; x < this.dungeonSize; x++) {
                 const room = document.createElement('div');
                 room.className = 'dungeon-room';
 
-                // Randomly place rooms (ensuring connectivity)
-                const isRoom = this.shouldPlaceRoom(i, j, rooms);
-                if (isRoom) {
-                    room.innerHTML = `<i class="fas fa-door-closed"></i>`;
+                // Always place entrance at (0,0)
+                if (x === 0 && y === 0) {
+                    room.innerHTML = `<i class="fas fa-door-open text-green-400"></i>`;
                     room.classList.add('dungeon-entrance');
-
-                    // Add room types
-                    const roomTypes = ['treasure', 'trap', 'empty'];
+                    this.currentDungeon[y][x] = {
+                        type: 'entrance',
+                        content: { description: 'The dungeon entrance. A safe place to start your adventure.' }
+                    };
+                } else if (Math.random() < 0.6) {
+                    // Place interesting rooms
+                    const roomTypes = ['treasure', 'trap', 'monster', 'empty'];
                     const roomType = roomTypes[Math.floor(Math.random() * roomTypes.length)];
 
                     switch (roomType) {
                         case 'treasure':
                             room.innerHTML = `<i class="fas fa-coins text-yellow-400"></i>`;
-                            room.classList.add('bg-yellow-900');
+                            room.classList.add('dungeon-treasure');
+                            this.currentDungeon[y][x] = {
+                                type: 'treasure',
+                                content: { description: 'A room filled with treasure! Gold and items await.' }
+                            };
                             break;
                         case 'trap':
                             room.innerHTML = `<i class="fas fa-skull text-red-400"></i>`;
-                            room.classList.add('bg-red-900');
+                            room.classList.add('dungeon-trap');
+                            this.currentDungeon[y][x] = {
+                                type: 'trap',
+                                content: { description: 'A dangerous trap room. Tread carefully!' }
+                            };
                             break;
+                        case 'monster':
+                            room.innerHTML = `<i class="fas fa-dragon text-purple-400"></i>`;
+                            room.classList.add('dungeon-monster');
+                            this.currentDungeon[y][x] = {
+                                type: 'monster',
+                                encounter: {
+                                    description: 'A hostile creature blocks your path!',
+                                    type: 'combat'
+                                },
+                                content: { description: 'A monster lurks in the shadows of this room.' }
+                            };
+                            break;
+                        default:
+                            room.innerHTML = `<i class="fas fa-circle text-gray-400"></i>`;
+                            room.classList.add('dungeon-empty');
+                            this.currentDungeon[y][x] = {
+                                type: 'empty',
+                                content: { description: 'An empty room. Nothing of interest here.' }
+                            };
                     }
-
-                    rooms.push({ x: i, y: j, type: roomType });
                 } else {
                     room.classList.add('dungeon-path');
+                    this.currentDungeon[y][x] = {
+                        type: 'empty',
+                        content: { description: 'A dark corridor. Nothing to see here.' }
+                    };
                 }
 
                 dungeonGrid.appendChild(room);
@@ -208,8 +541,8 @@ class DungeonGame {
         }
 
         dungeonContainer.classList.remove('hidden');
-        this.showToast(`Generated ${this.dungeonSize}x${this.dungeonSize} dungeon with ${rooms.length} rooms!`, 'success');
-        this.addStoryEntry(`Explored a ${this.dungeonSize}x${this.dungeonSize} dungeon with ${rooms.length} rooms`, 'success');
+        this.showToast(`Generated ${this.dungeonSize}x${this.dungeonSize} dungeon!`, 'success');
+        this.addStoryEntry(`Explored a ${this.dungeonSize}x${this.dungeonSize} dungeon`, 'success');
     }
 
     shouldPlaceRoom(x, y, existingRooms) {

@@ -451,6 +451,139 @@
             margin-left: 0.5rem;
             margin-right: 0;
         }
+
+        body.rtl .ml-4 {
+            margin-right: 1rem;
+            margin-left: 0;
+        }
+
+        body.rtl .mr-4 {
+            margin-left: 1rem;
+            margin-right: 0;
+        }
+
+        body.rtl .pl-4 {
+            padding-right: 1rem;
+            padding-left: 0;
+        }
+
+        body.rtl .pr-4 {
+            padding-left: 1rem;
+            padding-right: 0;
+        }
+
+        body.rtl .space-x-4 > * + * {
+            margin-right: 1rem;
+            margin-left: 0;
+        }
+
+        body.rtl .space-x-8 > * + * {
+            margin-right: 2rem;
+            margin-left: 0;
+        }
+
+        body.rtl .flex-row {
+            flex-direction: row-reverse;
+        }
+
+        body.rtl .flex-row-reverse {
+            flex-direction: row;
+        }
+
+        body.rtl .grid-cols-2 {
+            direction: rtl;
+        }
+
+        body.rtl .grid-cols-3 {
+            direction: rtl;
+        }
+
+        /* RTL for specific components */
+        body.rtl .project-card {
+            text-align: right;
+        }
+
+        body.rtl .contact-form {
+            text-align: right;
+        }
+
+        body.rtl .nav-item {
+            text-align: right;
+        }
+
+        body.rtl .hero-content {
+            direction: rtl;
+        }
+
+        body.rtl .footer-content {
+            direction: rtl;
+            text-align: center;
+        }
+
+        body.rtl .modal-content {
+            direction: rtl;
+            text-align: right;
+        }
+
+        body.rtl .language-dropdown {
+            left: auto;
+            right: 0;
+        }
+
+        body.rtl .dropdown-menu {
+            left: auto;
+            right: 0;
+            text-align: right;
+        }
+
+        /* RTL for form elements */
+        body.rtl input,
+        body.rtl textarea {
+            text-align: right;
+        }
+
+        body.rtl .form-input,
+        body.rtl .form-textarea {
+            text-align: right;
+            direction: rtl;
+        }
+
+        /* RTL for buttons */
+        body.rtl .btn-primary {
+            text-align: center;
+        }
+
+        body.rtl .filter-btn {
+            margin-left: 0;
+            margin-right: 0.5rem;
+        }
+
+        body.rtl .filter-btn:last-child {
+            margin-right: 0;
+        }
+
+        .hero-content {
+            text-align: center;
+        }
+
+        .footer-content {
+            text-align: center;
+        }
+
+        .modal-content {
+            text-align: left;
+        }
+
+        .language-dropdown {
+            left: 0;
+            right: auto;
+        }
+
+        .dropdown-menu {
+            left: 0;
+            right: auto;
+            text-align: left;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-all duration-500 min-h-screen">
@@ -521,12 +654,12 @@
     <!-- Hero Section -->
     <section id="home" class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-20 transition-all duration-500">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
+            <div class="text-center hero-content">
                 <div class="w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mx-auto mb-8 flex items-center justify-center text-white text-6xl shadow-2xl">
                     <i class="fas fa-rocket"></i>
                 </div>
                 <h1 class="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-                    DevOps & 
+                    Vibe Coding Expert & 
                     <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Full Stack Developer</span>
                 </h1>
                 <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto" data-translate="hero.subtitle">
@@ -703,17 +836,20 @@
                     <span class="font-semibold">John Mogi</span>
                 </div>
                 <div class="text-gray-400 text-sm">
-                    © 2024 John Mogi. All rights reserved.
+                    <span data-translate="footer.copyright">© 2024 John Mogi. All rights reserved.</span>
                 </div>
                 <div class="flex space-x-4 mt-4 md:mt-0">
                     <a href="https://github.com/johnmogi" class="text-gray-400 hover:text-white transition-colors duration-200">
                         <i class="fab fa-github text-xl"></i>
+                        <span class="sr-only" data-translate="footer.github">GitHub</span>
                     </a>
                     <a href="https://linkedin.com/in/johnmogi" class="text-gray-400 hover:text-white transition-colors duration-200">
                         <i class="fab fa-linkedin text-xl"></i>
+                        <span class="sr-only" data-translate="footer.linkedin">LinkedIn</span>
                     </a>
                     <a href="mailto:dev@johnmogi.com" class="text-gray-400 hover:text-white transition-colors duration-200">
                         <i class="fas fa-envelope text-xl"></i>
+                        <span class="sr-only" data-translate="footer.email">Email</span>
                     </a>
                 </div>
             </div>
@@ -733,7 +869,7 @@
                 'nav.home': 'Home',
                 'nav.projects': 'Projects',
                 'nav.contact': 'Contact',
-                'hero.title': 'DevOps & Full Stack Developer',
+                'hero.title': 'Vibe Coding Expert & Full Stack Developer',
                 'hero.subtitle': 'Passionate about building scalable infrastructure and modern web applications. Dungeon Master by night, developer by day.',
                 'hero.viewWork': 'View My Work',
                 'hero.getInTouch': 'Get In Touch',
@@ -751,13 +887,35 @@
                 'contact.phone': 'Phone Number *',
                 'contact.email': 'Email (Optional)',
                 'contact.send': 'Send WhatsApp',
-                'contact.success': 'WhatsApp message sent!'
+                'contact.success': 'WhatsApp message sent!',
+                'footer.copyright': '© 2024 John Mogi. All rights reserved.',
+                'footer.email': 'Email',
+                'footer.github': 'GitHub',
+                'footer.linkedin': 'LinkedIn',
+                'loading': 'Loading...',
+                'error': 'Error',
+                'project.viewLive': 'View Live',
+                'project.viewGithub': 'View GitHub',
+                'project.timeline': 'Timeline',
+                'project.teamSize': 'Team Size',
+                'project.metrics': 'Metrics',
+                'project.features': 'Key Features',
+                'project.achievements': 'Achievements',
+                'project.challenges': 'Challenges Overcome',
+                'project.outcomes': 'Project Outcomes',
+                'project.technologies': 'Technologies Used',
+                'project.projectOverview': 'Project Overview',
+                'filter.all': 'All Projects',
+                'filter.web': 'Web Development',
+                'filter.devops': 'DevOps',
+                'filter.games': 'Games',
+                'filter.marketing': 'Marketing'
             },
             es: {
                 'nav.home': 'Inicio',
                 'nav.projects': 'Proyectos',
                 'nav.contact': 'Contacto',
-                'hero.title': 'DevOps y Desarrollador Full Stack',
+                'hero.title': 'Experto en Vibe Coding y Desarrollador Full Stack',
                 'hero.subtitle': 'Apasionado por construir infraestructura escalable y aplicaciones web modernas. Dungeon Master de noche, desarrollador de día.',
                 'hero.viewWork': 'Ver Mi Trabajo',
                 'hero.getInTouch': 'Contactar',
@@ -775,13 +933,35 @@
                 'contact.phone': 'Número de Teléfono *',
                 'contact.email': 'Email (Opcional)',
                 'contact.send': 'Enviar WhatsApp',
-                'contact.success': '¡Mensaje de WhatsApp enviado!'
+                'contact.success': '¡Mensaje de WhatsApp enviado!',
+                'footer.copyright': '© 2024 John Mogi. Todos los derechos reservados.',
+                'footer.email': 'Email',
+                'footer.github': 'GitHub',
+                'footer.linkedin': 'LinkedIn',
+                'loading': 'Cargando...',
+                'error': 'Error',
+                'project.viewLive': 'Ver En Vivo',
+                'project.viewGithub': 'Ver GitHub',
+                'project.timeline': 'Cronograma',
+                'project.teamSize': 'Tamaño del Equipo',
+                'project.metrics': 'Métricas',
+                'project.features': 'Características Clave',
+                'project.achievements': 'Logros',
+                'project.challenges': 'Desafíos Superados',
+                'project.outcomes': 'Resultados del Proyecto',
+                'project.technologies': 'Tecnologías Utilizadas',
+                'project.projectOverview': 'Resumen del Proyecto',
+                'filter.all': 'Todos los Proyectos',
+                'filter.web': 'Desarrollo Web',
+                'filter.devops': 'DevOps',
+                'filter.games': 'Juegos',
+                'filter.marketing': 'Marketing'
             },
             fr: {
                 'nav.home': 'Accueil',
                 'nav.projects': 'Projets',
                 'nav.contact': 'Contact',
-                'hero.title': 'DevOps & Développeur Full Stack',
+                'hero.title': 'Expert Vibe Coding & Développeur Full Stack',
                 'hero.subtitle': 'Passionné par la construction d\'infrastructures évolutives et d\'applications web modernes. Dungeon Master la nuit, développeur le jour.',
                 'hero.viewWork': 'Voir Mon Travail',
                 'hero.getInTouch': 'Entrer en Contact',
@@ -799,13 +979,35 @@
                 'contact.phone': 'Numéro de Téléphone *',
                 'contact.email': 'Email (Optionnel)',
                 'contact.send': 'Envoyer WhatsApp',
-                'contact.success': 'Message WhatsApp envoyé !'
+                'contact.success': 'Message WhatsApp envoyé !',
+                'footer.copyright': '© 2024 John Mogi. Tous droits réservés.',
+                'footer.email': 'Email',
+                'footer.github': 'GitHub',
+                'footer.linkedin': 'LinkedIn',
+                'loading': 'Chargement...',
+                'error': 'Erreur',
+                'project.viewLive': 'Voir En Direct',
+                'project.viewGithub': 'Voir GitHub',
+                'project.timeline': 'Chronologie',
+                'project.teamSize': 'Taille de l\'Équipe',
+                'project.metrics': 'Métriques',
+                'project.features': 'Fonctionnalités Clés',
+                'project.achievements': 'Réalisations',
+                'project.challenges': 'Défis Surmontés',
+                'project.outcomes': 'Résultats du Projet',
+                'project.technologies': 'Technologies Utilisées',
+                'project.projectOverview': 'Aperçu du Projet',
+                'filter.all': 'Tous les Projets',
+                'filter.web': 'Développement Web',
+                'filter.devops': 'DevOps',
+                'filter.games': 'Jeux',
+                'filter.marketing': 'Marketing'
             },
             he: {
                 'nav.home': 'בית',
                 'nav.projects': 'פרויקטים',
                 'nav.contact': 'צור קשר',
-                'hero.title': 'DevOps ומפתח Full Stack',
+                'hero.title': 'מומחה Vibe Coding ומפתח Full Stack',
                 'hero.subtitle': 'נלהב לבנות תשתית ניתנת להרחבה ואפליקציות אינטרנט מודרניות. Dungeon Master בלילה, מפתח ביום.',
                 'hero.viewWork': 'צפה בעבודה שלי',
                 'hero.getInTouch': 'צור קשר',
@@ -823,7 +1025,29 @@
                 'contact.phone': 'מספר טלפון *',
                 'contact.email': 'אימייל (אופציונלי)',
                 'contact.send': 'שלח WhatsApp',
-                'contact.success': 'הודעת WhatsApp נשלחה!'
+                'contact.success': 'הודעת WhatsApp נשלחה!',
+                'footer.copyright': '© 2024 John Mogi. כל הזכויות שמורות.',
+                'footer.email': 'אימייל',
+                'footer.github': 'GitHub',
+                'footer.linkedin': 'LinkedIn',
+                'loading': 'טוען...',
+                'error': 'שגיאה',
+                'project.viewLive': 'צפה באתר',
+                'project.viewGithub': 'צפה ב-GitHub',
+                'project.timeline': 'ציר זמן',
+                'project.teamSize': 'גודל הצוות',
+                'project.metrics': 'מדדים',
+                'project.features': 'תכונות עיקריות',
+                'project.achievements': 'הישגים',
+                'project.challenges': 'אתגרים שנפתרו',
+                'project.outcomes': 'תוצאות הפרויקט',
+                'project.technologies': 'טכנולוגיות בשימוש',
+                'project.projectOverview': 'סקירת הפרויקט',
+                'filter.all': 'כל הפרויקטים',
+                'filter.web': 'פיתוח אתרים',
+                'filter.devops': 'DevOps',
+                'filter.games': 'משחקים',
+                'filter.marketing': 'שיווק'
             }
         };
 
@@ -875,8 +1099,31 @@
             });
         });
 
-        // Initialize language on page load
-        translatePage(currentLanguage);
+        // Handle broken images with placeholders
+        function handleImageErrors() {
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                img.addEventListener('error', function() {
+                    // Create placeholder based on context
+                    if (this.closest('.project-card')) {
+                        // Project image placeholder
+                        this.src = `https://via.placeholder.com/400x300/4F46E5/FFFFFF?text=${encodeURIComponent(this.alt || 'Project')}`;
+                        this.style.objectFit = 'contain';
+                    } else if (this.closest('.gallery-item')) {
+                        // Gallery image placeholder
+                        this.src = `https://via.placeholder.com/300x200/10B981/FFFFFF?text=${encodeURIComponent(this.alt || 'Gallery')}`;
+                        this.style.objectFit = 'contain';
+                    } else {
+                        // General image placeholder
+                        this.src = 'https://via.placeholder.com/400x300/6B7280/FFFFFF?text=Image+Not+Found';
+                        this.style.objectFit = 'contain';
+                    }
+                });
+            });
+        }
+
+        // Initialize image error handling
+        handleImageErrors();
         
         function toggleDarkMode() {
             document.documentElement.classList.toggle('dark');
@@ -1521,7 +1768,7 @@
                     </div>
 
                     <div>
-                        <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">Project Overview</h3>
+                        <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white" data-translate="project.projectOverview">Project Overview</h3>
                         <p class="text-gray-600 dark:text-gray-300 mb-4">${project.longDescription}</p>
 
                         <div class="grid grid-cols-2 gap-4 mb-6">
@@ -1534,7 +1781,7 @@
                         </div>
 
                         <div class="mb-4">
-                            <h4 class="font-semibold mb-2 text-gray-900 dark:text-white">Technologies Used</h4>
+                            <h4 class="font-semibold mb-2 text-gray-900 dark:text-white" data-translate="project.technologies">Technologies Used</h4>
                             <div class="flex flex-wrap gap-2">
                                 ${project.technologies.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
                             </div>
@@ -1543,7 +1790,7 @@
                 </div>
 
                 <div class="mt-8">
-                    <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Key Features</h3>
+                    <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white" data-translate="project.features">Key Features</h3>
                     <ul class="feature-list text-gray-600 dark:text-gray-300">
                         ${project.features.map(feature => `<li>${feature}</li>`).join('')}
                     </ul>
@@ -1551,13 +1798,13 @@
 
                 <div class="grid md:grid-cols-2 gap-8 mt-8">
                     <div>
-                        <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Achievements</h3>
+                        <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white" data-translate="project.achievements">Achievements</h3>
                         <ul class="space-y-2 text-gray-600 dark:text-gray-300">
                             ${project.achievements.map(achievement => `<li>• ${achievement}</li>`).join('')}
                         </ul>
                     </div>
                     <div>
-                        <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Challenges Overcome</h3>
+                        <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white" data-translate="project.challenges">Challenges Overcome</h3>
                         <ul class="space-y-2 text-gray-600 dark:text-gray-300">
                             ${project.challenges.map(challenge => `<li>• ${challenge}</li>`).join('')}
                         </ul>
@@ -1565,16 +1812,16 @@
                 </div>
 
                 <div class="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">Project Outcomes</h3>
+                    <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white" data-translate="project.outcomes">Project Outcomes</h3>
                     <p class="text-gray-600 dark:text-gray-300">${project.outcomes}</p>
                 </div>
 
                 <div class="flex gap-4 mt-8">
                     ${project.demo ? `<a href="${project.demo}" target="_blank" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-center font-semibold transition-colors duration-200">
-                        <i class="fas fa-external-link-alt mr-2"></i>View Live
+                        <i class="fas fa-external-link-alt mr-2"></i><span data-translate="project.viewLive">View Live</span>
                     </a>` : ''}
                     ${project.github ? `<a href="${project.github}" target="_blank" class="flex-1 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 px-6 py-3 rounded-lg text-center font-semibold transition-colors duration-200">
-                        <i class="fab fa-github mr-2"></i>View Code
+                        <i class="fab fa-github mr-2"></i><span data-translate="project.viewGithub">View GitHub</span>
                     </a>` : ''}
                 </div>
             `;
@@ -1685,8 +1932,8 @@
                             ${project.technologies.length > 3 ? `<span class="tech-tag">+${project.technologies.length - 3} more</span>` : ''}
                         </div>
                         <div class="grid grid-cols-2 gap-4 text-sm text-gray-500 dark:text-gray-400">
-                            <div><i class="fas fa-clock mr-1"></i>${project.timeline}</div>
-                            <div><i class="fas fa-users mr-1"></i>${project.teamSize}</div>
+                            <div><i class="fas fa-clock mr-1"></i><span data-translate="project.timeline">${project.timeline}</span></div>
+                            <div><i class="fas fa-users mr-1"></i><span data-translate="project.teamSize">${project.teamSize}</span></div>
                         </div>
                     </div>
                 `;

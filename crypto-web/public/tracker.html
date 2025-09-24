@@ -41,47 +41,48 @@
         @keyframes loadingPulse {
             0% { opacity: 1; }
             50% { opacity: 0.5; }
-            100% { opacity: 1; }
         }
 
-        /* Apply animations to elements */
+        /* Enhanced live indicator */
+        @keyframes liveShimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Swipe in animation for charts */
+        @keyframes swipeIn {
+            0% {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Fade in animation for charts */
+        @keyframes fadeInUp {
+            0% {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
         .favorites-pill {
-            animation: pillSlideIn 0.5s ease-out forwards;
-        }
-
-        .refresh-animation {
-            animation: refreshSwipe 0.3s ease-in-out;
+            animation: pillSlideIn 0.3s ease-out forwards;
         }
 
         .live-indicator {
-            animation: loadingPulse 1.5s ease-in-out infinite;
-        }
-
-        /* Enhanced chart container */
-        #chartContainer {
-            transition: all 0.3s ease-in-out;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        #chartContainer:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Countdown animation */
-        #countdown {
-            transition: all 0.2s ease-in-out;
-            font-weight: bold;
-        }
-
-        /* Live mode indicator */
-        .live-badge {
             position: relative;
             overflow: hidden;
         }
 
-        .live-badge::before {
+        .live-indicator::after {
             content: '';
             position: absolute;
             top: 0;
@@ -92,9 +93,9 @@
             animation: liveShimmer 3s infinite;
         }
 
-        @keyframes liveShimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
+        /* Enhanced refresh animation */
+        .refresh-animation {
+            animation: chartPulse 0.3s ease-out;
         }
 
         /* Essential styles in case CSS build fails */
@@ -158,30 +159,32 @@
         </div>
 
         <!-- Controls -->
-        <div class="flex flex-wrap items-center gap-4 mb-6">
-            <button id="refreshBtn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-                Refresh Now
-            </button>
-            <label class="flex items-center">
-                <input type="checkbox" id="liveModeToggle" class="mr-2">
-                <span class="text-gray-700">Live Updates</span>
-            </label>
-            <select id="refreshInterval" class="px-3 py-2 border border-gray-300 rounded">
-                <option value="5">5 seconds</option>
-                <option value="30">30 seconds</option>
-                <option value="60">1 minute</option>
-                <option value="300">5 minutes</option>
-                <option value="600">10 minutes</option>
-            </select>
-            <div class="flex items-center space-x-2">
-                <input type="checkbox" id="dummyModeToggle" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
-                <label for="dummyModeToggle" class="text-sm text-gray-700">Demo Mode</label>
-            </div>
-            <div id="lastRefresh" class="text-sm text-gray-500">
-                Last updated: Never
-            </div>
-            <div id="nextRefresh" class="text-sm text-blue-600 hidden">
-                Next update in: <span id="countdown">30</span>s
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex flex-wrap gap-4 items-center justify-between">
+                <div class="flex flex-wrap gap-4 items-center">
+                    <div class="flex items-center space-x-2">
+                        <label for="refreshInterval" class="text-gray-700 font-medium">Update Interval:</label>
+                        <select id="refreshInterval" class="border border-gray-300 rounded px-3 py-1">
+                            <option value="1">1 second</option>
+                            <option value="5">5 seconds</option>
+                            <option value="30">30 seconds</option>
+                            <option value="60" selected>1 minute</option>
+                            <option value="300">5 minutes</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="dummyModeToggle" class="rounded">
+                        <label for="dummyModeToggle" class="text-gray-700">Demo Mode</label>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="refreshBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        Refresh Now
+                    </button>
+                    <div id="nextRefresh" class="text-sm text-gray-600 hidden">
+                        Next update in: <span id="countdown" class="font-mono">60</span>s
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -217,6 +220,9 @@
             <div class="w-full" style="height: 300px; max-height: 300px; overflow: hidden;">
                 <canvas id="portfolioChart" width="400" height="300"></canvas>
             </div>
+            <div id="lastRefresh" class="text-sm text-gray-600 mt-2 text-center">
+                <!-- Last refresh time will be populated by JavaScript -->
+            </div>
         </div>
 
         <!-- Error State -->
@@ -240,21 +246,8 @@
             // Load initial data
             await loadTrackerData();
 
-            // Simple API test - try to get Bitcoin data directly
-            console.log('🧪 Testing direct API calls...');
-            try {
-                const testResponse = await fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1&interval=daily');
-                console.log('🧪 Direct CoinGecko test:', testResponse.status, testResponse.statusText);
-            } catch (e) {
-                console.log('🧪 Direct CoinGecko test failed:', e.message);
-            }
-
-            try {
-                const testResponse2 = await fetch('https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=1');
-                console.log('🧪 Direct CryptoCompare test:', testResponse2.status, testResponse2.statusText);
-            } catch (e) {
-                console.log('🧪 Direct CryptoCompare test failed:', e.message);
-            }
+            // Start live updates by default (no toggle needed)
+            startLiveUpdates();
 
             // Set up event listeners
             document.getElementById('refreshBtn').addEventListener('click', async () => {
@@ -276,28 +269,14 @@
                 }
             });
 
-            document.getElementById('liveModeToggle').addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    startLiveUpdates();
-                    showToast('Live updates enabled', 'success');
-                } else {
-                    stopLiveUpdates();
-                    showToast('Live updates disabled', 'info');
-                }
-            });
-
             document.getElementById('refreshInterval').addEventListener('change', () => {
-                if (document.getElementById('liveModeToggle').checked) {
-                    stopLiveUpdates();
-                    startLiveUpdates();
-                }
+                stopLiveUpdates();
+                startLiveUpdates();
             });
 
             document.getElementById('dummyModeToggle').addEventListener('change', async (e) => {
-                const liveModeEnabled = document.getElementById('liveModeToggle').checked;
-
-                if (e.target.checked && liveModeEnabled) {
-                    // Start live price simulation when demo mode is enabled during live updates
+                if (e.target.checked) {
+                    // Start live price simulation when demo mode is enabled
                     startLivePriceSimulation();
                 } else {
                     // Stop live price simulation when demo mode is disabled

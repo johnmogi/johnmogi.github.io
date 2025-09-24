@@ -166,12 +166,18 @@ function startLiveUpdates() {
     }
 
     liveUpdateInterval = setInterval(async () => {
-        // Add refresh animation to chart container
+        // Add swipe/fade animation to chart container
         const chartContainer = document.getElementById('chartContainer');
         if (chartContainer) {
-            chartContainer.classList.add('refresh-animation');
+            // Add swipe effect
+            chartContainer.classList.add('chart-swipe-in');
             setTimeout(() => {
-                chartContainer.classList.remove('refresh-animation');
+                chartContainer.classList.remove('chart-swipe-in');
+                // Add fade effect after swipe
+                chartContainer.classList.add('chart-fade-in');
+                setTimeout(() => {
+                    chartContainer.classList.remove('chart-fade-in');
+                }, 500);
             }, 300);
         }
 
@@ -352,7 +358,7 @@ async function loadTrackerData() {
             }
 
             return `
-                <div class="favorites-pill ${errorClass} px-3 py-1 rounded-full text-sm flex items-center" ${title} style="animation-delay: ${index * 0.1}s">
+                <div class="favorites-pill ${errorClass} px-3 py-1 rounded-full text-sm flex items-center chart-swipe-in" ${title} style="animation-delay: ${index * 0.1}s">
                     <span class="capitalize">${coinId}</span>
                     <button onclick="removeFromFavorites('${coinId}')" class="ml-2 text-blue-600 hover:text-blue-800 transition-colors duration-200">×</button>
                 </div>
@@ -365,6 +371,7 @@ async function loadTrackerData() {
         // Update UI with smooth transitions
         favoritesContainerEl.classList.remove('hidden');
         chartContainerEl.classList.remove('hidden');
+        chartContainerEl.classList.add('chart-fade-in');
         document.getElementById('lastRefresh').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
 
         // Reset countdown if live updates are enabled
@@ -394,7 +401,7 @@ async function loadTrackerData() {
 
         // Update favorites pills to show demo mode
         favoritesContainerEl.innerHTML = favorites.map(coinId => `
-            <div class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm flex items-center" title="Using demo data">
+            <div class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm flex items-center chart-swipe-in" title="Using demo data">
                 <span class="capitalize">${coinId}</span>
                 <button onclick="removeFromFavorites('${coinId}')" class="ml-2 text-blue-600 hover:text-blue-800">×</button>
             </div>
@@ -403,6 +410,7 @@ async function loadTrackerData() {
         updateChart(dummyData);
         favoritesContainerEl.classList.remove('hidden');
         chartContainerEl.classList.remove('hidden');
+        chartContainerEl.classList.add('chart-fade-in');
         document.getElementById('lastRefresh').textContent = `Last updated: ${new Date().toLocaleTimeString()} (Demo Mode - Network Issues)`;
 
         // Show notification about demo mode
@@ -417,36 +425,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load initial data
     await loadTrackerData();
 
-    // Initialize live mode toggle
-    const liveModeToggle = document.getElementById('liveModeToggle');
-    if (liveModeToggle) {
-        liveModeToggle.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                startLiveUpdates();
-                document.getElementById('nextRefresh').classList.remove('hidden');
-            } else {
-                stopLiveUpdates();
-                document.getElementById('nextRefresh').classList.add('hidden');
-            }
-        });
-    }
+    // Start live updates by default (no toggle needed)
+    startLiveUpdates();
 
-    // Initialize demo mode toggle
-    const dummyModeToggle = document.getElementById('dummyModeToggle');
-    if (dummyModeToggle) {
-        dummyModeToggle.addEventListener('change', async (e) => {
-            const liveModeEnabled = document.getElementById('liveModeToggle').checked;
+    // Set up event listeners
+    document.getElementById('refreshBtn').addEventListener('click', async () => {
+        const refreshBtn = document.getElementById('refreshBtn');
 
-            if (e.target.checked && liveModeEnabled) {
-                // Start live price simulation when demo mode is enabled during live updates
-                startLivePriceSimulation();
-            } else {
-                // Stop live price simulation when demo mode is disabled
-                stopLivePriceSimulation();
-            }
+        // Add loading animation to button
+        refreshBtn.classList.add('animate-pulse', 'bg-green-400');
+        refreshBtn.textContent = 'Refreshing...';
 
+        try {
             await loadTrackerData();
-            showNotification(`Demo mode ${e.target.checked ? 'enabled' : 'disabled'}`, 'info');
-        });
-    }
+            showToast('Portfolio updated', 'success');
+        } catch (error) {
+            showToast('Refresh failed', 'error');
+        } finally {
+            // Remove loading animation
+            refreshBtn.classList.remove('animate-pulse', 'bg-green-400');
+            refreshBtn.textContent = 'Refresh Now';
+        }
+    });
+
+    document.getElementById('refreshInterval').addEventListener('change', () => {
+        stopLiveUpdates();
+        startLiveUpdates();
+    });
+
+    document.getElementById('dummyModeToggle').addEventListener('change', async (e) => {
+        if (e.target.checked) {
+            // Start live price simulation when demo mode is enabled
+            startLivePriceSimulation();
+        } else {
+            // Stop live price simulation when demo mode is disabled
+            stopLivePriceSimulation();
+        }
+
+        await loadTrackerData();
+        showToast(`Demo mode ${e.target.checked ? 'enabled' : 'disabled'}`, 'info');
+    });
 });
