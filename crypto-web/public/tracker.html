@@ -91,7 +91,7 @@
         }
     </style>
         <!-- Note: Using Tailwind CSS CDN for development. For production, consider using the Tailwind CLI or PostCSS plugin -->
-        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="./css/output.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     </head>
@@ -187,9 +187,11 @@
     </main>
 
     <!-- JavaScript Modules -->
-    <script src="js/notifications.js"></script>
-    <script src="js/chart.js"></script>
-    <script src="js/tracker.js"></script>
+    <script src="./js/cache.js"></script>
+    <script src="./js/api.js"></script>
+    <script src="./js/chart.js"></script>
+    <script src="./js/tracker.js"></script>
+    <script src="./js/notifications.js"></script>
     <script>
         // Initialize the page
         document.addEventListener('DOMContentLoaded', async () => {

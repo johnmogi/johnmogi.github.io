@@ -529,15 +529,15 @@
                     DevOps & 
                     <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Full Stack Developer</span>
                 </h1>
-                <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+                <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto" data-translate="hero.subtitle">
                     Passionate about building scalable infrastructure and modern web applications. 
                     Dungeon Master by night, developer by day.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="#projects" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                    <a href="#projects" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105" data-translate="hero.viewWork">
                         View My Work
                     </a>
-                    <a href="#contact" class="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200">
+                    <a href="#contact" class="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200" data-translate="hero.getInTouch">
                         Get In Touch
                     </a>
                 </div>
@@ -549,28 +549,28 @@
     <section id="projects" class="py-20 bg-white dark:bg-gray-800 transition-all duration-500">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">Featured Projects</h2>
+                <h2 class="text-4xl font-bold text-gray-900 dark:text-white mb-4" data-translate="projects.title">Featured Projects</h2>
                 <div class="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto mb-6"></div>
-                <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" data-translate="projects.subtitle">
                     Comprehensive showcase of my work with detailed galleries, metrics, and professional presentation.
                 </p>
             </div>
 
             <!-- Filter Buttons -->
             <div class="flex flex-wrap justify-center gap-3 mb-12">
-                <button class="filter-btn active px-4 py-2 rounded-full bg-blue-600 text-white" data-filter="all">
+                <button class="filter-btn active px-4 py-2 rounded-full bg-blue-600 text-white" data-filter="all" data-translate="projects.all">
                     All Projects
                 </button>
-                <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="web">
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="web" data-translate="projects.web">
                     Web Development
                 </button>
-                <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="devops">
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="devops" data-translate="projects.devops">
                     DevOps
                 </button>
-                <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="game">
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="game" data-translate="projects.games">
                     Games
                 </button>
-                <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="marketing">
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="marketing" data-translate="projects.marketing">
                     Marketing
                 </button>
             </div>
@@ -663,36 +663,36 @@
 
                 <!-- Contact Form -->
                 <div class="contact-form">
-                    <h3 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Send Message</h3>
+                    <h3 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white" data-translate="contact.sendMessage">Send Message</h3>
                     <form id="contactForm" class="space-y-4">
                         <div class="form-group">
-                            <label for="name" class="form-label">Name *</label>
+                            <label for="name" class="form-label" data-translate="contact.name">Name *</label>
                             <input type="text" id="name" name="name" class="form-input" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="email" class="form-label">Email *</label>
+                            <label for="email" class="form-label" data-translate="contact.email">Email *</label>
                             <input type="email" id="email" name="email" class="form-input" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="subject" class="form-label">Subject</label>
+                            <label for="subject" class="form-label" data-translate="contact.subject">Subject</label>
                             <input type="text" id="subject" name="subject" class="form-input">
                         </div>
 
                         <div class="form-group">
-                            <label for="message" class="form-label">Message *</label>
+                            <label for="message" class="form-label" data-translate="contact.message">Message *</label>
                             <textarea id="message" name="message" class="form-textarea" required></textarea>
                         </div>
 
                         <button type="submit" class="submit-btn" id="submitBtn">
-                            <i class="fas fa-paper-plane mr-2"></i>Send Message
+                            <i class="fas fa-paper-plane mr-2"></i><span data-translate="contact.send">Send Message</span>
                         </button>
                     </form>
 
                     <div id="formMessage" class="mt-4 hidden">
                         <div class="p-3 rounded-lg bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                            <i class="fas fa-check-circle mr-2"></i>Message sent successfully!
+                            <i class="fas fa-check-circle mr-2"></i><span data-translate="contact.success">Message sent successfully!</span>
                         </div>
                     </div>
                 </div>
@@ -732,9 +732,169 @@
 
     <!-- JavaScript -->
     <script>
-        // Dark mode toggle
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const mobileDarkModeToggle = document.getElementById('mobileDarkModeToggle');
+        // Language System
+        const languageBtn = document.getElementById('languageBtn');
+        const languageDropdown = document.getElementById('languageDropdown');
+        const currentLanguageSpan = document.getElementById('currentLanguage');
+
+        // Translation data
+        const translations = {
+            en: {
+                'nav.home': 'Home',
+                'nav.projects': 'Projects',
+                'nav.contact': 'Contact',
+                'hero.title': 'DevOps & Full Stack Developer',
+                'hero.subtitle': 'Passionate about building scalable infrastructure and modern web applications. Dungeon Master by night, developer by day.',
+                'hero.viewWork': 'View My Work',
+                'hero.getInTouch': 'Get In Touch',
+                'projects.title': 'Featured Projects',
+                'projects.subtitle': 'Comprehensive showcase of my work with detailed galleries, metrics, and professional presentation.',
+                'projects.all': 'All Projects',
+                'projects.web': 'Web Development',
+                'projects.devops': 'DevOps',
+                'projects.games': 'Games',
+                'projects.marketing': 'Marketing',
+                'contact.title': "Let's Work Together",
+                'contact.subtitle': 'Have a project in mind? I\'d love to hear about it!',
+                'contact.getInTouch': 'Get In Touch',
+                'contact.sendMessage': 'Send Message',
+                'contact.name': 'Name *',
+                'contact.email': 'Email *',
+                'contact.subject': 'Subject',
+                'contact.message': 'Message *',
+                'contact.send': 'Send Message',
+                'contact.success': 'Message sent successfully!'
+            },
+            es: {
+                'nav.home': 'Inicio',
+                'nav.projects': 'Proyectos',
+                'nav.contact': 'Contacto',
+                'hero.title': 'DevOps y Desarrollador Full Stack',
+                'hero.subtitle': 'Apasionado por construir infraestructura escalable y aplicaciones web modernas. Dungeon Master de noche, desarrollador de día.',
+                'hero.viewWork': 'Ver Mi Trabajo',
+                'hero.getInTouch': 'Contactar',
+                'projects.title': 'Proyectos Destacados',
+                'projects.subtitle': 'Exposición completa de mi trabajo con galerías detalladas, métricas y presentación profesional.',
+                'projects.all': 'Todos los Proyectos',
+                'projects.web': 'Desarrollo Web',
+                'projects.devops': 'DevOps',
+                'projects.games': 'Juegos',
+                'projects.marketing': 'Marketing',
+                'contact.title': 'Trabajemos Juntos',
+                'contact.subtitle': '¿Tienes un proyecto en mente? ¡Me encantaría saber de él!',
+                'contact.getInTouch': 'Contactar',
+                'contact.sendMessage': 'Enviar Mensaje',
+                'contact.name': 'Nombre *',
+                'contact.email': 'Email *',
+                'contact.subject': 'Asunto',
+                'contact.message': 'Mensaje *',
+                'contact.send': 'Enviar Mensaje',
+                'contact.success': '¡Mensaje enviado exitosamente!'
+            },
+            fr: {
+                'nav.home': 'Accueil',
+                'nav.projects': 'Projets',
+                'nav.contact': 'Contact',
+                'hero.title': 'DevOps & Développeur Full Stack',
+                'hero.subtitle': 'Passionné par la construction d\'infrastructures évolutives et d\'applications web modernes. Dungeon Master la nuit, développeur le jour.',
+                'hero.viewWork': 'Voir Mon Travail',
+                'hero.getInTouch': 'Entrer en Contact',
+                'projects.title': 'Projets en Vedette',
+                'projects.subtitle': 'Présentation complète de mon travail avec galeries détaillées, métriques et présentation professionnelle.',
+                'projects.all': 'Tous les Projets',
+                'projects.web': 'Développement Web',
+                'projects.devops': 'DevOps',
+                'projects.games': 'Jeux',
+                'projects.marketing': 'Marketing',
+                'contact.title': 'Travaillons Ensemble',
+                'contact.subtitle': 'Vous avez un projet en tête ? J\'aimerais en savoir plus !',
+                'contact.getInTouch': 'Entrer en Contact',
+                'contact.sendMessage': 'Envoyer un Message',
+                'contact.name': 'Nom *',
+                'contact.email': 'Email *',
+                'contact.subject': 'Sujet',
+                'contact.message': 'Message *',
+                'contact.send': 'Envoyer le Message',
+                'contact.success': 'Message envoyé avec succès !'
+            },
+            he: {
+                'nav.home': 'בית',
+                'nav.projects': 'פרויקטים',
+                'nav.contact': 'צור קשר',
+                'hero.title': 'DevOps ומפתח Full Stack',
+                'hero.subtitle': 'נלהב לבנות תשתית ניתנת להרחבה ואפליקציות אינטרנט מודרניות. Dungeon Master בלילה, מפתח ביום.',
+                'hero.viewWork': 'צפה בעבודה שלי',
+                'hero.getInTouch': 'צור קשר',
+                'projects.title': 'פרויקטים מובחרים',
+                'projects.subtitle': 'תצוגה מקיפה של עבודתי עם גלריות מפורטות, מדדים והצגה מקצועית.',
+                'projects.all': 'כל הפרויקטים',
+                'projects.web': 'פיתוח אתרים',
+                'projects.devops': 'DevOps',
+                'projects.games': 'משחקים',
+                'projects.marketing': 'שיווק',
+                'contact.title': 'בואו נעבוד יחד',
+                'contact.subtitle': 'יש לך פרויקט בראש? אשמח לשמוע עליו!',
+                'contact.getInTouch': 'צור קשר',
+                'contact.sendMessage': 'שלח הודעה',
+                'contact.name': 'שם *',
+                'contact.email': 'אימייל *',
+                'contact.subject': 'נושא',
+                'contact.message': 'הודעה *',
+                'contact.send': 'שלח הודעה',
+                'contact.success': 'ההודעה נשלחה בהצלחה!'
+            }
+        };
+
+        let currentLanguage = localStorage.getItem('language') || 'en';
+
+        function translatePage(language) {
+            const elements = document.querySelectorAll('[data-translate]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (translations[language] && translations[language][key]) {
+                    element.textContent = translations[language][key];
+                }
+            });
+
+            // Update current language display
+            currentLanguageSpan.textContent = language.toUpperCase();
+
+            // Handle RTL for Hebrew
+            if (language === 'he') {
+                document.body.classList.add('rtl');
+                document.body.setAttribute('dir', 'rtl');
+            } else {
+                document.body.classList.remove('rtl');
+                document.body.setAttribute('dir', 'ltr');
+            }
+
+            localStorage.setItem('language', language);
+        }
+
+        // Language selector functionality
+        languageBtn?.addEventListener('click', () => {
+            languageDropdown.classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!languageBtn.contains(e.target) && !languageDropdown.contains(e.target)) {
+                languageDropdown.classList.add('hidden');
+            }
+        });
+
+        // Language option selection
+        document.querySelectorAll('.language-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const selectedLang = btn.getAttribute('data-lang');
+                currentLanguage = selectedLang;
+                translatePage(currentLanguage);
+                languageDropdown.classList.add('hidden');
+            });
+        });
+
+        // Initialize language on page load
+        translatePage(currentLanguage);
         
         function toggleDarkMode() {
             document.documentElement.classList.toggle('dark');

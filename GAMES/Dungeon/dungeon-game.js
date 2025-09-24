@@ -175,20 +175,64 @@ function svgToDataURL(svg) {
 // Room-based dungeon functions
 function generateDungeon(width, height) {
     const dungeon = [];
-    const roomTypes = ['empty', 'monster', 'treasure', 'potion', 'trap', 'dark'];
+    const roomTypes = ['monster', 'treasure', 'potion', 'trap', 'empty', 'dark'];
+    const interestingRoomChance = 0.4; // 40% chance for interesting rooms
 
     for (let y = 0; y < height; y++) {
         dungeon[y] = [];
         for (let x = 0; x < width; x++) {
+            let type = 'empty';
+
             // Entrance is always at (0,0)
-            const type = (x === 0 && y === 0) ? 'entrance' :
-                       Math.random() < 0.1 ? getRandomItem(roomTypes) : 'empty';
+            if (x === 0 && y === 0) {
+                type = 'entrance';
+            }
+            // Higher chance for interesting rooms
+            else if (Math.random() < interestingRoomChance) {
+                // Weight different room types for better variety
+                const rand = Math.random();
+                if (rand < 0.25) type = 'monster';
+                else if (rand < 0.5) type = 'treasure';
+                else if (rand < 0.75) type = 'potion';
+                else type = 'trap';
+            }
+            // Add some dark/unknown rooms for mystery
+            else if (Math.random() < 0.1) {
+                type = 'dark';
+            }
+
             dungeon[y][x] = {
                 type: type,
                 visited: (x === 0 && y === 0),
                 discovered: (x === 0 && y === 0),
                 content: generateRoomContent(type)
             };
+        }
+    }
+
+    // Ensure we have at least some interesting rooms
+    let interestingCount = 0;
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            if (dungeon[y][x].type !== 'empty' && dungeon[y][x].type !== 'entrance') {
+                interestingCount++;
+            }
+        }
+    }
+
+    // If we don't have enough interesting rooms, add some
+    if (interestingCount < 3) {
+        for (let i = 0; i < 3; i++) {
+            let x, y;
+            do {
+                x = Math.floor(Math.random() * width);
+                y = Math.floor(Math.random() * height);
+            } while (dungeon[y][x].type !== 'empty');
+
+            const types = ['monster', 'treasure', 'potion', 'trap'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            dungeon[y][x].type = type;
+            dungeon[y][x].content = generateRoomContent(type);
         }
     }
 
@@ -205,38 +249,44 @@ function generateRoomContent(roomType) {
             return { type: 'potion', healing: 20 + Math.random() * 30 };
         case 'trap':
             return { type: 'trap', damage: 10 + Math.random() * 20 };
+        case 'dark':
+            // Dark rooms have a chance for hidden content
+            if (Math.random() < 0.3) {
+                return Math.random() < 0.5 ? generateMonster() : getRandomItem(gameData.items);
+            }
+            return { type: 'dark', description: 'A dark, mysterious room with unknown contents' };
         default:
             return null;
     }
 }
 
 function drawDungeonGrid() {
-    const gridSize = 80; // Much larger grid
-    const startX = 100; // Move to left side but give space for legend
-    const startY = 100;
+    const gridSize = 70; // Slightly smaller for better fit
+    const startX = 50; // Move closer to left edge
+    const startY = 50; // Move up a bit
 
-    // Draw main grid background - make it very prominent
+    // Draw main grid background - make it more contained
     add([
-        rect(gridSize * window.gameState.dungeon[0].length + 40,
-             gridSize * window.gameState.dungeon.length + 40),
+        rect(gridSize * window.gameState.dungeon[0].length + 20,
+             gridSize * window.gameState.dungeon.length + 20),
         color(20, 30, 50), // Dark blue background
-        pos(startX - 20, startY - 20),
+        pos(startX - 10, startY - 10),
         "minimap",
-        outline(4, color(100, 150, 255)) // Bright blue outline
+        outline(3, color(100, 150, 255)) // Bright blue outline
     ]);
 
     // Add grid title
     add([
-        text("DUNGEON MAP", { size: 24 }),
-        pos(startX + (gridSize * window.gameState.dungeon[0].length)/2, startY - 50),
+        text("DUNGEON MAP", { size: 20 }),
+        pos(startX + (gridSize * window.gameState.dungeon[0].length)/2, startY - 30),
         anchor("center"),
         color(255, 255, 255)
     ]);
 
-    // Draw legend/key on the left
-    drawLegend(startX - 80, startY);
+    // Draw legend/key on the left - smaller and better positioned
+    drawLegend(startX - 60, startY);
 
-    // Draw rooms with much better visibility
+    // Draw rooms with better visibility
     for (let y = 0; y < window.gameState.dungeon.length; y++) {
         for (let x = 0; x < window.gameState.dungeon[0].length; x++) {
             const room = window.gameState.dungeon[y][x];
@@ -249,11 +299,12 @@ function drawDungeonGrid() {
             else if (room.type === 'treasure') roomColor = [200, 200, 0]; // Yellow
             else if (room.type === 'potion') roomColor = [0, 200, 200]; // Cyan
             else if (room.type === 'trap') roomColor = [200, 0, 200]; // Magenta
+            else if (room.type === 'dark') roomColor = [100, 50, 150]; // Purple
 
             if (room.discovered) {
                 // Main room background
                 add([
-                    rect(gridSize - 8, gridSize - 8),
+                    rect(gridSize - 6, gridSize - 6),
                     color(roomColor[0]/2, roomColor[1]/2, roomColor[2]/2), // Darker background
                     pos(roomX, roomY),
                     "room"
@@ -261,14 +312,14 @@ function drawDungeonGrid() {
 
                 // Room border
                 add([
-                    rect(gridSize - 8, gridSize - 8),
+                    rect(gridSize - 6, gridSize - 6),
                     color(roomColor[0], roomColor[1], roomColor[2]),
                     pos(roomX, roomY),
                     outline(2, color(255, 255, 255)),
                     "room"
                 ]);
 
-                // Add room type indicator - larger and clearer
+                // Add room type indicator - clearer
                 let symbol = '';
                 let symbolColor = [255, 255, 255];
                 if (room.type === 'entrance') { symbol = 'E'; symbolColor = [255, 255, 255]; }
@@ -276,37 +327,38 @@ function drawDungeonGrid() {
                 else if (room.type === 'treasure') { symbol = 'T'; symbolColor = [0, 0, 0]; }
                 else if (room.type === 'potion') { symbol = 'P'; symbolColor = [0, 0, 0]; }
                 else if (room.type === 'trap') { symbol = 'X'; symbolColor = [255, 255, 255]; }
+                else if (room.type === 'dark') { symbol = 'D'; symbolColor = [255, 255, 255]; }
 
                 if (symbol) {
                     add([
-                        text(symbol, { size: 24 }), // Larger text
+                        text(symbol, { size: 20 }), // Slightly smaller text
                         pos(roomX + gridSize/2, roomY + gridSize/2),
                         anchor("center"),
                         color(symbolColor[0], symbolColor[1], symbolColor[2])
                     ]);
                 }
 
-                // Current room indicator - very obvious
+                // Current room indicator - more visible
                 if (x === window.gameState.currentRoom.x && y === window.gameState.currentRoom.y) {
                     // Multiple indicators for current room
                     add([
-                        rect(gridSize - 8, gridSize - 8),
+                        rect(gridSize - 6, gridSize - 6),
                         color(255, 255, 255),
                         pos(roomX, roomY),
-                        opacity(0.3),
+                        opacity(0.4),
                         "current"
                     ]);
                     add([
-                        rect(gridSize - 8, gridSize - 8),
+                        rect(gridSize - 6, gridSize - 6),
                         color(255, 255, 0), // Yellow border
                         pos(roomX, roomY),
-                        outline(4, color(255, 255, 0)),
+                        outline(3, color(255, 255, 0)),
                         "current"
                     ]);
-                    // Add animated "YOU" text
+                    // Add "YOU" text
                     add([
-                        text("YOU", { size: 16 }),
-                        pos(roomX + gridSize/2, roomY + gridSize/2 - 12),
+                        text("YOU", { size: 14 }),
+                        pos(roomX + gridSize/2, roomY + gridSize/2 - 8),
                         anchor("center"),
                         color(255, 0, 0), // Red text
                         "current"
@@ -315,20 +367,20 @@ function drawDungeonGrid() {
             } else {
                 // Undiscovered rooms - clearly marked
                 add([
-                    rect(gridSize - 8, gridSize - 8),
+                    rect(gridSize - 6, gridSize - 6),
                     color(20, 20, 20), // Very dark
                     pos(roomX, roomY),
                     "room"
                 ]);
                 add([
-                    rect(gridSize - 8, gridSize - 8),
+                    rect(gridSize - 6, gridSize - 6),
                     color(100, 100, 100),
                     pos(roomX, roomY),
                     outline(1, color(150, 150, 150)),
                     "room"
                 ]);
                 add([
-                    text("?", { size: 24 }),
+                    text("?", { size: 20 }),
                     pos(roomX + gridSize/2, roomY + gridSize/2),
                     anchor("center"),
                     color(150, 150, 150)
@@ -337,16 +389,16 @@ function drawDungeonGrid() {
         }
     }
 
-    // Add directional indicators
+    // Add directional indicators - smaller
     addDirectionalIndicators(startX, startY, gridSize);
 }
 
 function drawLegend(startX, startY) {
     const legendY = startY;
 
-    // Legend background
+    // Legend background - smaller and more compact
     add([
-        rect(70, 200),
+        rect(60, 160),
         color(30, 30, 50),
         pos(startX, legendY),
         outline(2, color(100, 150, 255))
@@ -354,92 +406,80 @@ function drawLegend(startX, startY) {
 
     // Legend title
     add([
-        text("LEGEND", { size: 16 }),
-        pos(startX + 35, legendY + 10),
+        text("LEGEND", { size: 14 }),
+        pos(startX + 30, legendY + 8),
         anchor("center"),
         color(255, 255, 255)
     ]);
 
-    // Room type explanations
+    // Room type explanations - more compact
     const legendItems = [
         { symbol: "E", color: [0, 200, 100], desc: "Entrance" },
         { symbol: "M", color: [200, 50, 50], desc: "Monster" },
         { symbol: "T", color: [200, 200, 0], desc: "Treasure" },
         { symbol: "P", color: [0, 200, 200], desc: "Potion" },
         { symbol: "X", color: [200, 0, 200], desc: "Trap" },
-        { symbol: "?", color: [150, 150, 150], desc: "Unknown" }
+        { symbol: "D", color: [100, 50, 150], desc: "Dark" }
     ];
 
     legendItems.forEach((item, i) => {
-        const y = legendY + 30 + i * 25;
+        const y = legendY + 25 + i * 20;
 
-        // Color square
+        // Color square - smaller
         add([
-            rect(15, 15),
+            rect(12, 12),
             color(item.color[0], item.color[1], item.color[2]),
-            pos(startX + 10, y)
+            pos(startX + 8, y)
         ]);
 
-        // Symbol
+        // Symbol - smaller
         add([
-            text(item.symbol, { size: 14 }),
-            pos(startX + 25, y + 7),
+            text(item.symbol, { size: 12 }),
+            pos(startX + 22, y + 6),
             anchor("left"),
             color(255, 255, 255)
         ]);
 
-        // Description
+        // Description - smaller
         add([
-            text(item.desc, { size: 12 }),
-            pos(startX + 45, y + 7),
+            text(item.desc, { size: 10 }),
+            pos(startX + 38, y + 6),
             anchor("left"),
             color(200, 200, 200)
         ]);
     });
-
-    // Current room indicator
-    add([
-        text("Yellow border =", { size: 12 }),
-        pos(startX + 5, legendY + 180),
-        color(255, 255, 0)
-    ]);
-    add([
-        text("Your location", { size: 12 }),
-        pos(startX + 5, legendY + 195),
-        color(255, 255, 0)
-    ]);
 }
 
 function addDirectionalIndicators(startX, startY, gridSize) {
-    // North arrow
+    // North arrow - smaller
     add([
-        text("N", { size: 16 }),
-        pos(startX + (gridSize * window.gameState.dungeon[0].length)/2, startY - 30),
+        text("N", { size: 14 }),
+        pos(startX + (gridSize * window.gameState.dungeon[0].length)/2, startY - 25),
         anchor("center"),
         color(255, 255, 255)
     ]);
 
-    // South arrow
+    // South arrow - smaller
     add([
-        text("S", { size: 16 }),
+        text("S", { size: 14 }),
         pos(startX + (gridSize * window.gameState.dungeon[0].length)/2,
-            startY + gridSize * window.gameState.dungeon.length + 25),
+            startY + gridSize * window.gameState.dungeon.length + 20),
         anchor("center"),
         color(255, 255, 255)
     ]);
 
-    // West arrow
+    // West arrow - smaller
     add([
-        text("W", { size: 16 }),
-        pos(startX - 25, startY + (gridSize * window.gameState.dungeon.length)/2),
+        text("W", { size: 14 }),
+        pos(startX - 20, startY + (gridSize * window.gameState.dungeon.length)/2),
         anchor("center"),
         color(255, 255, 255)
     ]);
 
-    // East arrow
+    // East arrow - smaller
     add([
-        text("E", { size: 16 }),
-        pos(startX + gridSize * window.gameState.dungeon[0].length + 25,
+        text("E", { size: 14 }),
+        pos(startX + gridSize * window.gameState.dungeon[0].length + 20,
             startY + (gridSize * window.gameState.dungeon.length)/2),
         anchor("center"),
         color(255, 255, 255)
@@ -532,7 +572,8 @@ function describeRoom() {
         'treasure': 'a treasure room',
         'potion': 'a room with a healing potion',
         'trap': 'a dangerous trap room',
-        'dark': 'a dark, mysterious room'
+        'dark': 'a dark, mysterious room',
+        'unknown': 'an unknown room'
     };
     return roomNames[room.type] || 'an unknown room';
 }
@@ -596,6 +637,41 @@ function interactWithRoom() {
                     room.content = null;
                 }
                 break;
+
+            case 'dark':
+                if (room.content && room.content.type !== 'dark') {
+                    // Dark room with hidden content
+                    if (room.content.type === 'monster') {
+                        const monster = room.content;
+                        const damage = Math.floor(Math.random() * 10) + window.gameState.hero.stats.str / 2;
+                        monster.hp -= damage;
+                        addRoomEntry(`You find a ${monster.name} in the dark! You attack for ${damage} damage!`);
+
+                        if (monster.hp <= 0) {
+                            addRoomEntry(`You defeated the ${monster.name} in the dark! Gained ${monster.level * 15} XP.`);
+                            window.gameState.hero.xp += monster.level * 15;
+                            room.type = 'empty';
+                            room.content = null;
+                        } else {
+                            const monsterDamage = monster.damage;
+                            window.gameState.hero.hp -= monsterDamage;
+                            addRoomEntry(`The ${monster.name} attacks you for ${monsterDamage} damage!`);
+
+                            if (window.gameState.hero.hp <= 0) {
+                                addRoomEntry("You have been defeated in the dark! Game Over.");
+                                go("menu");
+                            }
+                        }
+                    } else if (room.content.type === 'treasure') {
+                        window.gameState.hero.inventory.push(room.content);
+                        addRoomEntry(`You found ${room.content.name} hidden in the dark!`);
+                        room.type = 'empty';
+                        room.content = null;
+                    }
+                } else {
+                    addRoomEntry(`You search the dark room but find nothing but shadows.`);
+                }
+                break;
         }
     } else {
         addRoomEntry(`You search ${describeRoom()} but find nothing interesting.`);
@@ -657,6 +733,8 @@ scene("menu", () => {
 
     onKeyPress("space", () => {
         go("game");
+        // Reset dungeon for new game
+        window.gameState.dungeon = null;
     });
 
     onKeyPress("enter", () => {
@@ -676,6 +754,7 @@ scene("menu", () => {
             obj.text.includes("SETTINGS")
         )) {
             if (obj.text.includes("START GAME")) {
+                window.gameState.dungeon = null; // Reset dungeon for new game
                 go("game");
             } else if (obj.text.includes("HOW TO PLAY")) {
                 go("help");
@@ -769,7 +848,7 @@ scene("game", () => {
 
     // Initialize room system
     if (!window.gameState.dungeon) {
-        window.gameState.dungeon = generateDungeon(5, 5); // 5x5 grid
+        window.gameState.dungeon = generateDungeon(6, 6); // 6x6 grid for more rooms
         window.gameState.currentRoom = { x: 0, y: 0 }; // Start at entrance
     }
 
