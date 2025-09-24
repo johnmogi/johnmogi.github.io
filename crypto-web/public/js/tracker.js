@@ -9,15 +9,54 @@ const API_PROVIDERS = [
     {
         name: 'coingecko',
         baseUrl: 'https://api.allorigins.win/raw?url=https://api.coingecko.com/api/v3',
-        useProxy: true
+        useProxy: true,
+        maxRetries: 3,
+        retryDelay: 1000
     }
 ];
 
 let currentApiProvider = 0;
 
+// Enhanced fetch with retry logic and exponential backoff
+async function fetchWithRetry(url, maxRetries = 3, baseDelay = 1000) {
+    let lastError;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            const response = await fetch(url);
+
+            // If successful or client error (4xx), don't retry
+            if (response.ok || (response.status >= 400 && response.status < 500)) {
+                return response;
+            }
+
+            // For server errors (5xx), retry with exponential backoff
+            if (attempt < maxRetries) {
+                const delay = baseDelay * Math.pow(2, attempt); // Exponential backoff
+                console.log(`Server error ${response.status}, retrying in ${delay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                continue;
+            }
+
+            return response; // Return the error response after all retries
+
+        } catch (error) {
+            lastError = error;
+
+            if (attempt < maxRetries) {
+                const delay = baseDelay * Math.pow(2, attempt);
+                console.log(`Network error, retrying in ${delay}ms...`, error.message);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                continue;
+            }
+        }
+    }
+
+    throw lastError || new Error('Max retries exceeded');
+}
 async function getMarketChart(coinId, days = 30) {
     // Try each API provider in sequence
-    for (let i = currentApiProvider; i < API_PROVIDERS.length; i++) {
+    for (let i = 0; i < API_PROVIDERS.length; i++) {
         try {
             const provider = API_PROVIDERS[i];
             console.log(`Trying ${provider.name} API for ${coinId}...`);
@@ -27,11 +66,12 @@ async function getMarketChart(coinId, days = 30) {
                 // CryptoCompare format: https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=30
                 url = `${provider.baseUrl}/v2/histoday?fsym=${coinId.toUpperCase()}&tsym=USD&limit=${days}`;
             } else if (provider.name === 'coingecko') {
-                // CoinGecko format
+                // CoinGecko format: https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=30&interval=daily
                 url = `${provider.baseUrl}/coins/${coinId}/market_chart?vs_currency=usd&days=${days}&interval=daily`;
+                console.log(`Fetching from CoinGecko: ${url}`);
             }
 
-            const response = await fetch(url);
+            const response = await fetchWithRetry(url, provider.maxRetries, provider.retryDelay);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -43,12 +83,16 @@ async function getMarketChart(coinId, days = 30) {
             const transformedData = await transformChartData(data, provider.name, coinId);
             console.log(`Successfully loaded chart data for ${coinId} from ${provider.name}`);
 
-            // If successful, update current provider and return data
-            currentApiProvider = i;
             return transformedData;
 
         } catch (error) {
             console.warn(`${API_PROVIDERS[i].name} API failed for ${coinId}:`, error.message);
+
+            // If it's a rate limit error, wait longer before trying next provider
+            if (error.message.includes('429') || error.message.includes('rate limit')) {
+                console.log('Rate limit detected, waiting before trying next provider...');
+                await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds
+            }
             continue;
         }
     }
@@ -97,6 +141,62 @@ async function transformChartData(data, providerName, coinId) {
     }
 
     throw new Error(`Unknown provider: ${providerName}`);
+}
+
+// Live tracking functionality
+let liveUpdateInterval = null;
+let countdownInterval = null;
+let countdownValue = 30;
+
+function startLiveUpdates() {
+    if (liveUpdateInterval) {
+        clearInterval(liveUpdateInterval);
+    }
+
+    const interval = parseInt(document.getElementById('refreshInterval').value) * 1000;
+    countdownValue = parseInt(document.getElementById('refreshInterval').value);
+
+    // Start live price simulation if in demo mode
+    const dummyMode = document.getElementById('dummyModeToggle').checked;
+    if (dummyMode) {
+        startLivePriceSimulation();
+    }
+
+    liveUpdateInterval = setInterval(async () => {
+        await loadTrackerData();
+        showToast('Live update completed', 'info');
+    }, interval);
+
+    startCountdown();
+    document.getElementById('nextRefresh').classList.remove('hidden');
+}
+
+function stopLiveUpdates() {
+    if (liveUpdateInterval) {
+        clearInterval(liveUpdateInterval);
+        liveUpdateInterval = null;
+    }
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
+    stopLivePriceSimulation();
+    document.getElementById('nextRefresh').classList.add('hidden');
+}
+
+function startCountdown() {
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+    }
+
+    countdownInterval = setInterval(() => {
+        countdownValue--;
+        document.getElementById('countdown').textContent = countdownValue;
+
+        if (countdownValue <= 0) {
+            countdownValue = parseInt(document.getElementById('refreshInterval').value);
+        }
+    }, 1000);
 }
 
 // Favorites management
@@ -195,8 +295,24 @@ async function loadTrackerData() {
         favoritesContainerEl.classList.remove('hidden');
         chartContainerEl.classList.remove('hidden');
         document.getElementById('lastRefresh').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+
+        // Reset countdown if live updates are enabled
+        if (liveUpdateInterval) {
+            countdownValue = parseInt(document.getElementById('refreshInterval').value);
+            document.getElementById('countdown').textContent = countdownValue;
+        }
     } catch (error) {
         console.error('Error loading tracker data:', error);
+
+        // Check if this is an API rate limit error
+        const isRateLimit = error.message.includes('rate limit') || error.message.includes('429');
+
+        if (isRateLimit) {
+            showNotification('API rate limit reached. Switching to demo mode for now.', 'warning');
+        } else {
+            showNotification('API unavailable. Using demo data as fallback.', 'warning');
+        }
+
         // Use dummy data as complete fallback
         console.warn('Using complete dummy data fallback');
         const dummyData = favorites.map(coinId => ({
@@ -216,7 +332,6 @@ async function loadTrackerData() {
         favoritesContainerEl.classList.remove('hidden');
         chartContainerEl.classList.remove('hidden');
         document.getElementById('lastRefresh').textContent = `Last updated: ${new Date().toLocaleTimeString()} (Demo Mode)`;
-        showNotification('Using demo data - API connection failed', 'warning');
     } finally {
         loadingEl.classList.add('hidden');
     }

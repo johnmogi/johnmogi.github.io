@@ -97,7 +97,7 @@
     <canvas id="gameCanvas"></canvas>
     
     <div class="controls pixel-font">
-        <h3 class="text-yellow-400 glow mb-2">í¾® CONTROLS</h3>
+        <h3 class="text-yellow-400 glow mb-2">ï¿½ï¿½ï¿½ CONTROLS</h3>
         <div class="space-y-1 text-sm">
             <div><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">W</kbd><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">A</kbd><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">S</kbd><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">D</kbd> Move</div>
             <div><kbd class="bg-gray-700 px-2 py-1 rounded text-red-400">SPACE</kbd> Attack</div>
@@ -107,7 +107,7 @@
     </div>
     
     <div class="stats pixel-font">
-        <h3 class="text-yellow-400 glow mb-2">í³Š HERO STATS</h3>
+        <h3 class="text-yellow-400 glow mb-2">ï¿½ï¿½ï¿½ HERO STATS</h3>
         <div id="heroStats" class="space-y-1 text-sm">
             <div>Loading hero data...</div>
         </div>
@@ -121,7 +121,7 @@
         </div>
         
         <div class="mt-2">
-            <div class="text-blue-400 mb-1">í´® MANA</div>
+            <div class="text-blue-400 mb-1">ï¿½ï¿½ï¿½ MANA</div>
             <div class="mana-bar">
                 <div class="mana-fill" id="manaFill" style="width: 100%"></div>
             </div>
@@ -323,42 +323,45 @@
             add([
                 text("DUNGEON MASTER RPG", { size: 48, font: "sink" }),
                 pos(width() / 2, height() / 2 - 150),
-                origin("center"),
+                anchor("center"),
                 color(255, 215, 0)
             ]);
             
             add([
                 text("Kaboom.js Edition", { size: 24 }),
                 pos(width() / 2, height() / 2 - 100),
-                origin("center"),
+                anchor("center"),
                 color(255, 255, 255)
             ]);
             
             add([
                 text("â–¶ START GAME", { size: 24 }),
                 pos(width() / 2, height() / 2 - 20),
-                origin("center"),
+                anchor("center"),
+                area(),
                 color(255, 255, 255)
             ]);
             
             add([
-                text("í³– HOW TO PLAY", { size: 24 }),
+                text("ï¿½ï¿½ï¿½ HOW TO PLAY", { size: 24 }),
                 pos(width() / 2, height() / 2 + 20),
-                origin("center"),
+                anchor("center"),
+                area(),
                 color(255, 255, 255)
             ]);
             
             add([
                 text("âš™ï¸  SETTINGS", { size: 24 }),
                 pos(width() / 2, height() / 2 + 60),
-                origin("center"),
+                anchor("center"),
+                area(),
                 color(255, 255, 255)
             ]);
             
             add([
                 text("Use WASD to move, SPACE to attack", { size: 16 }),
                 pos(width() / 2, height() - 80),
-                origin("center"),
+                anchor("center"),
                 color(150, 150, 150)
             ]);
             
@@ -373,6 +376,23 @@
             onKeyPress("h", () => {
                 go("help");
             });
+            
+            // Mouse support for menu - specific to clickable buttons only
+            onClick((obj) => {
+                if (obj.is("text") && (
+                    obj.text.includes("START GAME") ||
+                    obj.text.includes("HOW TO PLAY") ||
+                    obj.text.includes("SETTINGS")
+                )) {
+                    if (obj.text.includes("START GAME")) {
+                        go("game");
+                    } else if (obj.text.includes("HOW TO PLAY")) {
+                        go("help");
+                    } else if (obj.text.includes("SETTINGS")) {
+                        go("game");
+                    }
+                }
+            });
         });
 
         // Scene: Help
@@ -386,24 +406,25 @@
             add([
                 text("HOW TO PLAY", { size: 36 }),
                 pos(width() / 2, 50),
-                origin("center"),
+                anchor("center"),
+                area(),
                 color(255, 215, 0)
             ]);
             
             const controls = [
-                "í¾® CONTROLS:",
+                "ï¿½ï¿½ï¿½ CONTROLS:",
                 "WASD - Move your hero",
                 "SPACE - Attack nearby enemies",
                 "E - Interact with objects",
                 "I - Open inventory",
                 "M - View map",
                 "",
-                "í¾¯ COMBAT:",
+                "ï¿½ï¿½ï¿½ COMBAT:",
                 "Get close to enemies and press SPACE",
                 "Use strategy and positioning",
                 "Collect items to increase power",
                 "",
-                "í¿† OBJECTIVE:",
+                "ï¿½ï¿½ï¿½ OBJECTIVE:",
                 "Explore the dungeon",
                 "Defeat monsters",
                 "Collect treasure",
@@ -412,9 +433,10 @@
             
             controls.forEach((text, i) => {
                 add([
-                    text(text, { size: text.startsWith("í¾®") || text.startsWith("í¾¯") || text.startsWith("í¿†") ? 20 : 16 }),
+                    text(text, { size: text.startsWith("ï¿½ï¿½ï¿½") || text.startsWith("ï¿½ï¿½ï¿½") || text.startsWith("ï¿½ï¿½ï¿½") ? 20 : 16 }),
                     pos(width() / 2, 120 + i * 25),
-                    origin("center"),
+                    anchor("center"),
+                    area(),
                     color(text.includes("WASD") || text.includes("SPACE") ? [100, 255, 100] : [255, 255, 255])
                 ]);
             });
@@ -422,12 +444,20 @@
             add([
                 text("Press SPACE to return to menu", { size: 18 }),
                 pos(width() / 2, height() - 50),
-                origin("center"),
+                anchor("center"),
+                area(),
                 color(255, 255, 0)
             ]);
             
             onKeyPress("space", () => {
                 go("menu");
+            });
+            
+            // Mouse support for help scene - specific to return text only
+            onClick((obj) => {
+                if (obj.is("text") && obj.text.includes("Press SPACE to return to menu")) {
+                    go("menu");
+                }
             });
         });
 
@@ -468,7 +498,7 @@
                     pos(wall.x, wall.y),
                     scale(1),
                     area(),
-                    solid(),
+                    body(),
                     "wall"
                 ]);
             });
@@ -596,7 +626,7 @@
                             add([
                                 text("MONSTER DEFEATED!", { size: 24 }),
                                 pos(width() / 2, height() / 2),
-                                origin("center"),
+                                anchor("center"),
                                 color(255, 255, 0),
                                 lifespan(2)
                             ]);
@@ -612,7 +642,7 @@
                                 add([
                                     text(`LEVEL UP! Level ${window.gameState.hero.level}`, { size: 28 }),
                                     pos(width() / 2, height() / 2),
-                                    origin("center"),
+                                    anchor("center"),
                                     color(255, 215, 0),
                                     lifespan(3)
                                 ]);
@@ -645,7 +675,7 @@
                                     add([
                                         text("GAME OVER!", { size: 48 }),
                                         pos(width() / 2, height() / 2),
-                                        origin("center"),
+                                        anchor("center"),
                                         color(255, 0, 0),
                                         lifespan(3)
                                     ]);
@@ -734,8 +764,8 @@
             }
         }, 500);
 
-        console.log('í¾® Dungeon Master RPG loaded with Kaboom.js - CORS FREE!');
-        console.log('í¾¯ Use WASD to move, SPACE to attack!');
+        console.log('ï¿½ï¿½ï¿½ Dungeon Master RPG loaded with Kaboom.js - CORS FREE!');
+        console.log('ï¿½ï¿½ï¿½ Use WASD to move, SPACE to attack!');
     </script>
 </body>
 </html>

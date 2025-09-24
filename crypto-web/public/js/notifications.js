@@ -37,3 +37,8 @@ function showNotification(message, type = 'info') {
         }, 300);
     }, 4000);
 }
+
+// Alias for showToast to maintain compatibility
+function showToast(message, type = 'info') {
+    showNotification(message, type);
+}

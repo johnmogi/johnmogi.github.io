@@ -4,26 +4,41 @@ const API_PROVIDERS = [
         name: 'cryptocompare',
         baseUrl: 'https://min-api.cryptocompare.com/data',
         marketUrl: 'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC,ETH,USDT,SOL,MNT&tsyms=USD',
-        useProxy: false
+        useProxy: false,
+        retryDelay: 1000, // 1 second retry delay
+        maxRetries: 2
     },
     {
         name: 'coingecko',
         baseUrl: 'https://api.allorigins.win/raw?url=https://api.coingecko.com/api/v3',
         marketUrl: 'https://api.allorigins.win/raw?url=https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h',
-        useProxy: true
+        useProxy: true,
+        retryDelay: 2000, // 2 second retry delay for rate limits
+        maxRetries: 3
     }
 ];
 
 let currentApiProvider = 0;
+let requestCount = 0;
+let lastRequestTime = 0;
 
 async function listMarkets() {
+    // Implement simple rate limiting - don't make requests more than once per second
+    const now = Date.now();
+    if (now - lastRequestTime < 1000) {
+        console.log('Rate limiting: waiting before making API request');
+        await new Promise(resolve => setTimeout(resolve, 1000 - (now - lastRequestTime)));
+    }
+    lastRequestTime = Date.now();
+    requestCount++;
+
     // Try each API provider in sequence
     for (let i = currentApiProvider; i < API_PROVIDERS.length; i++) {
         try {
             const provider = API_PROVIDERS[i];
             console.log(`Trying ${provider.name} API...`);
 
-            const response = await fetch(provider.marketUrl);
+            const response = await fetchWithRetry(provider.marketUrl, provider.maxRetries, provider.retryDelay);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -41,12 +56,56 @@ async function listMarkets() {
 
         } catch (error) {
             console.warn(`${API_PROVIDERS[i].name} API failed:`, error.message);
+
+            // If it's a rate limit error, wait longer before trying next provider
+            if (error.message.includes('429') || error.message.includes('rate limit')) {
+                console.log('Rate limit detected, waiting before trying next provider...');
+                await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+            }
             continue;
         }
     }
 
     // If all APIs fail, throw error
     throw new Error('All API providers failed');
+}
+
+// Enhanced fetch with retry logic and exponential backoff
+async function fetchWithRetry(url, maxRetries = 3, baseDelay = 1000) {
+    let lastError;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            const response = await fetch(url);
+
+            // If successful or client error (4xx), don't retry
+            if (response.ok || (response.status >= 400 && response.status < 500)) {
+                return response;
+            }
+
+            // For server errors (5xx), retry with exponential backoff
+            if (attempt < maxRetries) {
+                const delay = baseDelay * Math.pow(2, attempt); // Exponential backoff
+                console.log(`Server error ${response.status}, retrying in ${delay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                continue;
+            }
+
+            return response; // Return the error response after all retries
+
+        } catch (error) {
+            lastError = error;
+
+            if (attempt < maxRetries) {
+                const delay = baseDelay * Math.pow(2, attempt);
+                console.log(`Network error, retrying in ${delay}ms...`, error.message);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                continue;
+            }
+        }
+    }
+
+    throw lastError || new Error('Max retries exceeded');
 }
 
 async function transformApiData(data, providerName) {

@@ -4,7 +4,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Crypto Tracker</title>
-        <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Note: Using Tailwind CSS CDN for development. For production, consider using the Tailwind CLI or PostCSS plugin -->
+    <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     </head>
@@ -34,11 +35,25 @@
                 Refresh Now
             </button>
             <label class="flex items-center">
+                <input type="checkbox" id="liveModeToggle" class="mr-2">
+                <span class="text-gray-700">Live Updates</span>
+            </label>
+            <select id="refreshInterval" class="px-3 py-2 border border-gray-300 rounded">
+                <option value="5">5 seconds</option>
+                <option value="30">30 seconds</option>
+                <option value="60">1 minute</option>
+                <option value="300">5 minutes</option>
+                <option value="600">10 minutes</option>
+            </select>
+            <label class="flex items-center">
                 <input type="checkbox" id="dummyModeToggle" class="mr-2">
-                <span class="text-gray-700">Dummy Data Mode</span>
+                <span class="text-gray-700">Demo Mode</span>
             </label>
             <div id="lastRefresh" class="text-sm text-gray-500">
                 Last updated: Never
+            </div>
+            <div id="nextRefresh" class="text-sm text-blue-600 hidden">
+                Next update in: <span id="countdown">30</span>s
             </div>
         </div>
 
@@ -64,7 +79,9 @@
         <!-- Chart Container -->
         <div id="chartContainer" class="bg-white rounded-lg shadow-md p-6 hidden">
             <h3 class="text-xl font-bold text-gray-800 mb-4">Price Chart</h3>
-            <canvas id="portfolioChart" width="400" height="300"></canvas>
+            <div class="w-full" style="height: 300px; max-height: 300px; overflow: hidden;">
+                <canvas id="portfolioChart" width="400" height="300"></canvas>
+            </div>
         </div>
 
         <!-- Error State -->
@@ -92,14 +109,36 @@
                 showToast('Portfolio updated', 'success');
             });
 
-            document.getElementById('dummyModeToggle').addEventListener('change', async (e) => {
-                await loadTrackerData();
-                showToast(`Dummy data mode ${e.target.checked ? 'enabled' : 'disabled'}`, 'info');
+            document.getElementById('liveModeToggle').addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    startLiveUpdates();
+                    showToast('Live updates enabled', 'success');
+                } else {
+                    stopLiveUpdates();
+                    showToast('Live updates disabled', 'info');
+                }
             });
 
-            document.getElementById('retryBtn').addEventListener('click', async () => {
-                document.getElementById('errorState').classList.add('hidden');
+            document.getElementById('refreshInterval').addEventListener('change', () => {
+                if (document.getElementById('liveModeToggle').checked) {
+                    stopLiveUpdates();
+                    startLiveUpdates();
+                }
+            });
+
+            document.getElementById('dummyModeToggle').addEventListener('change', async (e) => {
+                const liveModeEnabled = document.getElementById('liveModeToggle').checked;
+
+                if (e.target.checked && liveModeEnabled) {
+                    // Start live price simulation when demo mode is enabled during live updates
+                    startLivePriceSimulation();
+                } else {
+                    // Stop live price simulation when demo mode is disabled
+                    stopLivePriceSimulation();
+                }
+
                 await loadTrackerData();
+                showToast(`Demo mode ${e.target.checked ? 'enabled' : 'disabled'}`, 'info');
             });
         });
     </script>
