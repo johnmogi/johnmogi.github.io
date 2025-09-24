@@ -446,7 +446,7 @@ async function loadTrackerData() {
         console.error('Error loading tracker data:', error);
 
         // Check if this is a CORS or network error
-        const isNetworkError = error.message.includes('CORS') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('429') || error.message.includes('All API providers failed');
+        const isNetworkError = error.message.includes('CORS') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('429') || error.message.includes('All API providers failed') || error.message.includes('CORS_BLOCKED');
 
         if (isNetworkError) {
             console.log('🌐 Network/CORS/API error detected - switching to demo mode');

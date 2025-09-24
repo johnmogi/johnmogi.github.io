@@ -76,7 +76,60 @@ async function initializeCoinPage() {
 
     } catch (error) {
         console.error(`❌ Error loading coin detail for ${coinId}:`, error);
-        showError(`Failed to load coin data: ${error.message}`);
+
+        // Check if this is a network/API error
+        const isNetworkError = error.message.includes('CORS') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('429') || error.message.includes('All API providers failed') || error.message.includes('CORS_BLOCKED');
+
+        if (isNetworkError) {
+            console.log('🌐 Network/API error detected - using demo data');
+        }
+
+        // Create sample data for demonstration
+        const sampleCoinData = {
+            id: coinId,
+            name: coinId.charAt(0).toUpperCase() + coinId.slice(1),
+            symbol: coinId.toUpperCase(),
+            image: 'https://via.placeholder.com/128',
+            current_price: 1000.00,
+            price_change_percentage_24h: 5.0,
+            market_cap: 50000000000,
+            total_volume: 1000000000,
+            high_24h: 1050.00,
+            low_24h: 950.00,
+            description: `This is demo data for ${coinId}. In a real application, this would show detailed information about the cryptocurrency.`,
+            homepage: `https://example.com/${coinId}`
+        };
+
+        const sampleMarketData = {
+            prices: Array.from({ length: 30 }, (_, i) => [
+                Date.now() - (29 - i) * 24 * 60 * 60 * 1000,
+                1000 + Math.random() * 200 - 100
+            ])
+        };
+
+        // Update UI with sample data
+        updateCoinPage(sampleCoinData);
+        createCoinChart(sampleMarketData, coinId);
+
+        // Setup add to favorites button
+        const addToFavoritesBtn = document.getElementById('addToFavoritesBtn');
+        if (addToFavoritesBtn) {
+            addToFavoritesBtn.addEventListener('click', () => {
+                if (addToFavorites(coinId)) {
+                    addToFavoritesBtn.textContent = 'Added to Tracker';
+                    addToFavoritesBtn.disabled = true;
+                    addToFavoritesBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    addToFavoritesBtn.classList.add('bg-green-500', 'cursor-not-allowed');
+                }
+            });
+        }
+
+        // Show the content
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('coinContent').classList.remove('hidden');
+
+        const errorMsg = isNetworkError ? 'Network issues - using demo data' : 'API unavailable - using demo data';
+        showNotification(errorMsg, 'warning');
     }
 }
 

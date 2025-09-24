@@ -10,11 +10,11 @@ const API_PROVIDERS = [
     },
     {
         name: 'coingecko',
-        baseUrl: 'https://api.coingecko.com/api/v3',
-        marketUrl: 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h',
-        useProxy: false, // Try without proxy first
-        retryDelay: 1000, // 1 second retry delay
-        maxRetries: 1 // Reduce retries to avoid rate limits
+        baseUrl: 'https://api.allorigins.win/raw?url=https://api.coingecko.com/api/v3',
+        marketUrl: 'https://api.allorigins.win/raw?url=https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h',
+        useProxy: true, // Use CORS proxy to avoid browser CORS issues
+        retryDelay: 2000, // 2 second retry delay
+        maxRetries: 1 // Reduce retries for faster fallback
     }
 ];
 
@@ -87,9 +87,10 @@ async function fetchWithRetry(url, maxRetries = 3, baseDelay = 1000) {
 
             // Check for specific error types
             if (error.message.includes('CORS') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-                console.log(`🚫 CORS/Network error - this is expected in browser environment`);
+                console.log(`🚫 CORS/Network error detected - this is expected in browser environment`);
+                console.log(`🔄 Immediately falling back to demo data for better user experience`);
                 // Don't retry CORS errors, they're not going to work
-                break;
+                throw new Error('CORS_BLOCKED'); // Throw specific error for immediate fallback
             }
 
             if (attempt < maxRetries) {
