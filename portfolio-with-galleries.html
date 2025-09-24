@@ -577,6 +577,43 @@
         .language-dropdown {
             left: 0;
             right: auto;
+            /* Image placeholder styles */
+            img[data-retry-added] {
+                position: relative;
+                transition: all 0.3s ease;
+            }
+
+            img[data-retry-added]:hover {
+                transform: scale(1.02);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            .placeholder-loading {
+                background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+                background-size: 200% 100%;
+                animation: loading 1.5s infinite;
+            }
+
+            @keyframes loading {
+                0% { background-position: 200% 0; }
+                100% { background-position: -200% 0; }
+            }
+
+            /* Enhanced placeholder borders */
+            .project-placeholder {
+                border: 3px solid #4F46E5;
+                border-radius: 12px;
+            }
+
+            .gallery-placeholder {
+                border: 3px solid #10B981;
+                border-radius: 8px;
+            }
+
+            .hero-placeholder {
+                border: 3px solid #EF4444;
+                border-radius: 16px;
+            }
         }
 
         .dropdown-menu {
@@ -1112,6 +1149,7 @@
                     let placeholderUrl = 'https://via.placeholder.com/400x300/6B7280/FFFFFF?text=Image+Not+Found';
                     let bgColor = '6B7280';
                     let textColor = 'FFFFFF';
+                    let cssClass = '';
 
                     if (this.closest('.project-card')) {
                         // Project image placeholder
@@ -1119,17 +1157,20 @@
                         placeholderUrl = `https://via.placeholder.com/400x300/4F46E5/FFFFFF?text=${encodeURIComponent(projectName)}`;
                         bgColor = '4F46E5';
                         textColor = 'FFFFFF';
+                        cssClass = 'project-placeholder';
                     } else if (this.closest('.gallery-item')) {
                         // Gallery image placeholder
                         const galleryName = this.alt || 'Gallery';
                         placeholderUrl = `https://via.placeholder.com/300x200/10B981/FFFFFF?text=${encodeURIComponent(galleryName)}`;
                         bgColor = '10B981';
                         textColor = 'FFFFFF';
+                        cssClass = 'gallery-placeholder';
                     } else if (this.closest('.hero-content')) {
                         // Hero image placeholder
                         placeholderUrl = 'https://via.placeholder.com/400x300/EF4444/FFFFFF?text=Hero+Image';
                         bgColor = 'EF4444';
                         textColor = 'FFFFFF';
+                        cssClass = 'hero-placeholder';
                     }
 
                     // Apply placeholder
@@ -1137,6 +1178,9 @@
                     this.style.objectFit = 'contain';
                     this.style.backgroundColor = '#f3f4f6';
                     this.style.border = `2px solid #${bgColor}30`;
+                    if (cssClass) {
+                        this.classList.add(cssClass);
+                    }
 
                     // Add retry button for failed images
                     if (!this.hasAttribute('data-retry-added')) {
