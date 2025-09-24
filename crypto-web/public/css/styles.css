@@ -1,3 +1,42 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+}
+
+@layer components {
+  .coin-card {
+    @apply bg-white rounded-lg shadow-md p-4 transition-all duration-200 hover:shadow-lg hover:scale-105;
+  }
+
+  .price-positive {
+    @apply text-green-600;
+  }
+
+  .price-negative {
+    @apply text-red-600;
+  }
+
+  .favorites-pill {
+    @apply transition-all duration-200 hover:scale-110;
+  }
+}
+
+@layer utilities {
+  .refresh-animation {
+    @apply animate-pulse;
+  }
+
+  .live-badge::after {
+    content: '● LIVE';
+    @apply absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded-full;
+  }
+
+  .live-indicator {
+    @apply animate-ping;
+  }
+}

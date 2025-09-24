@@ -1,22 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Crypto Detail</title>
-    <!-- Note: Using Tailwind CSS CDN for development. For production, consider using the Tailwind CLI or PostCSS plugin -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Detail</title>
+    <!-- Fallback to CDN if local CSS fails -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="./css/output.css" rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-    </head>
-    <body class="bg-gray-100">
-        <!-- Shared Navbar -->
-        <nav class="bg-blue-600 text-white p-4">
-            <div class="container mx-auto flex justify-between items-center">
-                <h1 class="text-xl font-bold">Crypto Tracker</h1>
-                <div class="flex space-x-4">
-                    <a href="index.html" class="hover:bg-blue-700 px-3 py-2 rounded">Grid</a>
-                    <a href="coin.html" class="hover:bg-blue-700 px-3 py-2 rounded">Detail</a>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Essential styles in case CSS build fails */
+        .coin-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            transition: all 0.2s;
+        }
+        .coin-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: scale(1.05);
+        }
+        .price-positive {
+            color: #059669;
+        }
+        .price-negative {
+            color: #dc2626;
+        }
+        .favorites-pill {
+            transition: all 0.2s;
+        }
+        .favorites-pill:hover {
+            transform: scale(1.1);
+        }
+        .refresh-animation {
+            animation: pulse 1s;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .live-indicator {
+            animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        @keyframes ping {
+            75%, 100% { transform: scale(2); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Shared Navbar -->
+    <nav class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Crypto Tracker</h1>
+            <div class="flex space-x-4">
+                <a href="index.html" class="hover:bg-blue-700 px-3 py-2 rounded">Grid</a>
+                <a href="coin.html" class="hover:bg-blue-700 px-3 py-2 rounded">Detail</a>
+                <a href="tracker.html" class="hover:bg-blue-700 px-3 py-2 rounded">Tracker</a>
                     <a href="tracker.html" class="hover:bg-blue-700 px-3 py-2 rounded">Tracker</a>
                 </div>
             </div>

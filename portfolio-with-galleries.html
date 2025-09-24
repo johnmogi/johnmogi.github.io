@@ -666,33 +666,23 @@
                     <h3 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white" data-translate="contact.sendMessage">Send Message</h3>
                     <form id="contactForm" class="space-y-4">
                         <div class="form-group">
-                            <label for="name" class="form-label" data-translate="contact.name">Name *</label>
-                            <input type="text" id="name" name="name" class="form-input" required>
+                            <label for="phone" class="form-label" data-translate="contact.phone">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" class="form-input" required placeholder="+34 642 210 422">
                         </div>
 
                         <div class="form-group">
-                            <label for="email" class="form-label" data-translate="contact.email">Email *</label>
-                            <input type="email" id="email" name="email" class="form-input" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="subject" class="form-label" data-translate="contact.subject">Subject</label>
-                            <input type="text" id="subject" name="subject" class="form-input">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="message" class="form-label" data-translate="contact.message">Message *</label>
-                            <textarea id="message" name="message" class="form-textarea" required></textarea>
+                            <label for="email" class="form-label" data-translate="contact.email">Email (Optional)</label>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="your.email@example.com">
                         </div>
 
                         <button type="submit" class="submit-btn" id="submitBtn">
-                            <i class="fas fa-paper-plane mr-2"></i><span data-translate="contact.send">Send Message</span>
+                            <i class="fab fa-whatsapp mr-2"></i><span data-translate="contact.send">Send WhatsApp</span>
                         </button>
                     </form>
 
                     <div id="formMessage" class="mt-4 hidden">
                         <div class="p-3 rounded-lg bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                            <i class="fas fa-check-circle mr-2"></i><span data-translate="contact.success">Message sent successfully!</span>
+                            <i class="fas fa-check-circle mr-2"></i><span data-translate="contact.success">WhatsApp message sent!</span>
                         </div>
                     </div>
                 </div>
@@ -758,12 +748,10 @@
                 'contact.subtitle': 'Have a project in mind? I\'d love to hear about it!',
                 'contact.getInTouch': 'Get In Touch',
                 'contact.sendMessage': 'Send Message',
-                'contact.name': 'Name *',
-                'contact.email': 'Email *',
-                'contact.subject': 'Subject',
-                'contact.message': 'Message *',
-                'contact.send': 'Send Message',
-                'contact.success': 'Message sent successfully!'
+                'contact.phone': 'Phone Number *',
+                'contact.email': 'Email (Optional)',
+                'contact.send': 'Send WhatsApp',
+                'contact.success': 'WhatsApp message sent!'
             },
             es: {
                 'nav.home': 'Inicio',
@@ -784,12 +772,10 @@
                 'contact.subtitle': '¿Tienes un proyecto en mente? ¡Me encantaría saber de él!',
                 'contact.getInTouch': 'Contactar',
                 'contact.sendMessage': 'Enviar Mensaje',
-                'contact.name': 'Nombre *',
-                'contact.email': 'Email *',
-                'contact.subject': 'Asunto',
-                'contact.message': 'Mensaje *',
-                'contact.send': 'Enviar Mensaje',
-                'contact.success': '¡Mensaje enviado exitosamente!'
+                'contact.phone': 'Número de Teléfono *',
+                'contact.email': 'Email (Opcional)',
+                'contact.send': 'Enviar WhatsApp',
+                'contact.success': '¡Mensaje de WhatsApp enviado!'
             },
             fr: {
                 'nav.home': 'Accueil',
@@ -810,12 +796,10 @@
                 'contact.subtitle': 'Vous avez un projet en tête ? J\'aimerais en savoir plus !',
                 'contact.getInTouch': 'Entrer en Contact',
                 'contact.sendMessage': 'Envoyer un Message',
-                'contact.name': 'Nom *',
-                'contact.email': 'Email *',
-                'contact.subject': 'Sujet',
-                'contact.message': 'Message *',
-                'contact.send': 'Envoyer le Message',
-                'contact.success': 'Message envoyé avec succès !'
+                'contact.phone': 'Numéro de Téléphone *',
+                'contact.email': 'Email (Optionnel)',
+                'contact.send': 'Envoyer WhatsApp',
+                'contact.success': 'Message WhatsApp envoyé !'
             },
             he: {
                 'nav.home': 'בית',
@@ -836,12 +820,10 @@
                 'contact.subtitle': 'יש לך פרויקט בראש? אשמח לשמוע עליו!',
                 'contact.getInTouch': 'צור קשר',
                 'contact.sendMessage': 'שלח הודעה',
-                'contact.name': 'שם *',
-                'contact.email': 'אימייל *',
-                'contact.subject': 'נושא',
-                'contact.message': 'הודעה *',
-                'contact.send': 'שלח הודעה',
-                'contact.success': 'ההודעה נשלחה בהצלחה!'
+                'contact.phone': 'מספר טלפון *',
+                'contact.email': 'אימייל (אופציונלי)',
+                'contact.send': 'שלח WhatsApp',
+                'contact.success': 'הודעת WhatsApp נשלחה!'
             }
         };
 
@@ -1755,8 +1737,19 @@
                 const formData = new FormData(contactForm);
                 const data = Object.fromEntries(formData);
 
-                // Simulate form submission (replace with actual endpoint)
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                // Validate phone number
+                if (!data.phone || data.phone.trim() === '') {
+                    throw new Error('Phone number is required');
+                }
+
+                // Create WhatsApp message
+                const phoneNumber = data.phone.replace(/\s+/g, '');
+                const emailText = data.email ? `\nEmail: ${data.email}` : '';
+                const message = `Hello! I'm interested in your services.${emailText}`;
+
+                // Open WhatsApp with the message
+                const whatsappUrl = `https://wa.me/34642210422?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
 
                 // Show success message
                 formMessage.classList.remove('hidden');
@@ -1769,11 +1762,11 @@
 
             } catch (error) {
                 console.error('Form submission error:', error);
-                alert('Error sending message. Please try again or contact directly via email.');
+                alert('Error: ' + error.message);
             } finally {
                 // Re-enable submit button
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Message';
+                submitBtn.innerHTML = '<i class="fab fa-whatsapp mr-2"></i><span data-translate="contact.send">Send WhatsApp</span>';
             }
         });
 

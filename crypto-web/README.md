@@ -10,24 +10,54 @@ A stunning cryptocurrency price tracker with real-time charts, beautiful animati
 - **⚡ Live Updates**: Configurable refresh intervals (5s to 10min)
 - **🎭 Demo Mode**: Toggle between real API data and realistic demo data
 - **📱 Responsive**: Works perfectly on desktop and mobile devices
+- **💾 Smart Caching**: API responses cached to avoid rate limits
+- **🔧 Production Ready**: Proper Tailwind CSS build process
 
 ## 🚀 Quick Start
 
-1. **Start the server** (for CORS compatibility):
-   ```bash
-   cd public
-   python -m http.server 8000
-   ```
+### Option 1: Auto Setup (Recommended)
+```bash
+# Linux/Mac
+./start-dev.sh
 
-2. **Open in browser**:
-   ```
-   http://localhost:8000
-   ```
+# Windows
+start-dev.bat
+```
 
-3. **Navigate to Tracker**:
-   - Click "Tracker" in the navigation
-   - Add your favorite cryptocurrencies
-   - Toggle "Demo Mode" for reliable testing
+### Option 2: Manual Setup
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Build CSS
+npx tailwindcss -i ./public/css/styles.css -o ./public/css/output.css --minify
+
+# 3. Start server
+cd public
+python -m http.server 8000
+```
+
+### Option 3: Open in Browser
+```
+http://localhost:8000
+```
+
+## 🎯 Navigation Guide
+
+1. **Grid Page** (`index.html`):
+   - Browse all available cryptocurrencies
+   - Click any coin to view detailed information
+   - Real-time price updates with caching
+
+2. **Tracker Page** (`tracker.html`):
+   - Add favorite coins to your portfolio
+   - Multi-coin price charts
+   - Live updates with visual countdown
+
+3. **Coin Detail** (`coin.html?id=<coin>`):
+   - Comprehensive coin information
+   - Historical price charts
+   - Market statistics
 
 ## 🔧 Configuration
 
@@ -41,35 +71,18 @@ A stunning cryptocurrency price tracker with real-time charts, beautiful animati
 - **Visual countdown** showing next update
 - **Smooth transitions** between data points
 
-### API Fallback
-- **CryptoCompare** (primary) - Fast, reliable for major coins
-- **CoinGecko** (secondary) - Comprehensive data via proxy
-- **Demo Mode** (always works) - Beautiful animations with realistic data
+### API Fallback System
+1. **CryptoCompare API** (primary) - Fast, reliable for major coins
+2. **CoinGecko API** (secondary) - Comprehensive data via proxy
+3. **Cached Data** (fallback) - Previously fetched data
+4. **Demo Mode** (always works) - Beautiful animations with realistic data
 
-## 🎯 How It Works
+## 💾 Caching System
 
-### Best Case Scenario
-- ✅ Real API data loads successfully
-- ✅ Beautiful charts with live updates
-- ✅ Professional financial app appearance
-
-### API Issues Scenario
-- ✅ Automatic fallback to demo data
-- ✅ All features still work perfectly
-- ✅ Clear notifications about data source
-
-### Complete API Failure
-- ✅ Instant demo mode activation
-- ✅ Realistic price movements and trends
-- ✅ Full functionality with beautiful animations
-
-## 🛠️ Technical Details
-
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript
-- **Styling**: Tailwind CSS (CDN)
-- **Charts**: Chart.js with date adapter
-- **APIs**: CryptoCompare + CoinGecko with proxy fallback
-- **Fallback**: Intelligent demo data generation
+- **5-minute cache** for API responses
+- **Automatic fallback** to cached data when APIs fail
+- **Rate limit protection** - avoids hitting API limits
+- **Local storage** - persists between browser sessions
 
 ## 🎨 Design Features
 
@@ -86,6 +99,15 @@ A stunning cryptocurrency price tracker with real-time charts, beautiful animati
 - **CORS-compliant** - uses proxy services for API access
 - **Offline-ready** - demo mode works without internet
 
+## 🛠️ Technical Details
+
+- **Frontend**: HTML5, CSS3, Vanilla JavaScript
+- **Styling**: Tailwind CSS (properly built)
+- **Charts**: Chart.js with date adapter
+- **APIs**: CryptoCompare + CoinGecko with proxy fallback
+- **Caching**: localStorage with 5-minute expiry
+- **Build Process**: Tailwind CLI with PostCSS
+
 ## 📱 Browser Support
 
 - ✅ Chrome/Chromium (recommended)
@@ -96,3 +118,29 @@ A stunning cryptocurrency price tracker with real-time charts, beautiful animati
 ## 🎉 Enjoy!
 
 Experience the perfect blend of beautiful design and reliable functionality. The tracker works flawlessly whether APIs are available or not, always providing a stunning visual experience with realistic data.
+
+## 🐛 Troubleshooting
+
+### CSS Not Loading
+```bash
+# Rebuild the CSS
+npx tailwindcss -i ./public/css/styles.css -o ./public/css/output.css --minify
+```
+
+### Server Not Starting
+```bash
+# Check if port 8000 is available
+netstat -an | grep :8000
+# Or use a different port
+python -m http.server 8080
+```
+
+### APIs Not Working
+- The app will automatically fall back to demo mode
+- Check browser console for detailed error messages
+- Demo mode provides the same beautiful experience
+
+### Performance Issues
+- Clear browser cache and localStorage
+- Refresh the page
+- Demo mode is optimized for smooth performance

@@ -490,42 +490,48 @@ function updateRoomDescriptionPanel() {
     // Remove existing panel
     destroyAll("roomPanel");
 
+    // Position panel in top-right corner, avoiding overlap with stats
+    const panelWidth = 280;
+    const panelHeight = 100;
+    const rightMargin = 220; // Leave space for stats panel
+    const topMargin = 20;
+
     // Add updated room description panel
     add([
-        rect(300, 120),
+        rect(panelWidth, panelHeight),
         color(20, 30, 50),
-        pos(width() - 320, 20),
+        pos(width() - panelWidth - rightMargin, topMargin),
         outline(2, color(100, 150, 255)),
         "roomPanel"
     ]);
 
     add([
-        text("CURRENT ROOM", { size: 18 }),
-        pos(width() - 170, 35),
+        text("CURRENT ROOM", { size: 16 }),
+        pos(width() - panelWidth - rightMargin + panelWidth/2, topMargin + 15),
         anchor("center"),
         color(255, 255, 255),
         "roomPanel"
     ]);
 
     add([
-        text(`${describeRoom().toUpperCase()}`, { size: 16 }),
-        pos(width() - 170, 60),
+        text(`${describeRoom().toUpperCase()}`, { size: 14 }),
+        pos(width() - panelWidth - rightMargin + panelWidth/2, topMargin + 35),
         anchor("center"),
         color(255, 215, 0),
         "roomPanel"
     ]);
 
     add([
-        text("Use WASD to move", { size: 14 }),
-        pos(width() - 170, 85),
+        text("WASD: Move", { size: 12 }),
+        pos(width() - panelWidth - rightMargin + panelWidth/2 - 40, topMargin + 60),
         anchor("center"),
         color(200, 200, 200),
         "roomPanel"
     ]);
 
     add([
-        text("SPACE to interact", { size: 14 }),
-        pos(width() - 170, 105),
+        text("SPACE: Interact", { size: 12 }),
+        pos(width() - panelWidth - rightMargin + panelWidth/2 + 40, topMargin + 60),
         anchor("center"),
         color(200, 200, 200),
         "roomPanel"
@@ -533,9 +539,14 @@ function updateRoomDescriptionPanel() {
 }
 
 function showMovementFeedback(direction) {
+    const gridWidth = 70 * window.gameState.dungeon[0].length;
+    const gridHeight = 70 * window.gameState.dungeon.length;
+    const heroX = 50 + gridWidth / 2; // Center of grid
+    const heroY = 50 + gridHeight / 2; // Center of grid
+
     add([
-        text(`→ ${direction}`, { size: 24 }),
-        pos(width() / 2, height() / 2 - 100),
+        text(`→ ${direction}`, { size: 20 }),
+        pos(heroX, heroY - 80),
         anchor("center"),
         color(255, 255, 0),
         lifespan(1)
@@ -561,6 +572,21 @@ function updateRoomDisplay(room) {
 function addRoomEntry(message) {
     // Add message to adventure log (we'll implement this properly later)
     console.log(`[ADVENTURE LOG] ${message}`);
+
+    // Show message on screen for better visibility
+    const gridWidth = 70 * window.gameState.dungeon[0].length;
+    const gridHeight = 70 * window.gameState.dungeon.length;
+    const heroX = 50 + gridWidth / 2; // Center of grid
+    const heroY = 50 + gridHeight / 2; // Center of grid
+
+    add([
+        text(message, { size: 16 }),
+        pos(heroX, heroY + 60),
+        anchor("center"),
+        color(255, 255, 255),
+        outline(1, color(0, 0, 0)),
+        lifespan(3) // Show for 3 seconds
+    ]);
 }
 
 function describeRoom() {
@@ -858,10 +884,15 @@ scene("game", () => {
     // Draw current room info
     drawCurrentRoom();
 
-    // Hero positioned in center - smaller since grid is large
+    // Hero positioned in center - better positioned relative to grid
+    const gridWidth = 70 * window.gameState.dungeon[0].length;
+    const gridHeight = 70 * window.gameState.dungeon.length;
+    const heroX = 50 + gridWidth / 2; // Center of grid
+    const heroY = 50 + gridHeight / 2; // Center of grid
+
     const hero = add([
         sprite("hero"),
-        pos(width() / 2, height() / 2),
+        pos(heroX, heroY),
         scale(1.2), // Smaller hero since grid is prominent
         area(),
         "hero"

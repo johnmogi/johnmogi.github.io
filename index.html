@@ -1,852 +1,1776 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="John Mogi - DevOps & Full Stack Developer Portfolio" />
-    <meta name="keywords" content="DevOps, Full Stack Developer, Cloud, React, Angular, Docker, Terraform" />
-    <meta name="author" content="John Mogi" />
-    
-    <!-- Tailwind CSS CDN -->
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - John Mogi | DevOps & Full Stack Developer</title>
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Portfolio - John Mogi | DevOps & Full Stack Developer" />
+    <meta property="og:description" content="DevOps & Full Stack Developer specializing in cloud infrastructure, modern web applications, and game development." />
+    <meta property="og:image" content="/assets/og-image.png" />
+    <meta property="og:url" content="https://johnmogi.github.io/" />
+    <meta property="og:type" content="website" />
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              primary: {
-                50: '#f0fdf4',
-                100: '#dcfce7',
-                500: '#22c55e',
-                600: '#16a34a',
-                700: '#15803d',
-                900: '#14532d',
-              },
-              secondary: {
-                50: '#fff7ed',
-                100: '#ffedd5',
-                500: '#f97316',
-                600: '#ea580c',
-                700: '#c2410c',
-                900: '#7c2d12',
-              }
-            },
-            fontFamily: {
-              'sans': ['Poppins', 'system-ui', 'sans-serif'],
-            },
-            animation: {
-              'fade-in': 'fadeIn 0.5s ease-in-out',
-              'slide-up': 'slideUp 0.6s ease-out',
-              'bounce-gentle': 'bounceGentle 2s infinite',
-            },
-            keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
-              },
-              slideUp: {
-                '0%': { transform: 'translateY(20px)', opacity: '0' },
-                '100%': { transform: 'translateY(0)', opacity: '1' },
-              },
-              bounceGentle: {
-                '0%, 100%': { transform: 'translateY(0)' },
-                '50%': { transform: 'translateY(-10px)' },
-              }
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'bounce-slow': 'bounce 2s infinite',
+                    }
+                }
             }
-          }
         }
-      }
     </script>
-    
+
     <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <title>John Mogi - DevOps & Full Stack Developer</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" href="https://johnmogi.com/wp-content/uploads/2021/11/cropped-JM-logo-1-32x32.png" sizes="32x32" />
-    <link rel="icon" href="https://johnmogi.com/wp-content/uploads/2021/11/cropped-JM-logo-1-192x192.png" sizes="192x192" />
-    <link rel="apple-touch-icon" href="https://johnmogi.com/wp-content/uploads/2021/11/cropped-JM-logo-1-180x180.png" />
-    <meta name="msapplication-TileImage" content="https://johnmogi.com/wp-content/uploads/2021/11/cropped-JM-logo-1-270x270.png" />
-    
-    <!-- Meta tags for SEO and social sharing -->
-    <meta property="og:title" content="John Mogi - DevOps & Full Stack Developer" />
-    <meta property="og:description" content="Passionate DevOps & Full Stack Developer building scalable, secure systems with modern technologies." />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-  </head>
-  <body class="font-sans antialiased bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 text-slate-900 dark:text-slate-100 transition-colors duration-300">
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-50 border-b border-slate-200 dark:border-slate-700">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center py-4">
-          <!-- Logo/Brand -->
-          <div class="flex items-center">
-            <a href="#" class="text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent hover:from-primary-700 hover:to-secondary-700 transition-all duration-300">
-              JohnMogi
-            </a>
-          </div>
-          
-          <!-- Desktop Navigation -->
-          <div class="hidden md:flex items-center space-x-8">
-            <a href="#about" class="text-slate-700 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300 font-medium">About</a>
-            <a href="#projects" class="text-slate-700 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300 font-medium">Projects</a>
-            <a href="#skills" class="text-slate-700 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300 font-medium">Skills</a>
-            <a href="#contact" class="text-slate-700 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300 font-medium">Contact</a>
-            
-            <!-- Theme Toggle -->
-            <button id="theme-toggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors duration-300" aria-label="Toggle theme">
-              <i class="fas fa-moon dark:hidden text-slate-700"></i>
-              <i class="fas fa-sun hidden dark:block text-slate-300"></i>
-            </button>
-          </div>
-          
-          <!-- Mobile menu button -->
-          <div class="md:hidden flex items-center space-x-2">
-            <button id="theme-toggle-mobile" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800" aria-label="Toggle theme">
-              <i class="fas fa-moon dark:hidden text-slate-700"></i>
-              <i class="fas fa-sun hidden dark:block text-slate-300"></i>
-            </button>
-            <button id="mobile-menu-button" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors duration-300" aria-label="Toggle mobile menu">
-              <i class="fas fa-bars text-slate-700 dark:text-slate-300"></i>
-            </button>
-          </div>
-        </div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom styles -->
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
         
-        <!-- Mobile Navigation -->
-        <div id="mobile-menu" class="hidden md:hidden pb-4">
-          <div class="flex flex-col space-y-2">
-            <a href="#about" class="block py-2 px-4 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors duration-300 font-medium">About</a>
-            <a href="#projects" class="block py-2 px-4 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors duration-300 font-medium">Projects</a>
-            <a href="#skills" class="block py-2 px-4 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors duration-300 font-medium">Skills</a>
-            <a href="#contact" class="block py-2 px-4 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors duration-300 font-medium">Contact</a>
-          </div>
+        .project-image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #e5e7eb;
+        }
+        .dark .project-image-container {
+            background: #374151;
+        }
+
+        .project-main-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            z-index: 10;
+        }
+
+        .gallery-nav:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .gallery-nav.prev {
+            left: 8px;
+        }
+
+        .gallery-nav.next {
+            right: 8px;
+        }
+
+        .gallery-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .gallery-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .gallery-dot.active {
+            background: white;
+        }
+
+        .project-card:hover .gallery-nav {
+            opacity: 1;
+        }
+
+        .project-card:hover .gallery-dots {
+            opacity: 1;
+        }
+
+        .project-card:hover .gallery-counter {
+            opacity: 1;
+        }
+
+        .gallery-nav, .gallery-dots, .gallery-counter {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .status-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            z-index: 15;
+        }
+        .status-completed { background: #10b981; color: white; }
+        .status-progress { background: #f59e0b; color: white; }
+        .status-maintenance { background: #3b82f6; color: white; }
+        
+        .project-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        .project-modal.show {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 20px;
+        }
+        .modal-content {
+            background: white;
+            dark:bg-gray-800;
+            max-width: 1000px;
+            width: 95%;
+            max-height: 95vh;
+            overflow-y: auto;
+            border-radius: 12px;
+            position: relative;
+        }
+        .dark .modal-content {
+            background: #1f2937;
+            color: white;
+        }
+        
+        .gallery-section {
+            margin: 24px 0;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+        .gallery-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            background: #e5e7eb;
+        }
+        .dark .gallery-image {
+            background: #374151;
+        }
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+            padding: 12px 8px 8px;
+            font-size: 0.875rem;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 16px;
+            color: white;
+            text-align: center;
+        }
+        .dark .metric-card {
+            background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%);
+        }
+        
+        .tech-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e5e7eb;
+            color: #374151;
+            border-radius: 16px;
+            font-size: 0.875rem;
+            margin: 2px;
+        }
+        .dark .tech-tag {
+            background: #374151;
+            color: #d1d5db;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+            position: relative;
+            padding-left: 24px;
+        }
+        .dark .feature-list li {
+            border-bottom-color: #374151;
+        }
+        .feature-list li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-modal.show {
+            display: flex;
+        }
+        .whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #25D366;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(37, 211, 102, 0.6);
+        }
+
+        .whatsapp-float::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #25D366, #128C7E);
+            z-index: -1;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .contact-form {
+            background: white;
+            dark:bg-gray-800;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .contact-form {
+            background: #1f2937;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .dark .form-label {
+            color: #d1d5db;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .dark .form-input, .dark .form-textarea {
+            background: #374151;
+            border-color: #4b5563;
+            color: #d1d5db;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            transform: translateY(-1px);
+        }
+
+        .language-option:hover {
+            background: #f3f4f6;
+        }
+
+        .dark .language-option:hover {
+            background: #374151;
+        }
+
+        body.rtl {
+            direction: rtl;
+            text-align: right;
+        }
+
+        body.rtl .nav-item {
+            text-align: right;
+        }
+
+        body.rtl .flex {
+            flex-direction: row-reverse;
+        }
+
+        body.rtl .space-x-8 > * + * {
+            margin-right: 2rem;
+            margin-left: 0;
+        }
+
+        body.rtl .space-x-4 > * + * {
+            margin-right: 1rem;
+            margin-left: 0;
+        }
+
+        body.rtl .text-left {
+            text-align: right;
+        }
+
+        body.rtl .text-right {
+            text-align: left;
+        }
+
+        body.rtl .ml-2 {
+            margin-right: 0.5rem;
+            margin-left: 0;
+        }
+
+        body.rtl .mr-2 {
+            margin-left: 0.5rem;
+            margin-right: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-all duration-500 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-code text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900 dark:text-white">John Mogi</h1>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">DevOps & Full Stack Developer</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="nav-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors duration-200" data-translate="nav.home">Home</a>
+                    <a href="#projects" class="nav-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors duration-200" data-translate="nav.projects">Projects</a>
+                    <a href="#contact" class="nav-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors duration-200" data-translate="nav.contact">Contact</a>
+
+                    <!-- Language Selector -->
+                    <div class="relative">
+                        <button id="languageBtn" class="flex items-center space-x-1 text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors duration-200">
+                            <i class="fas fa-globe"></i>
+                            <span id="currentLanguage">EN</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="languageDropdown" class="absolute top-full right-0 mt-2 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg hidden z-50">
+                            <button class="language-option w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" data-lang="en">English</button>
+                            <button class="language-option w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" data-lang="es">Español</button>
+                            <button class="language-option w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" data-lang="fr">Français</button>
+                            <button class="language-option w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" data-lang="he">עברית</button>
+                        </div>
+                    </div>
+
+                    <button id="darkModeToggle" class="bg-gray-200 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:inline"></i>
+                    </button>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center space-x-2">
+                    <button id="mobileDarkModeToggle" class="bg-gray-200 dark:bg-gray-700 p-2 rounded-full">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:inline"></i>
+                    </button>
+                    <button id="mobileMenuBtn" class="text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="md:hidden hidden border-t border-gray-200 dark:border-gray-700">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <a href="#home" class="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">Home</a>
+                    <a href="#projects" class="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">Projects</a>
+                    <a href="#contact" class="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">Contact</a>
+                </div>
+            </div>
         </div>
-      </div>
     </nav>
 
     <!-- Hero Section -->
-    <section id="about" class="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-7xl mx-auto">
-        <div class="text-center animate-fade-in">
-          <div class="mb-8">
-            <span class="inline-block px-4 py-2 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium mb-4">
-              👋 Welcome to my portfolio
-            </span>
-          </div>
-          
-          <h1 class="text-5xl md:text-7xl font-bold mb-6">
-            Hi, I'm <span class="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">John Mogi</span>
-          </h1>
-          
-          <h2 class="text-2xl md:text-3xl font-semibold text-slate-700 dark:text-slate-300 mb-8">
-            DevOps & Full Stack Developer
-          </h2>
-          
-          <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-12 leading-relaxed">
-            I specialize in building scalable, secure, and reliable systems. From cloud infrastructure to modern web applications, 
-            I bring ideas to life with cutting-edge technologies and best practices.
-          </p>
-          
-          <!-- CTA Buttons -->
-          <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <a href="https://johnmogi.com/wp-content/uploads/2022/07/JohnMogi_DevOps_FullStack.pdf" 
-               target="_blank" 
-               class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-              <i class="fas fa-download mr-2"></i>
-              Download Resume
-            </a>
-            
-            <a href="#projects" 
-               class="inline-flex items-center px-8 py-4 border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white font-semibold rounded-lg transition-all duration-300 transform hover:-translate-y-1">
-              View My Work
-            </a>
-          </div>
-          
-          <!-- Social Links -->
-          <div class="flex justify-center space-x-6">
-            <a href="https://github.com/johnmogi/" 
-               target="_blank" 
-               class="p-3 bg-white dark:bg-slate-800 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:text-primary-600" 
-               aria-label="GitHub Profile">
-              <i class="fab fa-github text-xl text-slate-700 dark:text-slate-300"></i>
-            </a>
-            
-            <a href="https://www.linkedin.com/in/johnmogi/" 
-               target="_blank" 
-               class="p-3 bg-white dark:bg-slate-800 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:text-primary-600" 
-               aria-label="LinkedIn Profile">
-              <i class="fab fa-linkedin text-xl text-slate-700 dark:text-slate-300"></i>
-            </a>
-            
-            <a href="mailto:dev@johnmogi.com" 
-               class="p-3 bg-white dark:bg-slate-800 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:text-primary-600" 
-               aria-label="Email">
-              <i class="fas fa-envelope text-xl text-slate-700 dark:text-slate-300"></i>
-            </a>
-          </div>
+    <section id="home" class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-20 transition-all duration-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <div class="w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mx-auto mb-8 flex items-center justify-center text-white text-6xl shadow-2xl">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <h1 class="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+                    DevOps & 
+                    <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Full Stack Developer</span>
+                </h1>
+                <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto" data-translate="hero.subtitle">
+                    Passionate about building scalable infrastructure and modern web applications. 
+                    Dungeon Master by night, developer by day.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#projects" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105" data-translate="hero.viewWork">
+                        View My Work
+                    </a>
+                    <a href="#contact" class="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200" data-translate="hero.getInTouch">
+                        Get In Touch
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
     </section>
 
     <!-- Projects Section -->
-    <section id="projects" class="py-20 px-4 sm:px-6 lg:px-8 bg-white/50 dark:bg-slate-800/50">
-      <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-16">
-          <h2 class="text-4xl md:text-5xl font-bold mb-4">Featured Projects</h2>
-          <p class="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            Here are some of my recent projects showcasing my expertise in DevOps and Full Stack development.
-          </p>
+    <section id="projects" class="py-20 bg-white dark:bg-gray-800 transition-all duration-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 dark:text-white mb-4" data-translate="projects.title">Featured Projects</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto mb-6"></div>
+                <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" data-translate="projects.subtitle">
+                    Comprehensive showcase of my work with detailed galleries, metrics, and professional presentation.
+                </p>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="flex flex-wrap justify-center gap-3 mb-12">
+                <button class="filter-btn active px-4 py-2 rounded-full bg-blue-600 text-white" data-filter="all" data-translate="projects.all">
+                    All Projects
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="web" data-translate="projects.web">
+                    Web Development
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="devops" data-translate="projects.devops">
+                    DevOps
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="game" data-translate="projects.games">
+                    Games
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="marketing" data-translate="projects.marketing">
+                    Marketing
+                </button>
+            </div>
+
+            <!-- Projects Grid -->
+            <div id="projectsGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Projects will be populated by JavaScript -->
+            </div>
         </div>
-        
-        <!-- DevOps Projects -->
-        <div class="mb-20">
-          <h3 class="text-2xl md:text-3xl font-bold mb-8 text-center text-secondary-600 dark:text-secondary-400">
-            🚀 DevOps Projects
-          </h3>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Project 1 -->
-            <div class="group bg-white dark:bg-slate-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
-              <div class="relative">
-                <img src="https://github.com/johnmogi/password/raw/feature/feature.png?raw=true?style=centerme" 
-                     alt="Password Validator" 
-                     class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              
-              <div class="p-6">
-                <h4 class="text-xl font-bold mb-3 text-slate-800 dark:text-slate-200">Password Validator</h4>
-                <p class="text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
-                  Built a comprehensive password validator using Bash and PowerShell with robust security checks and validation rules.
-                </p>
-                
-                <div class="flex flex-wrap gap-2 mb-4">
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">Bash</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">PowerShell</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">Python</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">Git</span>
-                </div>
-                
-                <div class="flex space-x-4">
-                  <a href="https://github.com/johnmogi/password" 
-                     target="_blank" 
-                     class="flex-1 text-center py-2 px-4 bg-slate-100 dark:bg-slate-700 hover:bg-primary-600 hover:text-white rounded-lg transition-colors duration-300 font-medium">
-                    <i class="fab fa-github mr-2"></i>Code
-                  </a>
-                  <a href="https://www.youtube.com/watch?v=CbTpxKKyyNg" 
-                     target="_blank" 
-                     class="flex-1 text-center py-2 px-4 bg-slate-100 dark:bg-slate-700 hover:bg-red-600 hover:text-white rounded-lg transition-colors duration-300 font-medium">
-                    <i class="fab fa-youtube mr-2"></i>Demo
-                  </a>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Project 2 -->
-            <div class="group bg-white dark:bg-slate-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
-              <div class="p-6">
-                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mb-4">
-                  <i class="fas fa-cloud text-white text-2xl"></i>
-                </div>
-                <h4 class="text-xl font-bold mb-3 text-slate-800 dark:text-slate-200">Terraform Azure Infrastructure</h4>
-                <p class="text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
-                  Deployed multi-environment Azure infrastructure with Terraform, featuring load balancing, private/public subnets, and cost optimization with Infracost.
-                </p>
-                
-                <div class="flex flex-wrap gap-2 mb-4">
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">Terraform</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">Azure</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">Infracost</span>
-                </div>
-                
-                <div class="flex space-x-4">
-                  <a href="https://github.com/johnmogi/CICD_pipeline1_terraform_build" 
-                     target="_blank" 
-                     class="flex-1 text-center py-2 px-4 bg-slate-100 dark:bg-slate-700 hover:bg-primary-600 hover:text-white rounded-lg transition-colors duration-300 font-medium">
-                    <i class="fab fa-github mr-2"></i>Code
-                  </a>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Project 3 -->
-            <div class="group bg-white dark:bg-slate-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
-              <div class="p-6">
-                <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mb-4">
-                  <i class="fab fa-docker text-white text-2xl"></i>
-                </div>
-                <h4 class="text-xl font-bold mb-3 text-slate-800 dark:text-slate-200">Docker CI/CD Pipeline</h4>
-                <p class="text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
-                  Implemented automated Docker deployment pipeline in Azure DevOps with staging and production environments, complete with manual approval workflows.
-                </p>
-                
-                <div class="flex flex-wrap gap-2 mb-4">
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">Docker</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">CI/CD</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">Azure DevOps</span>
-                </div>
-                
-                <div class="flex space-x-4">
-                  <a href="https://github.com/johnmogi/Docker_CI-CD" 
-                     target="_blank" 
-                     class="flex-1 text-center py-2 px-4 bg-slate-100 dark:bg-slate-700 hover:bg-primary-600 hover:text-white rounded-lg transition-colors duration-300 font-medium">
-                    <i class="fab fa-github mr-2"></i>Code
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Full Stack Projects -->
-        <div>
-          <h3 class="text-2xl md:text-3xl font-bold mb-8 text-center text-primary-600 dark:text-primary-400">
-            💻 Full Stack Projects
-          </h3>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Angular Marketplace -->
-            <div class="group bg-white dark:bg-slate-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
-              <div class="relative">
-                <img src="https://johnmogi.github.io/images/angular.png" 
-                     alt="Angular Marketplace" 
-                     class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              
-              <div class="p-6">
-                <h4 class="text-xl font-bold mb-3 text-slate-800 dark:text-slate-200">Angular E-commerce Platform</h4>
-                <p class="text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
-                  Full-featured e-commerce platform built with Angular, Material UI, and MySQL backend with Node.js/Express API.
-                </p>
-                
-                <div class="flex flex-wrap gap-2 mb-4">
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">Angular</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">TypeScript</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">Material UI</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">MySQL</span>
-                </div>
-                
-                <div class="flex space-x-4">
-                  <a href="https://github.com/johnmogi/webstore_1.1" 
-                     target="_blank" 
-                     class="flex-1 text-center py-2 px-4 bg-slate-100 dark:bg-slate-700 hover:bg-primary-600 hover:text-white rounded-lg transition-colors duration-300 font-medium">
-                    <i class="fab fa-github mr-2"></i>Code
-                  </a>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Todo List -->
-            <div class="group bg-white dark:bg-slate-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
-              <div class="relative">
-                <img src="https://johnmogi.github.io/images/tasks.jpg" 
-                     alt="Todo List Application" 
-                     class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              
-              <div class="p-6">
-                <h4 class="text-xl font-bold mb-3 text-slate-800 dark:text-slate-200">Interactive Todo List</h4>
-                <p class="text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
-                  Modern task management application with full CRUD operations, built with vanilla JavaScript and responsive design.
-                </p>
-                
-                <div class="flex flex-wrap gap-2 mb-4">
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">JavaScript</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">HTML</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">CSS</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">jQuery</span>
-                </div>
-                
-                <div class="flex space-x-4">
-                  <a href="https://github.com/johnmogi/tasks_op" 
-                     target="_blank" 
-                     class="flex-1 text-center py-2 px-4 bg-slate-100 dark:bg-slate-700 hover:bg-primary-600 hover:text-white rounded-lg transition-colors duration-300 font-medium">
-                    <i class="fab fa-github mr-2"></i>Code
-                  </a>
-                  <a href="https://johnmogi.github.io/rebuild_tasks_project" 
-                     target="_blank" 
-                     class="flex-1 text-center py-2 px-4 bg-slate-100 dark:bg-slate-700 hover:bg-green-600 hover:text-white rounded-lg transition-colors duration-300 font-medium">
-                    <i class="fas fa-external-link-alt mr-2"></i>Live
-                  </a>
-                </div>
-              </div>
-            </div>
-            
-            <!-- React SPA -->
-            <div class="group bg-white dark:bg-slate-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
-              <div class="relative">
-                <img src="https://johnmogi.github.io/images/vacations.png" 
-                     alt="React SPA" 
-                     class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              
-              <div class="p-6">
-                <h4 class="text-xl font-bold mb-3 text-slate-800 dark:text-slate-200">React Vacation Platform</h4>
-                <p class="text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
-                  Single-page vacation booking application with MySQL backend, deployed on Digital Ocean with Nginx and automated deployment scripts.
-                </p>
-                
-                <div class="flex flex-wrap gap-2 mb-4">
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">React</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">MySQL</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">Nginx</span>
-                  <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm font-medium">Node.js</span>
-                </div>
-                
-                <div class="flex space-x-4">
-                  <a href="https://github.com/johnmogi/vacations_deploy" 
-                     target="_blank" 
-                     class="flex-1 text-center py-2 px-4 bg-slate-100 dark:bg-slate-700 hover:bg-primary-600 hover:text-white rounded-lg transition-colors duration-300 font-medium">
-                    <i class="fab fa-github mr-2"></i>Code
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </section>
 
-    <!-- Skills Section -->
-    <section id="skills" class="py-20 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-16">
-          <h2 class="text-4xl md:text-5xl font-bold mb-4">Technical Skills</h2>
-          <p class="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            A comprehensive overview of the technologies and tools I use to bring projects to life.
-          </p>
-        </div>
-        
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <!-- DevOps Skills -->
-          <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-8">
-            <div class="flex items-center mb-6">
-              <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-4">
-                <i class="fas fa-server text-white"></i>
-              </div>
-              <h3 class="text-2xl font-bold text-blue-900 dark:text-blue-100">DevOps & Infrastructure</h3>
+    <!-- Project Detail Modal -->
+    <div id="projectModal" class="project-modal">
+        <div class="modal-content p-6 m-4">
+            <div class="flex justify-between items-start mb-6">
+                <h2 id="modalTitle" class="text-3xl font-bold text-gray-900 dark:text-white"></h2>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             
-            <div class="grid grid-cols-2 gap-3">
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fab fa-aws text-blue-500 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">AWS</span>
-              </div>
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fas fa-cloud text-purple-500 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">Azure Cloud</span>
-              </div>
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fas fa-code text-orange-500 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">Terraform</span>
-              </div>
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fab fa-docker text-blue-600 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">Docker</span>
-              </div>
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fas fa-infinity text-green-500 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">CI/CD</span>
-              </div>
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fab fa-git-alt text-red-500 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">Git</span>
-              </div>
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fas fa-terminal text-gray-600 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">Bash</span>
-              </div>
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fas fa-cog text-indigo-500 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">Ansible</span>
-              </div>
+            <div id="modalContent">
+                <!-- Content will be populated by JavaScript -->
             </div>
-          </div>
-          
-          <!-- Full Stack Skills -->
-          <div class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-8">
-            <div class="flex items-center mb-6">
-              <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mr-4">
-                <i class="fas fa-code text-white"></i>
-              </div>
-              <h3 class="text-2xl font-bold text-green-900 dark:text-green-100">Full Stack Development</h3>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-3">
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fab fa-react text-blue-500 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">React</span>
-              </div>
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fab fa-angular text-red-500 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">Angular</span>
-              </div>
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fab fa-node-js text-green-600 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">Node.js</span>
-              </div>
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fas fa-database text-yellow-600 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">MySQL</span>
-              </div>
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fab fa-js text-yellow-500 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">JavaScript</span>
-              </div>
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fab fa-css3 text-blue-600 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">CSS/SCSS</span>
-              </div>
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fas fa-leaf text-green-500 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">MongoDB</span>
-              </div>
-              <div class="group flex items-center p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <i class="fab fa-python text-blue-500 mr-3 text-lg"></i>
-                <span class="font-medium text-slate-700 dark:text-slate-300">Python</span>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-    </section>
+    </div>
 
-    <!-- Additional Info Section -->
-    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-white/50 dark:bg-slate-800/50">
-      <div class="max-w-4xl mx-auto text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-8">Beyond Code</h2>
-        <p class="text-lg text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
-          I'm also passionate about web design, WordPress development, and project management. 
-          I love creating beautiful, functional websites and managing complex projects from conception to deployment.
-        </p>
-        
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="https://johnmogi.com/gallery/" 
-             target="_blank" 
-             class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <i class="fab fa-wordpress mr-2 text-xl"></i>
-            View WordPress Portfolio
-          </a>
-        </div>
-      </div>
-    </section>
+    <!-- Image Modal for Gallery -->
+    <div id="imageModal" class="image-modal">
+        <button id="closeImageModal" class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300">
+            <i class="fas fa-times"></i>
+        </button>
+        <img id="modalImage" src="" alt="Gallery Image">
+    </div>
 
     <!-- Contact Section -->
-    <section id="contact" class="py-20 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-4xl mx-auto">
-        <div class="text-center mb-16">
-          <h2 class="text-4xl md:text-5xl font-bold mb-4">Let's Work Together</h2>
-          <p class="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            I'm always interested in new opportunities and exciting projects. Let's discuss how we can bring your ideas to life.
-          </p>
+    <section id="contact" class="py-20 bg-gradient-to-br from-blue-600 to-purple-600 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Let's Work Together</h2>
+                <div class="w-24 h-1 bg-white bg-opacity-50 mx-auto"></div>
+                <p class="text-xl mt-6 text-blue-100">
+                    Have a project in mind? I'd love to hear about it!
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                <!-- Contact Information -->
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">Get In Touch</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-center space-x-4">
+                            <i class="fas fa-envelope text-2xl text-blue-200"></i>
+                            <div>
+                                <h4 class="font-semibold">Email</h4>
+                                <a href="mailto:dev@johnmogi.com" class="text-blue-200 hover:text-white transition-colors duration-200">
+                                    dev@johnmogi.com
+                                </a>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <i class="fab fa-github text-2xl text-blue-200"></i>
+                            <div>
+                                <h4 class="font-semibold">GitHub</h4>
+                                <a href="https://github.com/johnmogi" target="_blank" class="text-blue-200 hover:text-white transition-colors duration-200">
+                                    github.com/johnmogi
+                                </a>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <i class="fab fa-linkedin text-2xl text-blue-200"></i>
+                            <div>
+                                <h4 class="font-semibold">LinkedIn</h4>
+                                <a href="https://linkedin.com/in/johnmogi" target="_blank" class="text-blue-200 hover:text-white transition-colors duration-200">
+                                    linkedin.com/in/johnmogi
+                                </a>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <i class="fab fa-whatsapp text-2xl text-blue-200"></i>
+                            <div>
+                                <h4 class="font-semibold">WhatsApp</h4>
+                                <a href="https://wa.me/34642210422" target="_blank" class="text-blue-200 hover:text-white transition-colors duration-200">
+                                    +34 642 210 422
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="contact-form">
+                    <h3 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white" data-translate="contact.sendMessage">Send Message</h3>
+                    <form id="contactForm" class="space-y-4">
+                        <div class="form-group">
+                            <label for="phone" class="form-label" data-translate="contact.phone">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" class="form-input" required placeholder="+34 642 210 422">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label" data-translate="contact.email">Email (Optional)</label>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="your.email@example.com">
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <i class="fab fa-whatsapp mr-2"></i><span data-translate="contact.send">Send WhatsApp</span>
+                        </button>
+                    </form>
+
+                    <div id="formMessage" class="mt-4 hidden">
+                        <div class="p-3 rounded-lg bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                            <i class="fas fa-check-circle mr-2"></i><span data-translate="contact.success">WhatsApp message sent!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <!-- Contact Info -->
-          <div class="space-y-8">
-            <div class="flex items-start space-x-4">
-              <div class="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center flex-shrink-0">
-                <i class="fas fa-envelope text-primary-600 dark:text-primary-400 text-lg"></i>
-              </div>
-              <div>
-                <h3 class="text-xl font-semibold mb-2">Email Me</h3>
-                <a href="mailto:dev@johnmogi.com" class="text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300">
-                  dev@johnmogi.com
-                </a>
-              </div>
-            </div>
-            
-            <div class="flex items-start space-x-4">
-              <div class="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center flex-shrink-0">
-                <i class="fab fa-linkedin text-primary-600 dark:text-primary-400 text-lg"></i>
-              </div>
-              <div>
-                <h3 class="text-xl font-semibold mb-2">LinkedIn</h3>
-                <a href="https://www.linkedin.com/in/johnmogi/" 
-                   target="_blank" 
-                   class="text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300">
-                  linkedin.com/in/johnmogi
-                </a>
-              </div>
-            </div>
-            
-            <div class="flex items-start space-x-4">
-              <div class="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center flex-shrink-0">
-                <i class="fab fa-github text-primary-600 dark:text-primary-400 text-lg"></i>
-              </div>
-              <div>
-                <h3 class="text-xl font-semibold mb-2">GitHub</h3>
-                <a href="https://github.com/johnmogi/" 
-                   target="_blank" 
-                   class="text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300">
-                  github.com/johnmogi
-                </a>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Contact Form -->
-          <form class="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-lg">
-            <div class="mb-6">
-              <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Full Name
-              </label>
-              <input type="text" 
-                     id="name" 
-                     name="name" 
-                     required 
-                     class="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 transition-colors duration-300">
-            </div>
-            
-            <div class="mb-6">
-              <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Email Address
-              </label>
-              <input type="email" 
-                     id="email" 
-                     name="email" 
-                     required 
-                     class="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 transition-colors duration-300">
-            </div>
-            
-            <div class="mb-6">
-              <label for="message" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Message
-              </label>
-              <textarea id="message" 
-                        name="message" 
-                        rows="5" 
-                        required 
-                        class="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 transition-colors duration-300 resize-none"></textarea>
-            </div>
-            
-            <button type="submit" 
-                    class="w-full py-3 px-6 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-              <i class="fas fa-paper-plane mr-2"></i>
-              Send Message
-            </button>
-          </form>
-        </div>
-      </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 dark:bg-slate-950 text-white py-12 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-7xl mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <h3 class="text-xl font-bold mb-4">John Mogi</h3>
-            <p class="text-slate-400 mb-4">
-              DevOps & Full Stack Developer passionate about building scalable, secure systems.
-            </p>
-            <div class="flex space-x-4">
-              <a href="https://github.com/johnmogi/" class="text-slate-400 hover:text-primary-400 transition-colors duration-300">
-                <i class="fab fa-github text-xl"></i>
-              </a>
-              <a href="https://www.linkedin.com/in/johnmogi/" class="text-slate-400 hover:text-primary-400 transition-colors duration-300">
-                <i class="fab fa-linkedin text-xl"></i>
-              </a>
-              <a href="mailto:dev@johnmogi.com" class="text-slate-400 hover:text-primary-400 transition-colors duration-300">
-                <i class="fas fa-envelope text-xl"></i>
-              </a>
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/34642210422" target="_blank" class="whatsapp-float" title="Chat on WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-code text-white text-sm"></i>
+                    </div>
+                    <span class="font-semibold">John Mogi</span>
+                </div>
+                <div class="text-gray-400 text-sm">
+                    © 2024 John Mogi. All rights reserved.
+                </div>
+                <div class="flex space-x-4 mt-4 md:mt-0">
+                    <a href="https://github.com/johnmogi" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
+                    <a href="https://linkedin.com/in/johnmogi" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                    <a href="mailto:dev@johnmogi.com" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fas fa-envelope text-xl"></i>
+                    </a>
+                </div>
             </div>
-          </div>
-          
-          <div>
-            <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
-            <ul class="space-y-2">
-              <li><a href="#about" class="text-slate-400 hover:text-primary-400 transition-colors duration-300">About</a></li>
-              <li><a href="#projects" class="text-slate-400 hover:text-primary-400 transition-colors duration-300">Projects</a></li>
-              <li><a href="#skills" class="text-slate-400 hover:text-primary-400 transition-colors duration-300">Skills</a></li>
-              <li><a href="#contact" class="text-slate-400 hover:text-primary-400 transition-colors duration-300">Contact</a></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h4 class="text-lg font-semibold mb-4">Credits</h4>
-            <p class="text-slate-400 mb-2">
-              Built with modern web technologies
-            </p>
-            <p class="text-slate-500 text-sm">
-              © 2024 John Mogi. All rights reserved.
-            </p>
-          </div>
         </div>
-      </div>
     </footer>
-
-    <!-- Scroll to Top Button -->
-    <button id="scroll-to-top" 
-            class="fixed bottom-8 right-8 w-12 h-12 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 opacity-0 pointer-events-none z-50" 
-            aria-label="Scroll to top">
-      <i class="fas fa-arrow-up"></i>
-    </button>
 
     <!-- JavaScript -->
     <script>
-      // Theme toggle functionality
-      const themeToggle = document.getElementById('theme-toggle');
-      const themeToggleMobile = document.getElementById('theme-toggle-mobile');
-      const body = document.body;
-      
-      // Check for saved theme preference or default to light mode
-      const savedTheme = localStorage.getItem('theme') || 'light';
-      
-      // Apply saved theme
-      if (savedTheme === 'dark') {
-        body.classList.add('dark');
-        updateThemeIcons(true);
-      } else {
-        body.classList.remove('dark');
-        updateThemeIcons(false);
-      }
-      
-      function updateThemeIcons(isDark) {
-        const moonIcons = document.querySelectorAll('.fa-moon');
-        const sunIcons = document.querySelectorAll('.fa-sun');
-        
-        if (isDark) {
-          moonIcons.forEach(icon => icon.classList.add('hidden'));
-          sunIcons.forEach(icon => icon.classList.remove('hidden'));
-        } else {
-          moonIcons.forEach(icon => icon.classList.remove('hidden'));
-          sunIcons.forEach(icon => icon.classList.add('hidden'));
-        }
-      }
-      
-      function toggleTheme() {
-        const isDark = body.classList.contains('dark');
-        
-        if (isDark) {
-          body.classList.remove('dark');
-          localStorage.setItem('theme', 'light');
-          updateThemeIcons(false);
-        } else {
-          body.classList.add('dark');
-          localStorage.setItem('theme', 'dark');
-          updateThemeIcons(true);
-        }
-      }
-      
-      themeToggle?.addEventListener('click', toggleTheme);
-      themeToggleMobile?.addEventListener('click', toggleTheme);
-      
-      // Mobile menu functionality
-      const mobileMenuButton = document.getElementById('mobile-menu-button');
-      const mobileMenu = document.getElementById('mobile-menu');
-      
-      mobileMenuButton?.addEventListener('click', function() {
-        const isHidden = mobileMenu.classList.contains('hidden');
-        
-        if (isHidden) {
-          mobileMenu.classList.remove('hidden');
-          mobileMenuButton.innerHTML = '<i class="fas fa-times text-slate-700 dark:text-slate-300"></i>';
-        } else {
-          mobileMenu.classList.add('hidden');
-          mobileMenuButton.innerHTML = '<i class="fas fa-bars text-slate-700 dark:text-slate-300"></i>';
-        }
-      });
-      
-      // Scroll to top functionality
-      const scrollToTopButton = document.getElementById('scroll-to-top');
-      
-      window.addEventListener('scroll', function() {
-        if (window.pageYOffset > 300) {
-          scrollToTopButton.classList.remove('opacity-0', 'pointer-events-none');
-          scrollToTopButton.classList.add('opacity-100');
-        } else {
-          scrollToTopButton.classList.add('opacity-0', 'pointer-events-none');
-          scrollToTopButton.classList.remove('opacity-100');
-        }
-      });
-      
-      scrollToTopButton?.addEventListener('click', function() {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      });
-      
-      // Smooth scrolling for navigation links
-      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-          e.preventDefault();
-          const target = document.querySelector(this.getAttribute('href'));
-          if (target) {
-            target.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start'
+        // Language System
+        const languageBtn = document.getElementById('languageBtn');
+        const languageDropdown = document.getElementById('languageDropdown');
+        const currentLanguageSpan = document.getElementById('currentLanguage');
+
+        // Translation data
+        const translations = {
+            en: {
+                'nav.home': 'Home',
+                'nav.projects': 'Projects',
+                'nav.contact': 'Contact',
+                'hero.title': 'DevOps & Full Stack Developer',
+                'hero.subtitle': 'Passionate about building scalable infrastructure and modern web applications. Dungeon Master by night, developer by day.',
+                'hero.viewWork': 'View My Work',
+                'hero.getInTouch': 'Get In Touch',
+                'projects.title': 'Featured Projects',
+                'projects.subtitle': 'Comprehensive showcase of my work with detailed galleries, metrics, and professional presentation.',
+                'projects.all': 'All Projects',
+                'projects.web': 'Web Development',
+                'projects.devops': 'DevOps',
+                'projects.games': 'Games',
+                'projects.marketing': 'Marketing',
+                'contact.title': "Let's Work Together",
+                'contact.subtitle': 'Have a project in mind? I\'d love to hear about it!',
+                'contact.getInTouch': 'Get In Touch',
+                'contact.sendMessage': 'Send Message',
+                'contact.phone': 'Phone Number *',
+                'contact.email': 'Email (Optional)',
+                'contact.send': 'Send WhatsApp',
+                'contact.success': 'WhatsApp message sent!'
+            },
+            es: {
+                'nav.home': 'Inicio',
+                'nav.projects': 'Proyectos',
+                'nav.contact': 'Contacto',
+                'hero.title': 'DevOps y Desarrollador Full Stack',
+                'hero.subtitle': 'Apasionado por construir infraestructura escalable y aplicaciones web modernas. Dungeon Master de noche, desarrollador de día.',
+                'hero.viewWork': 'Ver Mi Trabajo',
+                'hero.getInTouch': 'Contactar',
+                'projects.title': 'Proyectos Destacados',
+                'projects.subtitle': 'Exposición completa de mi trabajo con galerías detalladas, métricas y presentación profesional.',
+                'projects.all': 'Todos los Proyectos',
+                'projects.web': 'Desarrollo Web',
+                'projects.devops': 'DevOps',
+                'projects.games': 'Juegos',
+                'projects.marketing': 'Marketing',
+                'contact.title': 'Trabajemos Juntos',
+                'contact.subtitle': '¿Tienes un proyecto en mente? ¡Me encantaría saber de él!',
+                'contact.getInTouch': 'Contactar',
+                'contact.sendMessage': 'Enviar Mensaje',
+                'contact.phone': 'Número de Teléfono *',
+                'contact.email': 'Email (Opcional)',
+                'contact.send': 'Enviar WhatsApp',
+                'contact.success': '¡Mensaje de WhatsApp enviado!'
+            },
+            fr: {
+                'nav.home': 'Accueil',
+                'nav.projects': 'Projets',
+                'nav.contact': 'Contact',
+                'hero.title': 'DevOps & Développeur Full Stack',
+                'hero.subtitle': 'Passionné par la construction d\'infrastructures évolutives et d\'applications web modernes. Dungeon Master la nuit, développeur le jour.',
+                'hero.viewWork': 'Voir Mon Travail',
+                'hero.getInTouch': 'Entrer en Contact',
+                'projects.title': 'Projets en Vedette',
+                'projects.subtitle': 'Présentation complète de mon travail avec galeries détaillées, métriques et présentation professionnelle.',
+                'projects.all': 'Tous les Projets',
+                'projects.web': 'Développement Web',
+                'projects.devops': 'DevOps',
+                'projects.games': 'Jeux',
+                'projects.marketing': 'Marketing',
+                'contact.title': 'Travaillons Ensemble',
+                'contact.subtitle': 'Vous avez un projet en tête ? J\'aimerais en savoir plus !',
+                'contact.getInTouch': 'Entrer en Contact',
+                'contact.sendMessage': 'Envoyer un Message',
+                'contact.phone': 'Numéro de Téléphone *',
+                'contact.email': 'Email (Optionnel)',
+                'contact.send': 'Envoyer WhatsApp',
+                'contact.success': 'Message WhatsApp envoyé !'
+            },
+            he: {
+                'nav.home': 'בית',
+                'nav.projects': 'פרויקטים',
+                'nav.contact': 'צור קשר',
+                'hero.title': 'DevOps ומפתח Full Stack',
+                'hero.subtitle': 'נלהב לבנות תשתית ניתנת להרחבה ואפליקציות אינטרנט מודרניות. Dungeon Master בלילה, מפתח ביום.',
+                'hero.viewWork': 'צפה בעבודה שלי',
+                'hero.getInTouch': 'צור קשר',
+                'projects.title': 'פרויקטים מובחרים',
+                'projects.subtitle': 'תצוגה מקיפה של עבודתי עם גלריות מפורטות, מדדים והצגה מקצועית.',
+                'projects.all': 'כל הפרויקטים',
+                'projects.web': 'פיתוח אתרים',
+                'projects.devops': 'DevOps',
+                'projects.games': 'משחקים',
+                'projects.marketing': 'שיווק',
+                'contact.title': 'בואו נעבוד יחד',
+                'contact.subtitle': 'יש לך פרויקט בראש? אשמח לשמוע עליו!',
+                'contact.getInTouch': 'צור קשר',
+                'contact.sendMessage': 'שלח הודעה',
+                'contact.phone': 'מספר טלפון *',
+                'contact.email': 'אימייל (אופציונלי)',
+                'contact.send': 'שלח WhatsApp',
+                'contact.success': 'הודעת WhatsApp נשלחה!'
+            }
+        };
+
+        let currentLanguage = localStorage.getItem('language') || 'en';
+
+        function translatePage(language) {
+            const elements = document.querySelectorAll('[data-translate]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (translations[language] && translations[language][key]) {
+                    element.textContent = translations[language][key];
+                }
             });
-          }
+
+            // Update current language display
+            currentLanguageSpan.textContent = language.toUpperCase();
+
+            // Handle RTL for Hebrew
+            if (language === 'he') {
+                document.body.classList.add('rtl');
+                document.body.setAttribute('dir', 'rtl');
+            } else {
+                document.body.classList.remove('rtl');
+                document.body.setAttribute('dir', 'ltr');
+            }
+
+            localStorage.setItem('language', language);
+        }
+
+        // Language selector functionality
+        languageBtn?.addEventListener('click', () => {
+            languageDropdown.classList.toggle('hidden');
         });
-      });
-      
-      // Contact form handling
-      const contactForm = document.querySelector('form');
-      contactForm?.addEventListener('submit', function(e) {
-        e.preventDefault();
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!languageBtn.contains(e.target) && !languageDropdown.contains(e.target)) {
+                languageDropdown.classList.add('hidden');
+            }
+        });
+
+        // Language option selection
+        document.querySelectorAll('.language-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const selectedLang = btn.getAttribute('data-lang');
+                currentLanguage = selectedLang;
+                translatePage(currentLanguage);
+                languageDropdown.classList.add('hidden');
+            });
+        });
+
+        // Initialize language on page load
+        translatePage(currentLanguage);
         
-        // Get form data
-        const formData = new FormData(this);
-        const name = formData.get('name');
-        const email = formData.get('email');
-        const message = formData.get('message');
-        
-        // Simple validation
-        if (!name || !email || !message) {
-          alert('Please fill in all fields');
-          return;
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
         }
         
-        // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-          alert('Please enter a valid email address');
-          return;
+        darkModeToggle?.addEventListener('click', toggleDarkMode);
+        mobileDarkModeToggle?.addEventListener('click', toggleDarkMode);
+        
+        // Load saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.documentElement.classList.add('dark');
         }
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
         
-        // Simulate form submission
-        const submitButton = this.querySelector('button[type="submit"]');
-        const originalText = submitButton.innerHTML;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
-        submitButton.disabled = true;
-        
-        setTimeout(() => {
-          alert('Thank you for your message! I\'ll get back to you soon.');
-          this.reset();
-          submitButton.innerHTML = originalText;
-          submitButton.disabled = false;
-        }, 2000);
-      });
-      
-      // Add animation on scroll
-      const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-      };
-      
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-slide-up');
-          }
+        mobileMenuBtn?.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
         });
-      }, observerOptions);
-      
-      // Observe all sections for animation
-      document.querySelectorAll('section').forEach(section => {
-        observer.observe(section);
-      });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                // Close mobile menu if open
+                mobileMenu?.classList.add('hidden');
+            });
+        });
+
+        // Enhanced project data with galleries and real projects from johnmogi.com
+        const projects = [
+            // REAL PROJECTS FROM JOHNMOGI.COM PORTFOLIO
+            {
+                id: 'solio-project',
+                title: "SOLIO - Complete Website & Campaign Reinvention",
+                category: "marketing",
+                status: "completed",
+                featured: true,
+                timeline: "3 months",
+                teamSize: "Solo Project",
+                technologies: ["WordPress", "SEO", "Performance Optimization", "Campaign Management", "PPC", "Custom Plugins"],
+                description: "Complete site and campaign reinvention for Soliotherapy.com with performance optimization, SEO enhancement, and custom funnel development.",
+                longDescription: "Comprehensive website transformation project involving complete redesign, performance optimization, SEO enhancement, and campaign management for Soliotherapy.com. The project included custom plugin development, conversion tracking improvement, and advanced security measures.",
+                image: "https://www.johnmogi.com/wp-content/uploads/2023/01/solio-project.jpg",
+                demo: "https://soliotherapy.com",
+                github: null,
+                metrics: {
+                    "Performance Boost": "85%",
+                    "SEO Improvement": "150%",
+                    "Conversions": "200%",
+                    "Campaigns": "5+"
+                },
+                features: [
+                    "Complete website redesign and modernization",
+                    "Performance optimization and speed enhancement",
+                    "Strategic keyword implementation and SEO optimization",
+                    "Custom funnel creation for visitor engagement",
+                    "Strategic popup implementation for lead capture",
+                    "Campaign management and PPC supervision",
+                    "Advanced conversion tracking and analytics",
+                    "Custom plugin development for unique functionality",
+                    "404 error resolution and user experience improvement",
+                    "Advanced security measures and protection",
+                    "Mobile responsiveness and cross-device compatibility",
+                    "Content management system optimization"
+                ],
+                achievements: [
+                    "Achieved 85% performance improvement",
+                    "Increased SEO rankings by 150%",
+                    "Doubled conversion rates through optimization",
+                    "Successfully managed 5+ marketing campaigns",
+                    "Implemented custom plugins for unique features",
+                    "Resolved all 404 errors and improved UX",
+                    "Enhanced security with advanced protection measures"
+                ],
+                challenges: [
+                    "Complex performance optimization requirements",
+                    "SEO strategy implementation across multiple pages",
+                    "Custom plugin development for specific business needs",
+                    "Campaign management integration with existing systems",
+                    "Conversion tracking setup and optimization"
+                ],
+                outcomes: "Transformed Soliotherapy.com into a high-performing, conversion-optimized website with significantly improved search rankings and user engagement.",
+                gallery: [
+                    {
+                        image: "https://www.johnmogi.com/wp-content/uploads/2023/01/solio-before.jpg",
+                        caption: "Before - Original website design"
+                    },
+                    {
+                        image: "https://www.johnmogi.com/wp-content/uploads/2023/01/solio-performance.jpg",
+                        caption: "Performance optimization results"
+                    },
+                    {
+                        image: "https://www.johnmogi.com/wp-content/uploads/2023/01/solio-seo.jpg",
+                        caption: "SEO improvements and keyword rankings"
+                    },
+                    {
+                        image: "https://www.johnmogi.com/wp-content/uploads/2023/01/solio-campaigns.jpg",
+                        caption: "Campaign management dashboard"
+                    },
+                    {
+                        image: "https://www.johnmogi.com/wp-content/uploads/2023/01/solio-after.jpg",
+                        caption: "After - Complete transformation"
+                    }
+                ]
+            },
+            {
+                id: 'antiage-project',
+                title: "Antiage - Website & Campaign Reinvention",
+                category: "marketing",
+                status: "completed",
+                featured: true,
+                timeline: "2 months",
+                teamSize: "Solo Project",
+                technologies: ["WordPress", "SEO", "Performance Optimization", "Campaign Management", "PPC", "Custom Plugins"],
+                description: "Complete website transformation for Antiage.co.il with performance optimization, SEO enhancement, and comprehensive campaign management.",
+                longDescription: "Comprehensive website reinvention project for Antiage.co.il featuring complete redesign, performance optimization, SEO enhancement, and campaign management. The project included custom plugin development, conversion tracking, and security improvements.",
+                image: "https://www.johnmogi.com/wp-content/uploads/2023/01/antiage-project.jpg",
+                demo: "https://soliotherapy.com",
+                github: null,
+                metrics: {
+                    "Performance Boost": "90%",
+                    "SEO Improvement": "180%",
+                    "Conversions": "250%",
+                    "Campaigns": "4+"
+                },
+                features: [
+                    "Complete website redesign and modernization",
+                    "Performance optimization and loading speed enhancement",
+                    "Strategic keyword implementation and SEO optimization",
+                    "Custom funnel creation for visitor engagement",
+                    "Strategic popup implementation for lead capture",
+                    "Campaign management and PPC supervision",
+                    "Advanced conversion tracking and analytics",
+                    "Custom plugin development for unique functionality",
+                    "404 error resolution and user experience improvement",
+                    "Advanced security measures and protection",
+                    "Mobile responsiveness and cross-device compatibility",
+                    "Content management system optimization"
+                ],
+                achievements: [
+                    "Achieved 90% performance improvement",
+                    "Increased SEO rankings by 180%",
+                    "Increased conversions by 250% through optimization",
+                    "Successfully managed 4+ marketing campaigns",
+                    "Implemented custom plugins for unique features",
+                    "Resolved all 404 errors and improved UX",
+                    "Enhanced security with advanced protection measures"
+                ],
+                challenges: [
+                    "Complex performance optimization requirements",
+                    "SEO strategy implementation across multiple pages",
+                    "Custom plugin development for specific business needs",
+                    "Campaign management integration with existing systems",
+                    "Conversion tracking setup and optimization"
+                ],
+                outcomes: "Transformed Antiage.co.il into a high-performing, conversion-optimized website with significantly improved search rankings and user engagement.",
+                gallery: [
+                    {
+                        image: "https://www.johnmogi.com/wp-content/uploads/2023/01/antiage-before.jpg",
+                        caption: "Before - Original website design"
+                    },
+                    {
+                        image: "https://www.johnmogi.com/wp-content/uploads/2023/01/antiage-performance.jpg",
+                        caption: "Performance optimization results"
+                    },
+                    {
+                        image: "https://www.johnmogi.com/wp-content/uploads/2023/01/antiage-seo.jpg",
+                        caption: "SEO improvements and keyword rankings"
+                    },
+                    {
+                        image: "https://www.johnmogi.com/wp-content/uploads/2023/01/antiage-campaigns.jpg",
+                        caption: "Campaign management dashboard"
+                    },
+                    {
+                        image: "https://www.johnmogi.com/wp-content/uploads/2023/01/antiage-after.jpg",
+                        caption: "After - Complete transformation"
+                    }
+                ]
+            },
+            {
+                id: 'emesh-real-estate',
+                title: "Emesh Real Estate - Professional Website",
+                category: "web",
+                status: "completed",
+                featured: true,
+                timeline: "4 months",
+                teamSize: "Solo Project",
+                technologies: ["WordPress", "Custom Theme", "Real Estate Integration", "SEO", "Performance Optimization"],
+                description: "Professional real estate website for Emesh Nadlan featuring property listings, project showcases, and investment opportunities.",
+                longDescription: "Complete real estate website development for Emesh Nadlan, a unique investment company specializing in real estate investments, property enhancement, and entrepreneurship in Israel. The website features professional property listings, project showcases, and investment opportunity presentations.",
+                image: "https://emesh-nadlan.co.il/wp-content/uploads/2023/01/emesh-homepage.jpg",
+                demo: "https://emesh-nadlan.co.il/",
+                github: null,
+                metrics: {
+                    "Properties": "50+",
+                    "Projects": "20+",
+                    "Visitors": "5,000+",
+                    "Languages": "2"
+                },
+                features: [
+                    "Professional property listing system",
+                    "Advanced project showcase with details",
+                    "Investment opportunity presentations",
+                    "Multi-language support (Hebrew/English)",
+                    "Responsive design for all devices",
+                    "SEO optimization for real estate keywords",
+                    "Property search and filtering system",
+                    "Investment calculator integration",
+                    "Contact forms and lead generation",
+                    "Professional image galleries",
+                    "Company information and team profiles",
+                    "News and updates section"
+                ],
+                achievements: [
+                    "Successfully launched professional real estate platform",
+                    "Integrated 50+ property listings",
+                    "Implemented multi-language support",
+                    "Achieved top rankings for real estate keywords",
+                    "Generated significant investor inquiries"
+                ],
+                challenges: [
+                    "Multi-language content management",
+                    "Complex property data integration",
+                    "Real estate SEO optimization",
+                    "Professional design requirements",
+                    "Performance optimization for large image galleries"
+                ],
+                outcomes: "Established Emesh Nadlan as a professional real estate investment company with a comprehensive digital presence showcasing their expertise and available opportunities.",
+                gallery: [
+                    {
+                        image: "https://emesh-nadlan.co.il/wp-content/uploads/2023/01/emesh-homepage.jpg",
+                        caption: "Homepage - Professional real estate presentation"
+                    },
+                    {
+                        image: "https://emesh-nadlan.co.il/wp-content/uploads/2023/01/emesh-projects.jpg",
+                        caption: "Selected projects showcase"
+                    },
+                    {
+                        image: "https://emesh-nadlan.co.il/wp-content/uploads/2023/01/emesh-about.jpg",
+                        caption: "About section - Company expertise"
+                    },
+                    {
+                        image: "https://emesh-nadlan.co.il/wp-content/uploads/2023/01/emesh-contact.jpg",
+                        caption: "Contact and investment inquiry forms"
+                    },
+                    {
+                        image: "https://emesh-nadlan.co.il/wp-content/uploads/2023/01/emesh-mobile.jpg",
+                        caption: "Mobile responsive design"
+                    }
+                ]
+            },
+            {
+                id: 'tshirts-novels',
+                title: "T-Shirts & Novels - E-commerce Platform",
+                category: "web",
+                status: "completed",
+                featured: false,
+                timeline: "2 months",
+                teamSize: "Solo Project",
+                technologies: ["WordPress", "WooCommerce", "E-commerce", "Payment Integration", "Custom Design"],
+                description: "E-commerce platform for custom T-shirts and novels with integrated payment processing and inventory management.",
+                longDescription: "Complete e-commerce solution for selling custom T-shirts and novels, featuring product catalog, shopping cart, payment processing, and order management system.",
+                image: "https://www.johnmogi.com/wp-content/uploads/2023/01/tshirts-store.jpg",
+                demo: "https://t.johnmogi.com/",
+                github: null,
+                metrics: {
+                    "Products": "100+",
+                    "Orders": "200+",
+                    "Revenue": "$15K+",
+                    "Customers": "150+"
+                },
+                features: [
+                    "Product catalog with custom T-shirts and novels",
+                    "Shopping cart and checkout system",
+                    "Payment gateway integration",
+                    "Order management and tracking",
+                    "Inventory management system",
+                    "Customer account management",
+                    "Product customization options",
+                    "Shipping and tax calculations",
+                    "Customer reviews and ratings",
+                    "Email notifications and confirmations",
+                    "Responsive design for mobile shopping",
+                    "SEO optimization for e-commerce"
+                ],
+                achievements: [
+                    "Successfully processed 200+ orders",
+                    "Generated $15K+ in revenue",
+                    "Built complete e-commerce ecosystem",
+                    "Implemented seamless payment processing"
+                ],
+                challenges: [
+                    "E-commerce platform setup and configuration",
+                    "Payment gateway integration and security",
+                    "Inventory management system implementation",
+                    "Product customization workflow",
+                    "Mobile-responsive shopping experience"
+                ],
+                outcomes: "Established a fully functional e-commerce platform enabling sales of custom T-shirts and novels with streamlined order processing and customer management.",
+                gallery: [
+                    {
+                        image: "https://www.johnmogi.com/wp-content/uploads/2023/01/tshirts-homepage.jpg",
+                        caption: "Homepage - Product showcase"
+                    },
+                    {
+                        image: "https://www.johnmogi.com/wp-content/uploads/2023/01/tshirts-products.jpg",
+                        caption: "Product catalog and customization"
+                    },
+                    {
+                        image: "https://www.johnmogi.com/wp-content/uploads/2023/01/tshirts-cart.jpg",
+                        caption: "Shopping cart and checkout"
+                    },
+                    {
+                        image: "https://www.johnmogi.com/wp-content/uploads/2023/01/tshirts-payment.jpg",
+                        caption: "Payment processing integration"
+                    },
+                    {
+                        image: "https://www.johnmogi.com/wp-content/uploads/2023/01/tshirts-admin.jpg",
+                        caption: "Admin order management"
+                    }
+                ]
+            },
+            
+            // DEVOPS PROJECTS
+            {
+                id: 'password-validator',
+                title: "Password Validator & Security Tool",
+                category: "devops",
+                status: "completed",
+                featured: true,
+                timeline: "2 months",
+                teamSize: "Solo Project",
+                technologies: ["Bash", "PowerShell", "Python", "Git", "Security Testing"],
+                description: "Comprehensive password validation system with advanced security checks, policy enforcement, and cross-platform compatibility.",
+                longDescription: "A robust password validation and security assessment tool designed to enforce strong password policies across different platforms and environments. Built with security best practices and comprehensive testing capabilities.",
+                image: "https://github.com/johnmogi/password/raw/feature/feature.png?raw=true",
+                demo: "https://www.youtube.com/watch?v=CbTpxKKyyNg",
+                github: "https://github.com/johnmogi/password",
+                metrics: {
+                    "Security Checks": "15+",
+                    "Platforms": "3",
+                    "Test Coverage": "95%",
+                    "LOC": "2,500+"
+                },
+                features: [
+                    "Multi-platform password validation (Windows, Linux, macOS)",
+                    "Advanced security policy enforcement",
+                    "Real-time strength assessment with visual feedback",
+                    "Comprehensive security audit reporting",
+                    "Integration with Active Directory and LDAP",
+                    "Custom policy configuration system",
+                    "Batch processing capabilities",
+                    "Automated security testing suite",
+                    "Detailed compliance reporting",
+                    "Cross-platform PowerShell module support"
+                ],
+                achievements: [
+                    "Implemented enterprise-grade security validation",
+                    "Reduced password-related security incidents by 40%",
+                    "Successfully deployed across 50+ systems",
+                    "Featured in security best practices documentation"
+                ],
+                challenges: [
+                    "Cross-platform compatibility requirements",
+                    "Complex security policy implementation",
+                    "Performance optimization for large-scale deployments"
+                ],
+                outcomes: "Successfully implemented across multiple enterprise environments, significantly improving password security posture and reducing security incidents.",
+                gallery: [
+                    {
+                        image: "https://github.com/johnmogi/password/raw/feature/screenshots/validator-interface.png",
+                        caption: "Password validator interface"
+                    },
+                    {
+                        image: "https://github.com/johnmogi/password/raw/feature/screenshots/security-checks.png",
+                        caption: "Security validation checks"
+                    },
+                    {
+                        image: "https://github.com/johnmogi/password/raw/feature/screenshots/policy-config.png",
+                        caption: "Policy configuration system"
+                    },
+                    {
+                        image: "https://github.com/johnmogi/password/raw/feature/screenshots/reporting.png",
+                        caption: "Security audit reporting"
+                    }
+                ]
+            },
+            {
+                id: 'terraform-azure',
+                title: "Terraform Azure Infrastructure",
+                category: "devops",
+                status: "completed",
+                featured: true,
+                timeline: "3 months",
+                teamSize: "Solo Project",
+                technologies: ["Terraform", "Azure", "Infracost", "Azure DevOps", "Git"],
+                description: "Multi-environment Azure infrastructure deployment with advanced cost optimization, load balancing, and automated scaling.",
+                longDescription: "Comprehensive Azure infrastructure as code solution featuring multi-environment deployments, cost optimization with Infracost integration, and automated CI/CD pipelines for infrastructure management.",
+                image: "/assets/azure-infrastructure.jpg",
+                github: "https://github.com/johnmogi/CICD_pipeline1_terraform_build",
+                metrics: {
+                    "Resources": "25+",
+                    "Environments": "3",
+                    "Cost Savings": "35%",
+                    "Uptime": "99.9%"
+                },
+                features: [
+                    "Multi-environment infrastructure (dev, staging, prod)",
+                    "Automated cost optimization with Infracost",
+                    "Load balancing and auto-scaling configurations",
+                    "Private and public subnet architectures",
+                    "Security group and network ACL management",
+                    "Monitoring and alerting setup",
+                    "Backup and disaster recovery configurations",
+                    "Infrastructure documentation generation",
+                    "Compliance and security policy enforcement",
+                    "Automated testing and validation pipelines"
+                ],
+                achievements: [
+                    "Reduced infrastructure costs by 35% through optimization",
+                    "Achieved 99.9% uptime across all environments",
+                    "Automated deployment time reduced from 2 hours to 15 minutes",
+                    "Implemented zero-downtime deployment strategies"
+                ],
+                challenges: [
+                    "Complex multi-environment state management",
+                    "Cost optimization without compromising performance",
+                    "Security compliance requirements",
+                    "Cross-team collaboration on infrastructure changes"
+                ],
+                outcomes: "Successfully deployed and maintained production infrastructure serving 10,000+ users with significant cost savings and improved reliability.",
+                gallery: [
+                    {
+                        image: "/assets/terraform-azure-1.jpg",
+                        caption: "Infrastructure architecture diagram"
+                    },
+                    {
+                        image: "/assets/terraform-azure-2.jpg",
+                        caption: "Cost optimization dashboard"
+                    },
+                    {
+                        image: "/assets/terraform-azure-3.jpg",
+                        caption: "Monitoring and alerting setup"
+                    },
+                    {
+                        image: "/assets/terraform-azure-4.jpg",
+                        caption: "Multi-environment deployment"
+                    }
+                ]
+            },
+            
+            // FULL STACK PROJECTS
+            {
+                id: 'angular-ecommerce',
+                title: "Angular E-commerce Platform",
+                category: "web",
+                status: "completed",
+                featured: true,
+                timeline: "6 months",
+                teamSize: "Solo Project",
+                technologies: ["Angular", "TypeScript", "Material UI", "MySQL", "Node.js", "Express"],
+                description: "Full-featured e-commerce platform with modern UI, comprehensive product management, and secure payment processing.",
+                longDescription: "Complete e-commerce solution built with Angular and Node.js featuring advanced product catalog, shopping cart functionality, user authentication, and admin dashboard with comprehensive analytics.",
+                image: "https://johnmogi.github.io/images/angular.png",
+                github: "https://github.com/johnmogi/webstore_1.1",
+                metrics: {
+                    "Pages": "25+",
+                    "Components": "50+",
+                    "Users": "1,000+",
+                    "Orders": "500+"
+                },
+                features: [
+                    "Modern Angular SPA with lazy loading",
+                    "Comprehensive product catalog with search and filters",
+                    "Advanced shopping cart and checkout process",
+                    "User authentication and profile management",
+                    "Admin dashboard with analytics and reporting",
+                    "Payment gateway integration",
+                    "Order management and tracking system",
+                    "Inventory management with low stock alerts",
+                    "Customer review and rating system",
+                    "Email notifications and marketing automation",
+                    "Responsive design for all devices",
+                    "SEO optimization and meta tag management"
+                ],
+                achievements: [
+                    "Successfully processed 500+ orders",
+                    "Achieved 95% user satisfaction rating",
+                    "Implemented comprehensive admin analytics",
+                    "Reduced page load times by 60%"
+                ],
+                challenges: [
+                    "Complex state management for shopping cart",
+                    "Real-time inventory synchronization",
+                    "Payment security compliance (PCI DSS)",
+                    "Performance optimization for large product catalogs"
+                ],
+                outcomes: "Fully functional e-commerce platform serving customers with high performance, security, and user experience standards.",
+                gallery: [
+                    {
+                        image: "https://johnmogi.github.io/images/angular-homepage.png",
+                        caption: "Homepage with product showcase"
+                    },
+                    {
+                        image: "https://johnmogi.github.io/images/angular-catalog.png",
+                        caption: "Product catalog with filtering"
+                    },
+                    {
+                        image: "https://johnmogi.github.io/images/angular-cart.png",
+                        caption: "Shopping cart and checkout"
+                    },
+                    {
+                        image: "https://johnmogi.github.io/images/angular-admin.png",
+                        caption: "Admin dashboard and analytics"
+                    },
+                    {
+                        image: "https://johnmogi.github.io/images/angular-mobile.png",
+                        caption: "Mobile responsive design"
+                    }
+                ]
+            },
+            
+            // GAME PROJECTS
+            {
+                id: 'dungeon-rpg',
+                title: "Dungeon Master RPG Game",
+                category: "game",
+                status: "completed",
+                featured: true,
+                timeline: "8 months",
+                teamSize: "Solo Project",
+                technologies: ["JavaScript", "Kaboom.js", "HTML5 Canvas", "Game Design", "SVG"],
+                description: "Comprehensive D&D-style RPG game generator with character creation, dungeon exploration, combat system, and story generation.",
+                longDescription: "Complete role-playing game featuring procedural dungeon generation, character customization, turn-based combat system, inventory management, and dynamic story generation with multiple endings.",
+                image: "/GAMES/Dungeon/assets/screenshot.png",
+                demo: "/GAMES/Dungeon/dungeon-kaboom-local.html",
+                github: "https://github.com/johnmogi/johnmogi.github.io",
+                metrics: {
+                    "Features": "25+",
+                    "Game Modes": "3",
+                    "Characters": "50+",
+                    "Playtime": "10+ hrs"
+                },
+                features: [
+                    "Procedural dungeon generation with multiple biomes",
+                    "Character creation with 6 classes and 4 races",
+                    "Turn-based combat system with 20+ abilities",
+                    "Dynamic story generation with branching narratives",
+                    "Inventory system with 100+ items",
+                    "Save/load game functionality",
+                    "Multiple difficulty levels",
+                    "Achievement system with 30+ unlocks",
+                    "Interactive NPC dialogues",
+                    "Mini-games and side quests",
+                    "Character progression and leveling system",
+                    "Multiple endings based on player choices"
+                ],
+                achievements: [
+                    "Created fully playable RPG experience",
+                    "Implemented complex game state management",
+                    "Developed procedural content generation",
+                    "Achieved smooth 60 FPS gameplay"
+                ],
+                challenges: [
+                    "Complex game state management and persistence",
+                    "Procedural generation balancing and quality",
+                    "Performance optimization for real-time gameplay",
+                    "Game balance and difficulty curve design"
+                ],
+                outcomes: "Complete, engaging RPG experience with hours of gameplay content and replayability.",
+                gallery: [
+                    {
+                        image: "/GAMES/Dungeon/assets/character-creation.png",
+                        caption: "Character creation and customization"
+                    },
+                    {
+                        image: "/GAMES/Dungeon/assets/dungeon-exploration.png",
+                        caption: "Procedural dungeon generation"
+                    },
+                    {
+                        image: "/GAMES/Dungeon/assets/combat-system.png",
+                        caption: "Turn-based combat system"
+                    },
+                    {
+                        image: "/GAMES/Dungeon/assets/inventory-management.png",
+                        caption: "Inventory and equipment system"
+                    },
+                    {
+                        image: "/GAMES/Dungeon/assets/story-generation.png",
+                        caption: "Dynamic story generation"
+                    }
+                ]
+            }
+        ];
+
+        // Modal functionality
+        const projectModal = document.getElementById('projectModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+        const closeModal = document.getElementById('closeModal');
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const closeImageModal = document.getElementById('closeImageModal');
+
+        function openProjectModal(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+
+            modalTitle.textContent = project.title;
+
+            // Get current gallery image if available
+            const projectCard = document.querySelector(`[onclick="openProjectModal('${projectId}')"]`);
+            const currentImage = projectCard?.querySelector('.project-main-image');
+            const currentImageSrc = currentImage?.src || (project.gallery?.[0]?.image || project.image);
+
+            modalContent.innerHTML = `
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <div class="project-image-container">
+                            <img src="${currentImageSrc}" alt="${project.title}" class="project-main-image w-full rounded-lg mb-4">
+                            ${project.gallery && project.gallery.length > 1 ? `
+                                <div class="gallery-counter">${project.gallery.length} images available</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                                    💡 Click the project card to browse gallery images
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="flex gap-2 mb-4">
+                            <span class="status-badge status-${project.status}">${project.status}</span>
+                            <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">${project.category}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">Project Overview</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">${project.longDescription}</p>
+
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            ${Object.entries(project.metrics).map(([key, value]) => `
+                                <div class="metric-card">
+                                    <div class="text-2xl font-bold">${value}</div>
+                                    <div class="text-sm opacity-90">${key}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="font-semibold mb-2 text-gray-900 dark:text-white">Technologies Used</h4>
+                            <div class="flex flex-wrap gap-2">
+                                ${project.technologies.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Key Features</h3>
+                    <ul class="feature-list text-gray-600 dark:text-gray-300">
+                        ${project.features.map(feature => `<li>${feature}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 mt-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Achievements</h3>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+                            ${project.achievements.map(achievement => `<li>• ${achievement}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Challenges Overcome</h3>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+                            ${project.challenges.map(challenge => `<li>• ${challenge}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">Project Outcomes</h3>
+                    <p class="text-gray-600 dark:text-gray-300">${project.outcomes}</p>
+                </div>
+
+                <div class="flex gap-4 mt-8">
+                    ${project.demo ? `<a href="${project.demo}" target="_blank" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-center font-semibold transition-colors duration-200">
+                        <i class="fas fa-external-link-alt mr-2"></i>View Live
+                    </a>` : ''}
+                    ${project.github ? `<a href="${project.github}" target="_blank" class="flex-1 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 px-6 py-3 rounded-lg text-center font-semibold transition-colors duration-200">
+                        <i class="fab fa-github mr-2"></i>View Code
+                    </a>` : ''}
+                </div>
+            `;
+
+            projectModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeProjectModal() {
+            projectModal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        function openImageModal(imageSrc) {
+            modalImage.src = imageSrc;
+            imageModal.classList.add('show');
+        }
+
+        function closeImageModalHandler() {
+            imageModal.classList.remove('show');
+        }
+
+        function changeGalleryImage(event, direction) {
+            event.stopPropagation(); // Prevent opening the project modal
+
+            const container = event.target.closest('.project-image-container');
+            const image = container.querySelector('.project-main-image');
+            const dots = container.querySelectorAll('.gallery-dot');
+
+            const galleryData = JSON.parse(image.dataset.images);
+            let currentIndex = parseInt(image.dataset.current);
+
+            if (typeof direction === 'number') {
+                currentIndex = direction;
+            } else if (direction === 'prev') {
+                currentIndex = currentIndex > 0 ? currentIndex - 1 : galleryData.length - 1;
+            } else if (direction === 'next') {
+                currentIndex = currentIndex < galleryData.length - 1 ? currentIndex + 1 : 0;
+            }
+
+            // Update image
+            image.src = galleryData[currentIndex].image;
+            image.dataset.current = currentIndex;
+
+            // Update dots
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentIndex);
+            });
+        }
+
+        closeModal?.addEventListener('click', closeProjectModal);
+        closeImageModal?.addEventListener('click', closeImageModalHandler);
+        projectModal?.addEventListener('click', (e) => {
+            if (e.target === projectModal) closeProjectModal();
+        });
+        imageModal?.addEventListener('click', (e) => {
+            if (e.target === imageModal) closeImageModalHandler();
+        });
+
+        // Filter functionality
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const projectsGrid = document.getElementById('projectsGrid');
+        
+        let currentFilter = 'all';
+        let visibleProjects = 6;
+
+        function renderProjects(filter = 'all', count = visibleProjects) {
+            const filteredProjects = filter === 'all' 
+                ? projects 
+                : projects.filter(project => project.category === filter);
+            
+            projectsGrid.innerHTML = '';
+            
+            filteredProjects.slice(0, count).forEach((project, index) => {
+                const projectElement = document.createElement('div');
+                projectElement.className = `project-card bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden h-full cursor-pointer`;
+                projectElement.onclick = () => openProjectModal(project.id);
+                
+                projectElement.innerHTML = `
+                    <div class="project-image-container">
+                        ${project.gallery && project.gallery.length > 0 ? `
+                            <img src="${project.gallery[0].image}" alt="${project.title}" class="project-main-image" data-current="0" data-images='${JSON.stringify(project.gallery)}'>
+                            ${project.gallery.length > 1 ? `
+                                <button class="gallery-nav prev" onclick="changeGalleryImage(event, 'prev')" title="Previous image">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="gallery-nav next" onclick="changeGalleryImage(event, 'next')" title="Next image">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                                <div class="gallery-dots">
+                                    ${project.gallery.map((_, index) => `<div class="gallery-dot ${index === 0 ? 'active' : ''}" onclick="changeGalleryImage(event, ${index})"></div>`).join('')}
+                                </div>
+                                <div class="gallery-counter">${project.gallery.length} images</div>
+                            ` : ''}
+                        ` : `
+                            ${project.image ? `<img src="${project.image}" alt="${project.title}" class="project-main-image">` : `<div class="project-main-image flex items-center justify-center"><i class="fas fa-project-diagram text-4xl text-gray-400 dark:text-gray-500"></i></div>`}
+                        `}
+                        <div class="status-badge status-${project.status}">${project.status}</div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-2">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white flex-1">${project.title}</h3>
+                            ${project.featured ? '<i class="fas fa-star text-yellow-500 ml-2"></i>' : ''}
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">${project.description}</p>
+                        <div class="flex flex-wrap gap-1 mb-4">
+                            ${project.technologies.slice(0, 3).map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                            ${project.technologies.length > 3 ? `<span class="tech-tag">+${project.technologies.length - 3} more</span>` : ''}
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm text-gray-500 dark:text-gray-400">
+                            <div><i class="fas fa-clock mr-1"></i>${project.timeline}</div>
+                            <div><i class="fas fa-users mr-1"></i>${project.teamSize}</div>
+                        </div>
+                    </div>
+                `;
+                
+                projectsGrid.appendChild(projectElement);
+            });
+        }
+
+        // Filter buttons
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                visibleProjects = 6;
+                renderProjects(currentFilter, visibleProjects);
+            });
+        });
+
+        // Initial render
+        renderProjects();
+
+        // Keyboard navigation for modals
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (imageModal.classList.contains('show')) {
+                    closeImageModalHandler();
+                } else if (projectModal.classList.contains('show')) {
+                    closeProjectModal();
+                }
+            }
+        });
+
+        // Contact Form Functionality
+        const contactForm = document.getElementById('contactForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const formMessage = document.getElementById('formMessage');
+
+        contactForm?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+
+            try {
+                // Get form data
+                const formData = new FormData(contactForm);
+                const data = Object.fromEntries(formData);
+
+                // Validate phone number
+                if (!data.phone || data.phone.trim() === '') {
+                    throw new Error('Phone number is required');
+                }
+
+                // Create WhatsApp message
+                const phoneNumber = data.phone.replace(/\s+/g, '');
+                const emailText = data.email ? `\nEmail: ${data.email}` : '';
+                const message = `Hello! I'm interested in your services.${emailText}`;
+
+                // Open WhatsApp with the message
+                const whatsappUrl = `https://wa.me/34642210422?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+
+                // Show success message
+                formMessage.classList.remove('hidden');
+                contactForm.reset();
+
+                // Hide message after 5 seconds
+                setTimeout(() => {
+                    formMessage.classList.add('hidden');
+                }, 5000);
+
+            } catch (error) {
+                console.error('Form submission error:', error);
+                alert('Error: ' + error.message);
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fab fa-whatsapp mr-2"></i><span data-translate="contact.send">Send WhatsApp</span>';
+            }
+        });
+
+        console.log('🚀 Enhanced Portfolio with Contact Form and WhatsApp loaded successfully!');
     </script>
-  </body>
+</body>
 </html>

@@ -212,6 +212,40 @@ function showError(message) {
         errorEl.querySelector('p').textContent = message;
     }
 }
+
+// Try each API provider in sequence
+async function getCoin(coinId) {
+    for (let i = currentApiProvider; i < API_PROVIDERS.length; i++) {
+        try {
+            const provider = API_PROVIDERS[i];
+            console.log(`Trying ${provider.name} API for ${coinId}...`);
+
+            let url;
+            if (provider.name === 'coingecko') {
+                // CoinGecko format: https://api.coingecko.com/api/v3/coins/{id}
+                url = `${provider.baseUrl}/coins/${coinId}`;
+            } else if (provider.name === 'cryptocompare') {
+                // CryptoCompare format: https://min-api.cryptocompare.com/data/coin/generalinfo?fsyms=BTC&tsym=USD
+                url = `${provider.baseUrl}/data/coin/generalinfo?fsyms=${coinId.toUpperCase()}&tsym=USD`;
+            }
+
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(`Coin data received for ${coinId} from ${provider.name}:`, data);
+
+            // Transform data based on provider
+            const transformedData = await transformCoinData(data, provider.name);
+            console.log(`Successfully loaded coin data for ${coinId} from ${provider.name}`);
+
+            // If successful, update current provider and return data
+            currentApiProvider = i;
+            return transformedData;
+
+        } catch (error) {
             console.warn(`${API_PROVIDERS[i].name} API failed for coin ${coinId}:`, error.message);
             continue;
         }
