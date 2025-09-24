@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dungeon Master RPG - Kaboom.js Edition</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <link href="dungeon-styles.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900">
+    <div class="game-info pixel-font">
+        <div>FPS: <span id="fps" class="text-green-400">0</span></div>
+        <div>Objects: <span id="objects" class="text-blue-400">0</span></div>
+        <div>Engine: <span class="text-yellow-400">Kaboom.js</span></div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="controls pixel-font">
+        <h3 class="text-yellow-400 glow mb-2">🎮 CONTROLS</h3>
+        <div class="space-y-1 text-sm">
+            <div><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">W</kbd><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">A</kbd><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">S</kbd><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">D</kbd> Move Rooms</div>
+            <div><kbd class="bg-gray-700 px-2 py-1 rounded text-red-400">SPACE</kbd> Interact</div>
+            <div><kbd class="bg-gray-700 px-2 py-1 rounded text-blue-400">E</kbd> Examine</div>
+            <div><kbd class="bg-gray-700 px-2 py-1 rounded text-purple-400">I</kbd> Inventory</div>
+        </div>
+    </div>
+
+    <div class="stats pixel-font">
+        <h3 class="text-yellow-400 glow mb-2">🧙 HERO STATS</h3>
+        <div id="heroStats" class="space-y-1 text-sm">
+            <div>Loading hero data...</div>
+        </div>
+
+        <div class="mt-3">
+            <div class="text-red-400 mb-1">❤️ HEALTH</div>
+            <div class="health-bar">
+                <div class="health-fill" id="healthFill" style="width: 100%"></div>
+            </div>
+            <div id="healthText" class="text-center text-red-400">100/100</div>
+        </div>
+
+        <div class="mt-2">
+            <div class="text-blue-400 mb-1">🔮 MANA</div>
+            <div class="mana-bar">
+                <div class="mana-fill" id="manaFill" style="width: 100%"></div>
+            </div>
+            <div id="manaText" class="text-center text-blue-400">50/50</div>
+        </div>
+    </div>
+
+    <!-- Kaboom.js loaded from CDN - NO CORS ISSUES -->
+    <script src="https://unpkg.com/kaboom/dist/kaboom.js"></script>
+
+    <!-- Game scripts -->
+    <script src="dungeon-game.js"></script>
+</body>
+</html>

@@ -3,9 +3,95 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Crypto Tracker</title>
-    <!-- Note: Using Tailwind CSS CDN for development. For production, consider using the Tailwind CLI or PostCSS plugin -->
-    <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+        /* Chart pulse animation for live updates */
+        @keyframes chartPulse {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+
+        /* Favorites pills slide-in animation */
+        @keyframes pillSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Refresh swipe effect */
+        @keyframes refreshSwipe {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Loading pulse for live updates */
+        @keyframes loadingPulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Apply animations to elements */
+        .favorites-pill {
+            animation: pillSlideIn 0.5s ease-out forwards;
+        }
+
+        .refresh-animation {
+            animation: refreshSwipe 0.3s ease-in-out;
+        }
+
+        .live-indicator {
+            animation: loadingPulse 1.5s ease-in-out infinite;
+        }
+
+        /* Enhanced chart container */
+        #chartContainer {
+            transition: all 0.3s ease-in-out;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        #chartContainer:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Countdown animation */
+        #countdown {
+            transition: all 0.2s ease-in-out;
+            font-weight: bold;
+        }
+
+        /* Live mode indicator */
+        .live-badge {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .live-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: liveShimmer 3s infinite;
+        }
+
+        @keyframes liveShimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+    </style>
+        <!-- Note: Using Tailwind CSS CDN for development. For production, consider using the Tailwind CLI or PostCSS plugin -->
+        <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     </head>
@@ -45,10 +131,10 @@
                 <option value="300">5 minutes</option>
                 <option value="600">10 minutes</option>
             </select>
-            <label class="flex items-center">
-                <input type="checkbox" id="dummyModeToggle" class="mr-2">
-                <span class="text-gray-700">Demo Mode</span>
-            </label>
+            <div class="flex items-center space-x-2">
+                <input type="checkbox" id="dummyModeToggle" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
+                <label for="dummyModeToggle" class="text-sm text-gray-700">Demo Mode</label>
+            </div>
             <div id="lastRefresh" class="text-sm text-gray-500">
                 Last updated: Never
             </div>
@@ -77,8 +163,15 @@
         </div>
 
         <!-- Chart Container -->
-        <div id="chartContainer" class="bg-white rounded-lg shadow-md p-6 hidden">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Price Chart</h3>
+        <div id="chartContainer" class="bg-white rounded-lg shadow-md p-6 hidden relative">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Price Chart</h3>
+                <div id="liveIndicator" class="hidden">
+                    <span class="live-badge bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">
+                        ● LIVE
+                    </span>
+                </div>
+            </div>
             <div class="w-full" style="height: 300px; max-height: 300px; overflow: hidden;">
                 <canvas id="portfolioChart" width="400" height="300"></canvas>
             </div>
@@ -103,10 +196,40 @@
             // Load initial data
             await loadTrackerData();
 
+            // Simple API test - try to get Bitcoin data directly
+            console.log('🧪 Testing direct API calls...');
+            try {
+                const testResponse = await fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1&interval=daily');
+                console.log('🧪 Direct CoinGecko test:', testResponse.status, testResponse.statusText);
+            } catch (e) {
+                console.log('🧪 Direct CoinGecko test failed:', e.message);
+            }
+
+            try {
+                const testResponse2 = await fetch('https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=1');
+                console.log('🧪 Direct CryptoCompare test:', testResponse2.status, testResponse2.statusText);
+            } catch (e) {
+                console.log('🧪 Direct CryptoCompare test failed:', e.message);
+            }
+
             // Set up event listeners
             document.getElementById('refreshBtn').addEventListener('click', async () => {
-                await loadTrackerData();
-                showToast('Portfolio updated', 'success');
+                const refreshBtn = document.getElementById('refreshBtn');
+
+                // Add loading animation to button
+                refreshBtn.classList.add('animate-pulse', 'bg-green-400');
+                refreshBtn.textContent = 'Refreshing...';
+
+                try {
+                    await loadTrackerData();
+                    showToast('Portfolio updated', 'success');
+                } catch (error) {
+                    showToast('Refresh failed', 'error');
+                } finally {
+                    // Remove loading animation
+                    refreshBtn.classList.remove('animate-pulse', 'bg-green-400');
+                    refreshBtn.textContent = 'Refresh Now';
+                }
             });
 
             document.getElementById('liveModeToggle').addEventListener('change', (e) => {

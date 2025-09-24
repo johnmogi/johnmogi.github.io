@@ -99,9 +99,9 @@
     <div class="controls pixel-font">
         <h3 class="text-yellow-400 glow mb-2">��� CONTROLS</h3>
         <div class="space-y-1 text-sm">
-            <div><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">W</kbd><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">A</kbd><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">S</kbd><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">D</kbd> Move</div>
-            <div><kbd class="bg-gray-700 px-2 py-1 rounded text-red-400">SPACE</kbd> Attack</div>
-            <div><kbd class="bg-gray-700 px-2 py-1 rounded text-blue-400">E</kbd> Interact</div>
+            <div><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">W</kbd><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">A</kbd><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">S</kbd><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">D</kbd> Move Rooms</div>
+            <div><kbd class="bg-gray-700 px-2 py-1 rounded text-red-400">SPACE</kbd> Interact</div>
+            <div><kbd class="bg-gray-700 px-2 py-1 rounded text-blue-400">E</kbd> Examine</div>
             <div><kbd class="bg-gray-700 px-2 py-1 rounded text-purple-400">I</kbd> Inventory</div>
         </div>
     </div>
@@ -304,14 +304,388 @@
             return 'data:image/svg+xml;base64,' + btoa(svg);
         }
 
-        // Load sprites - ALL INLINE
-        loadSprite("hero", svgToDataURL(heroSprite));
-        loadSprite("monster", svgToDataURL(monsterSprite));
-        loadSprite("wall", svgToDataURL(wallSprite));
-        loadSprite("floor", svgToDataURL(floorSprite));
-        loadSprite("treasure", svgToDataURL(treasureSprite));
-        loadSprite("potion", svgToDataURL(potionSprite));
+        // Room-based dungeon functions
+        function generateDungeon(width, height) {
+            const dungeon = [];
+            const roomTypes = ['empty', 'monster', 'treasure', 'potion', 'trap', 'dark'];
 
+            for (let y = 0; y < height; y++) {
+                dungeon[y] = [];
+                for (let x = 0; x < width; x++) {
+                    // Entrance is always at (0,0)
+                    const type = (x === 0 && y === 0) ? 'entrance' :
+                               Math.random() < 0.1 ? getRandomItem(roomTypes) : 'empty';
+                    dungeon[y][x] = {
+                        type: type,
+                        visited: (x === 0 && y === 0),
+                        discovered: (x === 0 && y === 0),
+                        content: generateRoomContent(type)
+                    };
+                }
+            }
+
+            return dungeon;
+        }
+
+        function generateRoomContent(roomType) {
+            switch(roomType) {
+                case 'monster':
+                    return generateMonster();
+                case 'treasure':
+                    return getRandomItem(gameData.items);
+                case 'potion':
+                    return { type: 'potion', healing: 20 + Math.random() * 30 };
+                case 'trap':
+                    return { type: 'trap', damage: 10 + Math.random() * 20 };
+                default:
+                    return null;
+            }
+        }
+
+        function drawDungeonGrid() {
+            const gridSize = 80; // Much larger grid
+            const startX = 100; // Move to left side but give space for legend
+            const startY = 100;
+
+            // Draw main grid background - make it very prominent
+            add([
+                rect(gridSize * window.gameState.dungeon[0].length + 40,
+                     gridSize * window.gameState.dungeon.length + 40),
+                color(20, 30, 50), // Dark blue background
+                pos(startX - 20, startY - 20),
+                "minimap",
+                outline(4, color(100, 150, 255)) // Bright blue outline
+            ]);
+
+            // Add grid title
+            add([
+                text("DUNGEON MAP", { size: 24 }),
+                pos(startX + (gridSize * window.gameState.dungeon[0].length)/2, startY - 50),
+                anchor("center"),
+                color(255, 255, 255)
+            ]);
+
+            // Draw legend/key on the left
+            drawLegend(startX - 80, startY);
+
+            // Draw rooms with much better visibility
+            for (let y = 0; y < window.gameState.dungeon.length; y++) {
+                for (let x = 0; x < window.gameState.dungeon[0].length; x++) {
+                    const room = window.gameState.dungeon[y][x];
+                    const roomX = startX + x * gridSize;
+                    const roomY = startY + y * gridSize;
+
+                    let roomColor = [50, 50, 50]; // Default empty room
+                    if (room.type === 'entrance') roomColor = [0, 200, 100]; // Green
+                    else if (room.type === 'monster') roomColor = [200, 50, 50]; // Red
+                    else if (room.type === 'treasure') roomColor = [200, 200, 0]; // Yellow
+                    else if (room.type === 'potion') roomColor = [0, 200, 200]; // Cyan
+                    else if (room.type === 'trap') roomColor = [200, 0, 200]; // Magenta
+
+                    if (room.discovered) {
+                        // Main room background
+                        add([
+                            rect(gridSize - 8, gridSize - 8),
+                            color(roomColor[0]/2, roomColor[1]/2, roomColor[2]/2), // Darker background
+                            pos(roomX, roomY),
+                            "room"
+                        ]);
+
+                        // Room border
+                        add([
+                            rect(gridSize - 8, gridSize - 8),
+                            color(roomColor[0], roomColor[1], roomColor[2]),
+                            pos(roomX, roomY),
+                            outline(2, color(255, 255, 255)),
+                            "room"
+                        ]);
+
+                        // Add room type indicator - larger and clearer
+                        let symbol = '';
+                        let symbolColor = [255, 255, 255];
+                        if (room.type === 'entrance') { symbol = 'E'; symbolColor = [255, 255, 255]; }
+                        else if (room.type === 'monster') { symbol = 'M'; symbolColor = [255, 255, 255]; }
+                        else if (room.type === 'treasure') { symbol = 'T'; symbolColor = [0, 0, 0]; }
+                        else if (room.type === 'potion') { symbol = 'P'; symbolColor = [0, 0, 0]; }
+                        else if (room.type === 'trap') { symbol = 'X'; symbolColor = [255, 255, 255]; }
+
+                        if (symbol) {
+                            add([
+                                text(symbol, { size: 24 }), // Larger text
+                                pos(roomX + gridSize/2, roomY + gridSize/2),
+                                anchor("center"),
+                                color(symbolColor[0], symbolColor[1], symbolColor[2])
+                            ]);
+                        }
+
+                        // Current room indicator - very obvious
+                        if (x === window.gameState.currentRoom.x && y === window.gameState.currentRoom.y) {
+                            // Multiple indicators for current room
+                            add([
+                                rect(gridSize - 8, gridSize - 8),
+                                color(255, 255, 255),
+                                pos(roomX, roomY),
+                                opacity(0.3),
+                                "current"
+                            ]);
+                            add([
+                                rect(gridSize - 8, gridSize - 8),
+                                color(255, 255, 0), // Yellow border
+                                pos(roomX, roomY),
+                                outline(4, color(255, 255, 0)),
+                                "current"
+                            ]);
+                            // Add animated "YOU" text
+                            add([
+                                text("YOU", { size: 16 }),
+                                pos(roomX + gridSize/2, roomY + gridSize/2 - 12),
+                                anchor("center"),
+                                color(255, 0, 0), // Red text
+                                "current"
+                            ]);
+                        }
+                    } else {
+                        // Undiscovered rooms - clearly marked
+                        add([
+                            rect(gridSize - 8, gridSize - 8),
+                            color(20, 20, 20), // Very dark
+                            pos(roomX, roomY),
+                            "room"
+                        ]);
+                        add([
+                            rect(gridSize - 8, gridSize - 8),
+                            color(100, 100, 100),
+                            pos(roomX, roomY),
+                            outline(1, color(150, 150, 150)),
+                            "room"
+                        ]);
+                        add([
+                            text("?", { size: 24 }),
+                            pos(roomX + gridSize/2, roomY + gridSize/2),
+                            anchor("center"),
+                            color(150, 150, 150)
+                        ]);
+                    }
+                }
+            }
+
+            // Add directional indicators
+            addDirectionalIndicators(startX, startY, gridSize);
+        }
+
+        function drawLegend(startX, startY) {
+            const legendY = startY;
+
+            // Legend background
+            add([
+                rect(70, 200),
+                color(30, 30, 50),
+                pos(startX, legendY),
+                outline(2, color(100, 150, 255))
+            ]);
+
+            // Legend title
+            add([
+                text("LEGEND", { size: 16 }),
+                pos(startX + 35, legendY + 10),
+                anchor("center"),
+                color(255, 255, 255)
+            ]);
+
+            // Room type explanations
+            const legendItems = [
+                { symbol: "E", color: [0, 200, 100], desc: "Entrance" },
+                { symbol: "M", color: [200, 50, 50], desc: "Monster" },
+                { symbol: "T", color: [200, 200, 0], desc: "Treasure" },
+                { symbol: "P", color: [0, 200, 200], desc: "Potion" },
+                { symbol: "X", color: [200, 0, 200], desc: "Trap" },
+                { symbol: "?", color: [150, 150, 150], desc: "Unknown" }
+            ];
+
+            legendItems.forEach((item, i) => {
+                const y = legendY + 30 + i * 25;
+
+                // Color square
+                add([
+                    rect(15, 15),
+                    color(item.color[0], item.color[1], item.color[2]),
+                    pos(startX + 10, y)
+                ]);
+
+                // Symbol
+                add([
+                    text(item.symbol, { size: 14 }),
+                    pos(startX + 25, y + 7),
+                    anchor("left"),
+                    color(255, 255, 255)
+                ]);
+
+                // Description
+                add([
+                    text(item.desc, { size: 12 }),
+                    pos(startX + 45, y + 7),
+                    anchor("left"),
+                    color(200, 200, 200)
+                ]);
+            });
+
+            // Current room indicator
+            add([
+                text("Yellow border =", { size: 12 }),
+                pos(startX + 5, legendY + 180),
+                color(255, 255, 0)
+            ]);
+            add([
+                text("Your location", { size: 12 }),
+                pos(startX + 5, legendY + 195),
+                color(255, 255, 0)
+            ]);
+        }
+
+        function addDirectionalIndicators(startX, startY, gridSize) {
+            // North arrow
+            add([
+                text("N", { size: 16 }),
+                pos(startX + (gridSize * window.gameState.dungeon[0].length)/2, startY - 30),
+                anchor("center"),
+                color(255, 255, 255)
+            ]);
+
+            // South arrow
+            add([
+                text("S", { size: 16 }),
+                pos(startX + (gridSize * window.gameState.dungeon[0].length)/2,
+                    startY + gridSize * window.gameState.dungeon.length + 25),
+                anchor("center"),
+                color(255, 255, 255)
+            ]);
+
+            // West arrow
+            add([
+                text("W", { size: 16 }),
+                pos(startX - 25, startY + (gridSize * window.gameState.dungeon.length)/2),
+                anchor("center"),
+                color(255, 255, 255)
+            ]);
+
+            // East arrow
+            add([
+                text("E", { size: 16 }),
+                pos(startX + gridSize * window.gameState.dungeon[0].length + 25,
+                    startY + (gridSize * window.gameState.dungeon.length)/2),
+                anchor("center"),
+                color(255, 255, 255)
+            ]);
+        }
+
+        function drawCurrentRoom() {
+            const room = window.gameState.dungeon[window.gameState.currentRoom.y][window.gameState.currentRoom.x];
+
+            // Mark room as discovered and visited
+            room.discovered = true;
+            room.visited = true;
+
+            // Update UI with room info
+            updateRoomDisplay(room);
+        }
+
+        function updateRoomDisplay(room) {
+            // This would update the UI to show room information
+            // For now, we'll use the adventure log
+        }
+
+        function showMovementFeedback(direction) {
+            add([
+                text(`→ ${direction}`, { size: 24 }),
+                pos(width() / 2, height() / 2 - 100),
+                anchor("center"),
+                color(255, 255, 0),
+                lifespan(1)
+            ]);
+        }
+
+        function addRoomEntry(message) {
+            // Add message to adventure log (we'll implement this properly later)
+            console.log(`[ADVENTURE LOG] ${message}`);
+        }
+
+        function describeRoom() {
+            const room = window.gameState.dungeon[window.gameState.currentRoom.y][window.gameState.currentRoom.x];
+            const roomNames = {
+                'entrance': 'the dungeon entrance',
+                'empty': 'an empty room',
+                'monster': 'a room with a monster',
+                'treasure': 'a treasure room',
+                'potion': 'a room with a healing potion',
+                'trap': 'a dangerous trap room',
+                'dark': 'a dark, mysterious room'
+            };
+            return roomNames[room.type] || 'an unknown room';
+        }
+
+        function interactWithRoom() {
+            const room = window.gameState.dungeon[window.gameState.currentRoom.y][window.gameState.currentRoom.x];
+
+            if (room.content) {
+                switch(room.type) {
+                    case 'monster':
+                        // Combat system
+                        const monster = room.content;
+                        const damage = Math.floor(Math.random() * 10) + window.gameState.hero.stats.str / 2;
+                        monster.hp -= damage;
+                        addRoomEntry(`You attack the ${monster.name} for ${damage} damage!`);
+
+                        if (monster.hp <= 0) {
+                            addRoomEntry(`You defeated the ${monster.name}! Gained ${monster.level * 10} XP.`);
+                            window.gameState.hero.xp += monster.level * 10;
+                            room.type = 'empty';
+                            room.content = null;
+                        } else {
+                            // Monster counterattacks
+                            const monsterDamage = monster.damage;
+                            window.gameState.hero.hp -= monsterDamage;
+                            addRoomEntry(`The ${monster.name} attacks you for ${monsterDamage} damage!`);
+
+                            if (window.gameState.hero.hp <= 0) {
+                                addRoomEntry("You have been defeated! Game Over.");
+                                go("menu");
+                            }
+                        }
+                        break;
+
+                    case 'treasure':
+                        window.gameState.hero.inventory.push(room.content);
+                        addRoomEntry(`You found ${room.content.name}!`);
+                        room.type = 'empty';
+                        room.content = null;
+                        break;
+
+                    case 'potion':
+                        const healing = room.content.healing;
+                        window.gameState.hero.hp = Math.min(window.gameState.hero.maxHp,
+                                                           window.gameState.hero.hp + healing);
+                        addRoomEntry(`You drink the potion and heal ${healing} HP!`);
+                        room.type = 'empty';
+                        room.content = null;
+                        break;
+
+                    case 'trap':
+                        const trapDamage = room.content.damage;
+                        window.gameState.hero.hp -= trapDamage;
+                        addRoomEntry(`You trigger a trap and take ${trapDamage} damage!`);
+
+                        if (window.gameState.hero.hp <= 0) {
+                            addRoomEntry("You have been defeated by a trap! Game Over.");
+                            go("menu");
+                        } else {
+                            room.type = 'empty';
+                            room.content = null;
+                        }
+                        break;
+                }
+            } else {
+                addRoomEntry(`You search ${describeRoom()} but find nothing interesting.`);
+            }
         // Scene: Menu
         scene("menu", () => {
             add([
@@ -359,7 +733,7 @@
             ]);
             
             add([
-                text("Use WASD to move, SPACE to attack", { size: 16 }),
+                text("Use WASD to move between rooms, SPACE to interact", { size: 16 }),
                 pos(width() / 2, height() - 80),
                 anchor("center"),
                 color(150, 150, 150)
@@ -379,7 +753,8 @@
             
             // Mouse support for menu - specific to clickable buttons only
             onClick((obj) => {
-                if (obj.is("text") && (
+                // Check if object is a text component by looking for text property
+                if (obj && obj.text && typeof obj.text === 'string' && (
                     obj.text.includes("START GAME") ||
                     obj.text.includes("HOW TO PLAY") ||
                     obj.text.includes("SETTINGS")
@@ -413,22 +788,23 @@
             
             const controls = [
                 "��� CONTROLS:",
-                "WASD - Move your hero",
-                "SPACE - Attack nearby enemies",
-                "E - Interact with objects",
-                "I - Open inventory",
-                "M - View map",
+                "WASD - Move between rooms (North, South, East, West)",
+                "SPACE - Interact with room contents",
+                "E - Examine room details",
+                "I - View inventory",
+                "M - View dungeon map",
                 "",
-                "��� COMBAT:",
-                "Get close to enemies and press SPACE",
-                "Use strategy and positioning",
-                "Collect items to increase power",
+                "��� EXPLORATION:",
+                "Move through the dungeon room by room",
+                "Each room may contain treasures, monsters, or traps",
+                "Search rooms to find hidden items",
+                "Level up by defeating monsters",
                 "",
                 "��� OBJECTIVE:",
                 "Explore the dungeon",
+                "Collect treasures",
                 "Defeat monsters",
-                "Collect treasure",
-                "Level up your character"
+                "Find your way out"
             ];
             
             controls.forEach((text, i) => {
@@ -455,317 +831,117 @@
             
             // Mouse support for help scene - specific to return text only
             onClick((obj) => {
-                if (obj.is("text") && obj.text.includes("Press SPACE to return to menu")) {
+                // Check if object is a text component by looking for text property
+                if (obj && obj.text && typeof obj.text === 'string' && 
+                    obj.text.includes("Press SPACE to return to menu")) {
                     go("menu");
                 }
             });
         });
 
-        // Scene: Game
+        // Scene: Game - Room-based Dungeon Crawler
         scene("game", () => {
             add([
                 rect(width(), height()),
                 color(20, 20, 30),
                 pos(0, 0)
             ]);
-            
+
             if (!window.gameState.hero) {
                 window.gameState.hero = generateHero();
             }
-            
-            // Create dungeon floor
-            for (let x = 0; x < width(); x += 32) {
-                for (let y = 0; y < height(); y += 32) {
-                    add([
-                        sprite("floor"),
-                        pos(x, y),
-                        scale(1),
-                        "floor"
-                    ]);
-                }
+
+            // Initialize room system
+            if (!window.gameState.dungeon) {
+                window.gameState.dungeon = generateDungeon(5, 5); // 5x5 grid
+                window.gameState.currentRoom = { x: 0, y: 0 }; // Start at entrance
             }
-            
-            // Add walls
-            const walls = [
-                {x: 200, y: 200}, {x: 232, y: 200}, {x: 264, y: 200},
-                {x: 400, y: 300}, {x: 432, y: 300},
-                {x: 600, y: 150}, {x: 632, y: 150}, {x: 664, y: 150}, {x: 696, y: 150}
-            ];
-            
-            walls.forEach(wall => {
-                add([
-                    sprite("wall"),
-                    pos(wall.x, wall.y),
-                    scale(1),
-                    area(),
-                    body(),
-                    "wall"
-                ]);
-            });
-            
-            // Add treasure and potions
-            add([
-                sprite("treasure"),
-                pos(500, 300),
-                scale(1),
-                area(),
-                "treasure"
-            ]);
-            
-            add([
-                sprite("potion"),
-                pos(300, 400),
-                scale(1),
-                area(),
-                "potion"
-            ]);
-            
-            // Hero
+
+            // Draw dungeon grid (visible mini-map)
+            drawDungeonGrid();
+
+            // Draw current room info
+            drawCurrentRoom();
+
+            // Hero positioned in center - smaller since grid is large
             const hero = add([
                 sprite("hero"),
-                pos(window.gameState.hero.x, window.gameState.hero.y),
-                scale(1.5),
+                pos(width() / 2, height() / 2),
+                scale(1.2), // Smaller hero since grid is prominent
                 area(),
-                "hero",
-                {
-                    speed: 120,
-                    lastAttack: 0
-                }
+                "hero"
             ]);
-            
-            // Monsters
-            const monster1 = add([
-                sprite("monster"),
-                pos(400, 200),
-                scale(1.5),
-                area(),
-                "monster",
-                {
-                    hp: 50,
-                    maxHp: 50,
-                    speed: 80,
-                    damage: 10,
-                    lastAttack: 0
-                }
-            ]);
-            
-            const monster2 = add([
-                sprite("monster"),
-                pos(600, 400),
-                scale(1.5),
-                area(),
-                "monster",
-                {
-                    hp: 30,
-                    maxHp: 30,
-                    speed: 60,
-                    damage: 8,
-                    lastAttack: 0
-                }
-            ]);
-            
-            window.gameState.monsters = [monster1, monster2];
-            
-            // Camera follow
-            hero.onUpdate(() => {
-                if (window.gameState.cameraLocked) {
-                    camPos(hero.pos.x, hero.pos.y);
+
+            // Add large room description in upper right
+            updateRoomDescriptionPanel();
+
+            // Room navigation controls
+            onKeyPress("w", () => {
+                if (window.gameState.currentRoom.y > 0) {
+                    window.gameState.currentRoom.y--;
+                    drawCurrentRoom();
+                    addRoomEntry("You move north");
+                    // Update room description panel
+                    updateRoomDescriptionPanel();
+                    // Show movement feedback
+                    showMovementFeedback("NORTH");
                 }
             });
-            
-            // Controls
-            onKeyDown("a", () => {
-                if (hero.pos.x > 0) {
-                    hero.move(-hero.speed, 0);
-                    window.gameState.hero.x = hero.pos.x;
+
+            onKeyPress("s", () => {
+                if (window.gameState.currentRoom.y < window.gameState.dungeon.length - 1) {
+                    window.gameState.currentRoom.y++;
+                    drawCurrentRoom();
+                    addRoomEntry("You move south");
+                    updateRoomDescriptionPanel();
+                    showMovementFeedback("SOUTH");
                 }
             });
-            
-            onKeyDown("d", () => {
-                if (hero.pos.x < width() - 32) {
-                    hero.move(hero.speed, 0);
-                    window.gameState.hero.x = hero.pos.x;
+
+            onKeyPress("a", () => {
+                if (window.gameState.currentRoom.x > 0) {
+                    window.gameState.currentRoom.x--;
+                    drawCurrentRoom();
+                    addRoomEntry("You move west");
+                    updateRoomDescriptionPanel();
+                    showMovementFeedback("WEST");
                 }
             });
-            
-            onKeyDown("w", () => {
-                if (hero.pos.y > 0) {
-                    hero.move(0, -hero.speed);
-                    window.gameState.hero.y = hero.pos.y;
+
+            onKeyPress("d", () => {
+                if (window.gameState.currentRoom.x < window.gameState.dungeon[0].length - 1) {
+                    window.gameState.currentRoom.x++;
+                    drawCurrentRoom();
+                    addRoomEntry("You move east");
+                    updateRoomDescriptionPanel();
+                    showMovementFeedback("EAST");
                 }
             });
-            
-            onKeyDown("s", () => {
-                if (hero.pos.y < height() - 32) {
-                    hero.move(0, hero.speed);
-                    window.gameState.hero.y = hero.pos.y;
-                }
-            });
-            
-            // Attack
+
+            // Room interaction
             onKeyPress("space", () => {
-                const now = Date.now();
-                if (now - hero.lastAttack < 500) return;
-                hero.lastAttack = now;
-                
-                window.gameState.monsters.forEach(monster => {
-                    if (monster.hp > 0 && distance(hero, monster) < 80) {
-                        const damage = Math.floor(Math.random() * 15) + window.gameState.hero.stats.str / 2;
-                        monster.hp -= damage;
-                        
-                        add([
-                            text(`-${damage}`, { size: 20 }),
-                            pos(monster.pos.x, monster.pos.y - 20),
-                            color(255, 0, 0),
-                            lifespan(1)
-                        ]);
-                        
-                        shake(5);
-                        
-                        if (monster.hp <= 0) {
-                            add([
-                                text("MONSTER DEFEATED!", { size: 24 }),
-                                pos(width() / 2, height() / 2),
-                                anchor("center"),
-                                color(255, 255, 0),
-                                lifespan(2)
-                            ]);
-                            
-                            destroy(monster);
-                            window.gameState.monsters = window.gameState.monsters.filter(m => m !== monster);
-                            window.gameState.hero.xp += 25;
-                            
-                            if (window.gameState.hero.xp >= window.gameState.hero.level * 100) {
-                                window.gameState.hero.level++;
-                                window.gameState.hero.maxHp += 20;
-                                window.gameState.hero.hp = window.gameState.hero.maxHp;
-                                add([
-                                    text(`LEVEL UP! Level ${window.gameState.hero.level}`, { size: 28 }),
-                                    pos(width() / 2, height() / 2),
-                                    anchor("center"),
-                                    color(255, 215, 0),
-                                    lifespan(3)
-                                ]);
-                            }
-                        }
-                    }
-                });
+                interactWithRoom();
+                // Update room panel after interaction
+                setTimeout(() => {
+                    updateRoomDescriptionPanel();
+                }, 500);
             });
-            
-            // Monster AI
-            onUpdate(() => {
-                window.gameState.monsters.forEach(monster => {
-                    if (monster.hp > 0) {
-                        const now = Date.now();
-                        if (now - monster.lastAttack > 2000) {
-                            monster.lastAttack = now;
-                            
-                            if (distance(hero, monster) < 80) {
-                                const damage = monster.damage;
-                                window.gameState.hero.hp -= damage;
-                                
-                                add([
-                                    text(`-${damage}`, { size: 20 }),
-                                    pos(hero.pos.x, hero.pos.y - 20),
-                                    color(255, 100, 100),
-                                    lifespan(1)
-                                ]);
-                                
-                                if (window.gameState.hero.hp <= 0) {
-                                    add([
-                                        text("GAME OVER!", { size: 48 }),
-                                        pos(width() / 2, height() / 2),
-                                        anchor("center"),
-                                        color(255, 0, 0),
-                                        lifespan(3)
-                                    ]);
-                                    go("menu");
-                                }
-                            }
-                        }
-                    }
-                });
-            });
-            
-            // Item collection
-            onCollide("hero", "treasure", (hero, treasure) => {
-                destroy(treasure);
-                const item = getRandomItem(gameData.items);
-                window.gameState.hero.inventory.push(item);
-                
-                add([
-                    text(`Found: ${item.name}!`, { size: 20 }),
-                    pos(hero.pos.x, hero.pos.y - 30),
-                    color(255, 215, 0),
-                    lifespan(2)
-                ]);
-            });
-            
-            onCollide("hero", "potion", (hero, potion) => {
-                destroy(potion);
-                const healing = 30;
-                window.gameState.hero.hp = Math.min(window.gameState.hero.maxHp, window.gameState.hero.hp + healing);
-                
-                add([
-                    text(`+${healing} HP!`, { size: 20 }),
-                    pos(hero.pos.x, hero.pos.y - 30),
-                    color(0, 255, 0),
-                    lifespan(2)
-                ]);
-            });
+
+            // Initial room description
+            addRoomEntry(`You enter the dungeon. You are in ${describeRoom()}`);
         });
 
-        // Start game
+        // Load all sprites first, then start the game
+        loadSprite("hero", svgToDataURL(heroSprite));
+        loadSprite("monster", svgToDataURL(monsterSprite));
+        loadSprite("wall", svgToDataURL(wallSprite));
+        loadSprite("floor", svgToDataURL(floorSprite));
+        loadSprite("treasure", svgToDataURL(treasureSprite));
+        loadSprite("potion", svgToDataURL(potionSprite));
+
+        // Start the game after loading
         go("menu");
-
-        // Debug info
-        onUpdate(() => {
-            if (window.gameState.hero) {
-                debug.log(`Hero: ${window.gameState.hero.name} | HP: ${window.gameState.hero.hp}/${window.gameState.hero.maxHp} | XP: ${window.gameState.hero.xp} | Level: ${window.gameState.hero.level}`);
-            }
-        });
-
-        // Update UI
-        onUpdate(() => {
-            document.getElementById('fps').textContent = Math.round(debug.fps());
-            document.getElementById('objects').textContent = get('*').length;
-        });
-
-        // Update hero stats
-        setInterval(() => {
-            const statsDiv = document.getElementById('heroStats');
-            const hero = window.gameState?.hero;
-            
-            if (hero) {
-                statsDiv.innerHTML = `
-                    <div><span class="text-green-400">${hero.name}</span></div>
-                    <div><span class="text-blue-400">${hero.race} ${hero.characterClass}</span></div>
-                    <div><span class="text-yellow-400">Level ${hero.level}</span></div>
-                    <div><span class="text-purple-400">XP: ${hero.xp}</span></div>
-                    <div><span class="text-cyan-400">Inventory: ${hero.inventory.length}</span></div>
-                `;
-                
-                const hpPercent = hero.hp / hero.maxHp;
-                document.getElementById('healthFill').style.width = `${hpPercent * 100}%`;
-                document.getElementById('healthText').textContent = `${Math.floor(hero.hp)}/${hero.maxHp}`;
-                
-                const mpPercent = hero.mp / hero.maxMp;
-                document.getElementById('manaFill').style.width = `${mpPercent * 100}%`;
-                document.getElementById('manaText').textContent = `${Math.floor(hero.mp)}/${hero.maxMp}`;
-                
-                const healthFill = document.getElementById('healthFill');
-                if (hpPercent > 0.6) {
-                    healthFill.style.background = 'linear-gradient(90deg, #00ff00, #88ff00, #ffff00)';
-                } else if (hpPercent > 0.3) {
-                    healthFill.style.background = 'linear-gradient(90deg, #ff8800, #ffaa00, #ffff00)';
-                } else {
-                    healthFill.style.background = 'linear-gradient(90deg, #ff0000, #ff4400, #ff8800)';
-                }
-            }
-        }, 500);
-
-        console.log('��� Dungeon Master RPG loaded with Kaboom.js - CORS FREE!');
-        console.log('��� Use WASD to move, SPACE to attack!');
+    });
     </script>
 </body>
 </html>

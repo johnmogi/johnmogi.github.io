@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="max-w-4xl mx-auto p-8">
+        <h1 class="text-3xl font-bold mb-8">Portfolio Test</h1>
+        
+        <div id="testGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Projects will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Test projects data
+        const testProjects = [
+            {
+                id: 'test1',
+                title: "Test Project 1",
+                category: "web",
+                status: "completed",
+                featured: true,
+                timeline: "2 months",
+                teamSize: "Solo Project",
+                technologies: ["HTML", "CSS", "JavaScript"],
+                description: "A test project to verify the portfolio structure works correctly.",
+                image: "https://via.placeholder.com/400x300/4F46E5/FFFFFF?text=Test+Project+1",
+                gallery: [
+                    {
+                        image: "https://via.placeholder.com/400x300/10B981/FFFFFF?text=Gallery+1",
+                        caption: "Gallery image 1"
+                    },
+                    {
+                        image: "https://via.placeholder.com/400x300/F59E0B/FFFFFF?text=Gallery+2",
+                        caption: "Gallery image 2"
+                    }
+                ]
+            },
+            {
+                id: 'test2',
+                title: "Test Project 2",
+                category: "devops",
+                status: "completed",
+                featured: false,
+                timeline: "1 month",
+                teamSize: "Team Project",
+                technologies: ["Docker", "Kubernetes", "AWS"],
+                description: "Another test project to ensure the gallery functionality works.",
+                image: "https://via.placeholder.com/400x300/EF4444/FFFFFF?text=Test+Project+2",
+                gallery: [
+                    {
+                        image: "https://via.placeholder.com/400x300/8B5CF6/FFFFFF?text=DevOps+1",
+                        caption: "DevOps diagram 1"
+                    }
+                ]
+            }
+        ];
+
+        function renderTestProjects() {
+            const testGrid = document.getElementById('testGrid');
+            testGrid.innerHTML = '';
+            
+            testProjects.forEach((project, index) => {
+                const projectElement = document.createElement('div');
+                projectElement.className = `project-card bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer`;
+                projectElement.onclick = () => alert(`Clicked: ${project.title}`);
+                
+                projectElement.innerHTML = `
+                    <div class="relative h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                        ${project.gallery && project.gallery.length > 0 ? 
+                            `<img src="${project.gallery[0].image}" alt="${project.title}" class="w-full h-full object-cover">` :
+                            `<img src="${project.image}" alt="${project.title}" class="w-full h-full object-cover">`
+                        }
+                        <div class="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded text-sm">${project.status}</div>
+                        ${project.gallery && project.gallery.length > 1 ? 
+                            `<div class="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded text-sm">${project.gallery.length} images</div>` :
+                            ''
+                        }
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">${project.title}</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">${project.description}</p>
+                        <div class="flex flex-wrap gap-1 mb-4">
+                            ${project.technologies.slice(0, 3).map(tech => `<span class="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-sm">${tech}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                testGrid.appendChild(projectElement);
+            });
+        }
+
+        // Render test projects
+        renderTestProjects();
+        
+        console.log('Test portfolio loaded successfully!');
+    </script>
+</body>
+</html>

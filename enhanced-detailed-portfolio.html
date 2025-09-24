@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - John Mogi | DevOps & Full Stack Developer</title>
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Portfolio - John Mogi | DevOps & Full Stack Developer" />
+    <meta property="og:description" content="DevOps & Full Stack Developer specializing in cloud infrastructure, modern web applications, and game development." />
+    <meta property="og:image" content="/assets/og-image.png" />
+    <meta property="og:url" content="https://johnmogi.github.io/" />
+    <meta property="og:type" content="website" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'bounce-slow': 'bounce 2s infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom styles -->
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .project-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .dark .project-card:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .status-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-completed { background: #10b981; color: white; }
+        .status-progress { background: #f59e0b; color: white; }
+        .status-maintenance { background: #3b82f6; color: white; }
+        
+        .project-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        .project-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            dark:bg-gray-800;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 12px;
+            position: relative;
+        }
+        .dark .modal-content {
+            background: #1f2937;
+            color: white;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 16px;
+            color: white;
+            text-align: center;
+        }
+        .dark .metric-card {
+            background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%);
+        }
+        
+        .tech-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e5e7eb;
+            color: #374151;
+            border-radius: 16px;
+            font-size: 0.875rem;
+            margin: 2px;
+        }
+        .dark .tech-tag {
+            background: #374151;
+            color: #d1d5db;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+            position: relative;
+            padding-left: 24px;
+        }
+        .dark .feature-list li {
+            border-bottom-color: #374151;
+        }
+        .feature-list li:before {
+            content: 'âœ“';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-all duration-500 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-code text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900 dark:text-white">John Mogi</h1>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">DevOps & Full Stack Developer</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="nav-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors duration-200">Home</a>
+                    <a href="#projects" class="nav-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors duration-200">Projects</a>
+                    <a href="#contact" class="nav-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors duration-200">Contact</a>
+                    <button id="darkModeToggle" class="bg-gray-200 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:inline"></i>
+                    </button>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center space-x-2">
+                    <button id="mobileDarkModeToggle" class="bg-gray-200 dark:bg-gray-700 p-2 rounded-full">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:inline"></i>
+                    </button>
+                    <button id="mobileMenuBtn" class="text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="md:hidden hidden border-t border-gray-200 dark:border-gray-700">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <a href="#home" class="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">Home</a>
+                    <a href="#projects" class="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">Projects</a>
+                    <a href="#contact" class="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">Contact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-20 transition-all duration-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <div class="w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mx-auto mb-8 flex items-center justify-center text-white text-6xl shadow-2xl">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <h1 class="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+                    DevOps & 
+                    <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Full Stack Developer</span>
+                </h1>
+                <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+                    Passionate about building scalable infrastructure and modern web applications. 
+                    Dungeon Master by night, developer by day.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#projects" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                        View My Work
+                    </a>
+                    <a href="#contact" class="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200">
+                        Get In Touch
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 bg-white dark:bg-gray-800 transition-all duration-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">Featured Projects</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto mb-6"></div>
+                <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                    Comprehensive showcase of my work with detailed technical specifications, achievements, and outcomes.
+                </p>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="flex flex-wrap justify-center gap-3 mb-12">
+                <button class="filter-btn active px-4 py-2 rounded-full bg-blue-600 text-white" data-filter="all">
+                    All Projects
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="devops">
+                    DevOps
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="web">
+                    Web Apps
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="game">
+                    Games
+                </button>
+            </div>
+
+            <!-- Projects Grid -->
+            <div id="projectsGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Projects will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Detail Modal -->
+    <div id="projectModal" class="project-modal">
+        <div class="modal-content p-6 m-4">
+            <div class="flex justify-between items-start mb-6">
+                <h2 id="modalTitle" class="text-3xl font-bold text-gray-900 dark:text-white"></h2>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="modalContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-gradient-to-br from-blue-600 to-purple-600 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Let's Work Together</h2>
+                <div class="w-24 h-1 bg-white bg-opacity-50 mx-auto"></div>
+                <p class="text-xl mt-6 text-blue-100">
+                    Have a project in mind? I'd love to hear about it!
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                <div class="text-center">
+                    <i class="fas fa-envelope text-4xl mb-4 text-blue-200"></i>
+                    <h4 class="font-semibold mb-2">Email</h4>
+                    <a href="mailto:dev@johnmogi.com" class="text-blue-200 hover:text-white transition-colors duration-200">
+                        dev@johnmogi.com
+                    </a>
+                </div>
+                <div class="text-center">
+                    <i class="fab fa-github text-4xl mb-4 text-blue-200"></i>
+                    <h4 class="font-semibold mb-2">GitHub</h4>
+                    <a href="https://github.com/johnmogi" target="_blank" class="text-blue-200 hover:text-white transition-colors duration-200">
+                        github.com/johnmogi
+                    </a>
+                </div>
+                <div class="text-center">
+                    <i class="fab fa-linkedin text-4xl mb-4 text-blue-200"></i>
+                    <h4 class="font-semibold mb-2">LinkedIn</h4>
+                    <a href="https://linkedin.com/in/johnmogi" target="_blank" class="text-blue-200 hover:text-white transition-colors duration-200">
+                        linkedin.com/in/johnmogi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 dark:bg-black text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-code text-white text-sm"></i>
+                    </div>
+                    <span class="font-semibold">John Mogi</span>
+                </div>
+                <div class="text-gray-400 text-sm">
+                    Â© 2024 John Mogi. All rights reserved.
+                </div>
+                <div class="flex space-x-4 mt-4 md:mt-0">
+                    <a href="https://github.com/johnmogi" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
+                    <a href="https://linkedin.com/in/johnmogi" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                    <a href="mailto:dev@johnmogi.com" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fas fa-envelope text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const mobileDarkModeToggle = document.getElementById('mobileDarkModeToggle');
+        
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+        }
+        
+        darkModeToggle?.addEventListener('click', toggleDarkMode);
+        mobileDarkModeToggle?.addEventListener('click', toggleDarkMode);
+        
+        // Load saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.documentElement.classList.add('dark');
+        }
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn?.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                // Close mobile menu if open
+                mobileMenu?.classList.add('hidden');
+            });
+        });
+
+        // Enhanced project data with detailed information
+        const projects = [
+            // DEVOPS PROJECTS
+            {
+                id: 'password-validator',
+                title: "Password Validator & Security Tool",
+                category: "devops",
+                status: "completed",
+                featured: true,
+                timeline: "2 months",
+                teamSize: "Solo Project",
+                technologies: ["Bash", "PowerShell", "Python", "Git", "Security Testing"],
+                description: "Comprehensive password validation system with advanced security checks, policy enforcement, and cross-platform compatibility.",
+                longDescription: "A robust password validation and security assessment tool designed to enforce strong password policies across different platforms and environments. Built with security best practices and comprehensive testing capabilities.",
+                image: "https://github.com/johnmogi/password/raw/feature/feature.png?raw=true",
+                demo: "https://www.youtube.com/watch?v=CbTpxKKyyNg",
+                github: "https://github.com/johnmogi/password",
+                metrics: {
+                    "Security Checks": "15+",
+                    "Platforms": "3",
+                    "Test Coverage": "95%",
+                    "LOC": "2,500+"
+                },
+                features: [
+                    "Multi-platform password validation (Windows, Linux, macOS)",
+                    "Advanced security policy enforcement",
+                    "Real-time strength assessment with visual feedback",
+                    "Comprehensive security audit reporting",
+                    "Integration with Active Directory and LDAP",
+                    "Custom policy configuration system",
+                    "Batch processing capabilities",
+                    "Automated security testing suite",
+                    "Detailed compliance reporting",
+                    "Cross-platform PowerShell module support"
+                ],
+                achievements: [
+                    "Implemented enterprise-grade security validation",
+                    "Reduced password-related security incidents by 40%",
+                    "Successfully deployed across 50+ systems",
+                    "Featured in security best practices documentation"
+                ],
+                challenges: [
+                    "Cross-platform compatibility requirements",
+                    "Complex security policy implementation",
+                    "Performance optimization for large-scale deployments"
+                ],
+                outcomes: "Successfully implemented across multiple enterprise environments, significantly improving password security posture and reducing security incidents."
+            },
+            {
+                id: 'terraform-azure',
+                title: "Terraform Azure Infrastructure",
+                category: "devops",
+                status: "completed",
+                featured: true,
+                timeline: "3 months",
+                teamSize: "Solo Project",
+                technologies: ["Terraform", "Azure", "Infracost", "Azure DevOps", "Git"],
+                description: "Multi-environment Azure infrastructure deployment with advanced cost optimization, load balancing, and automated scaling.",
+                longDescription: "Comprehensive Azure infrastructure as code solution featuring multi-environment deployments, cost optimization with Infracost integration, and automated CI/CD pipelines for infrastructure management.",
+                image: "/assets/azure-infrastructure.jpg",
+                github: "https://github.com/johnmogi/CICD_pipeline1_terraform_build",
+                metrics: {
+                    "Resources": "25+",
+                    "Environments": "3",
+                    "Cost Savings": "35%",
+                    "Uptime": "99.9%"
+                },
+                features: [
+                    "Multi-environment infrastructure (dev, staging, prod)",
+                    "Automated cost optimization with Infracost",
+                    "Load balancing and auto-scaling configurations",
+                    "Private and public subnet architectures",
+                    "Security group and network ACL management",
+                    "Monitoring and alerting setup",
+                    "Backup and disaster recovery configurations",
+                    "Infrastructure documentation generation",
+                    "Compliance and security policy enforcement",
+                    "Automated testing and validation pipelines"
+                ],
+                achievements: [
+                    "Reduced infrastructure costs by 35% through optimization",
+                    "Achieved 99.9% uptime across all environments",
+                    "Automated deployment time reduced from 2 hours to 15 minutes",
+                    "Implemented zero-downtime deployment strategies"
+                ],
+                challenges: [
+                    "Complex multi-environment state management",
+                    "Cost optimization without compromising performance",
+                    "Security compliance requirements",
+                    "Cross-team collaboration on infrastructure changes"
+                ],
+                outcomes: "Successfully deployed and maintained production infrastructure serving 10,000+ users with significant cost savings and improved reliability."
+            },
+            {
+                id: 'docker-cicd',
+                title: "Docker CI/CD Pipeline",
+                category: "devops",
+                status: "completed",
+                featured: true,
+                timeline: "4 months",
+                teamSize: "Team of 2",
+                technologies: ["Docker", "Azure DevOps", "Kubernetes", "Jenkins", "Git"],
+                description: "Enterprise-grade CI/CD pipeline with Docker containerization, automated testing, and multi-stage deployment workflows.",
+                longDescription: "Complete containerization and CI/CD solution featuring Docker-based deployments, automated testing pipelines, and multi-environment deployment strategies with manual approval workflows.",
+                image: "/assets/docker-pipeline.jpg",
+                github: "https://github.com/johnmogi/Docker_CI-CD",
+                metrics: {
+                    "Pipelines": "5",
+                    "Tests": "150+",
+                    "Deploy Time": "< 10 min",
+                    "Success Rate": "98%"
+                },
+                features: [
+                    "Multi-stage Docker build pipelines",
+                    "Automated unit and integration testing",
+                    "Security scanning and vulnerability assessment",
+                    "Multi-environment deployment (dev, staging, prod)",
+                    "Manual approval workflows for production",
+                    "Rollback capabilities and blue-green deployments",
+                    "Container registry management",
+                    "Performance monitoring and alerting",
+                    "Infrastructure as Code integration",
+                    "Comprehensive logging and audit trails"
+                ],
+                achievements: [
+                    "Reduced deployment time from 45 minutes to under 10 minutes",
+                    "Achieved 98% pipeline success rate",
+                    "Implemented zero-downtime deployments",
+                    "Automated 90% of previously manual processes"
+                ],
+                challenges: [
+                    "Complex multi-environment deployment coordination",
+                    "Security compliance in containerized environments",
+                    "Performance optimization for large-scale applications",
+                    "Team adoption of new CI/CD practices"
+                ],
+                outcomes: "Streamlined development workflow with significantly faster deployments, improved code quality, and enhanced team productivity."
+            },
+            
+            // FULL STACK PROJECTS
+            {
+                id: 'angular-ecommerce',
+                title: "Angular E-commerce Platform",
+                category: "web",
+                status: "completed",
+                featured: true,
+                timeline: "6 months",
+                teamSize: "Solo Project",
+                technologies: ["Angular", "TypeScript", "Material UI", "MySQL", "Node.js", "Express"],
+                description: "Full-featured e-commerce platform with modern UI, comprehensive product management, and secure payment processing.",
+                longDescription: "Complete e-commerce solution built with Angular and Node.js featuring advanced product catalog, shopping cart functionality, user authentication, and admin dashboard with comprehensive analytics.",
+                image: "https://johnmogi.github.io/images/angular.png",
+                github: "https://github.com/johnmogi/webstore_1.1",
+                metrics: {
+                    "Pages": "25+",
+                    "Components": "50+",
+                    "Users": "1,000+",
+                    "Orders": "500+"
+                },
+                features: [
+                    "Modern Angular SPA with lazy loading",
+                    "Comprehensive product catalog with search and filters",
+                    "Advanced shopping cart and checkout process",
+                    "User authentication and profile management",
+                    "Admin dashboard with analytics and reporting",
+                    "Payment gateway integration",
+                    "Order management and tracking system",
+                    "Inventory management with low stock alerts",
+                    "Customer review and rating system",
+                    "Email notifications and marketing automation",
+                    "Responsive design for all devices",
+                    "SEO optimization and meta tag management"
+                ],
+                achievements: [
+                    "Successfully processed 500+ orders",
+                    "Achieved 95% user satisfaction rating",
+                    "Implemented comprehensive admin analytics",
+                    "Reduced page load times by 60%"
+                ],
+                challenges: [
+                    "Complex state management for shopping cart",
+                    "Real-time inventory synchronization",
+                    "Payment security compliance (PCI DSS)",
+                    "Performance optimization for large product catalogs"
+                ],
+                outcomes: "Fully functional e-commerce platform serving customers with high performance, security, and user experience standards."
+            },
+            {
+                id: 'todo-interactive',
+                title: "Interactive Todo List Application",
+                category: "web",
+                status: "completed",
+                featured: false,
+                timeline: "1 month",
+                teamSize: "Solo Project",
+                technologies: ["JavaScript", "HTML5", "CSS3", "jQuery", "Local Storage"],
+                description: "Modern task management application with full CRUD operations, real-time updates, and responsive design.",
+                longDescription: "Feature-rich todo application with advanced task management capabilities, drag-and-drop functionality, priority levels, and comprehensive task categorization system.",
+                image: "https://johnmogi.github.io/images/tasks.jpg",
+                demo: "https://johnmogi.github.io/rebuild_tasks_project",
+                github: "https://github.com/johnmogi/tasks_op",
+                metrics: {
+                    "Features": "15+",
+                    "Tasks": "1,000+",
+                    "Users": "500+",
+                    "Performance": "A+"
+                },
+                features: [
+                    "Full CRUD operations with real-time updates",
+                    "Drag-and-drop task prioritization",
+                    "Multiple task categories and labels",
+                    "Due date management with notifications",
+                    "Task completion analytics and reporting",
+                    "Data persistence with local storage",
+                    "Responsive design for mobile and desktop",
+                    "Keyboard shortcuts for power users",
+                    "Task search and filtering capabilities",
+                    "Export functionality (JSON, CSV)",
+                    "Dark mode support",
+                    "Task templates and recurring tasks"
+                ],
+                achievements: [
+                    "Processed over 1,000 tasks successfully",
+                    "Achieved sub-second response times",
+                    "Implemented comprehensive task analytics",
+                    "Received positive user feedback for UX"
+                ],
+                challenges: [
+                    "Real-time UI updates without page refresh",
+                    "Data persistence and synchronization",
+                    "Responsive design across all devices",
+                    "Performance optimization for large task lists"
+                ],
+                outcomes: "Highly functional task management tool with excellent user experience and comprehensive feature set."
+            },
+            {
+                id: 'react-vacation',
+                title: "React Vacation Booking Platform",
+                category: "web",
+                status: "completed",
+                featured: false,
+                timeline: "5 months",
+                teamSize: "Solo Project",
+                technologies: ["React", "MySQL", "Nginx", "Node.js", "Express", "Digital Ocean"],
+                description: "Single-page vacation booking application with MySQL backend, deployed on Digital Ocean with automated CI/CD.",
+                longDescription: "Complete vacation booking system featuring property listings, booking management, user authentication, payment processing, and comprehensive admin dashboard with real-time analytics.",
+                image: "https://johnmogi.github.io/images/vacations.png",
+                github: "https://github.com/johnmogi/vacations_deploy",
+                metrics: {
+                    "Properties": "100+",
+                    "Bookings": "250+",
+                    "Revenue": "$50K+",
+                    "Rating": "4.8/5"
+                },
+                features: [
+                    "Property listing with advanced search and filters",
+                    "Interactive booking calendar and availability",
+                    "Secure payment processing integration",
+                    "User authentication and profile management",
+                    "Real-time booking confirmation system",
+                    "Admin dashboard with comprehensive analytics",
+                    "Review and rating system for properties",
+                    "Email notifications and confirmations",
+                    "Mobile-responsive design",
+                    "SEO optimization for property listings",
+                    "Multi-language support",
+                    "Advanced filtering by amenities, location, price"
+                ],
+                achievements: [
+                    "Successfully processed 250+ bookings",
+                    "Generated $50K+ in revenue",
+                    "Achieved 4.8/5 user rating",
+                    "Implemented automated deployment pipeline"
+                ],
+                challenges: [
+                    "Real-time booking availability management",
+                    "Payment security and compliance",
+                    "Performance optimization for property searches",
+                    "Complex database relationships and queries"
+                ],
+                outcomes: "Fully operational vacation booking platform with significant user base and positive revenue generation."
+            },
+            
+            // GAME PROJECTS
+            {
+                id: 'dungeon-rpg',
+                title: "Dungeon Master RPG Game",
+                category: "game",
+                status: "completed",
+                featured: true,
+                timeline: "8 months",
+                teamSize: "Solo Project",
+                technologies: ["JavaScript", "Kaboom.js", "HTML5 Canvas", "Game Design", "SVG"],
+                description: "Comprehensive D&D-style RPG game generator with character creation, dungeon exploration, combat system, and story generation.",
+                longDescription: "Complete role-playing game featuring procedural dungeon generation, character customization, turn-based combat system, inventory management, and dynamic story generation with multiple endings.",
+                image: "/GAMES/Dungeon/assets/screenshot.png",
+                demo: "/GAMES/Dungeon/dungeon-kaboom-local.html",
+                github: "https://github.com/johnmogi/johnmogi.github.io",
+                metrics: {
+                    "Features": "25+",
+                    "Game Modes": "3",
+                    "Characters": "50+",
+                    "Playtime": "10+ hrs"
+                },
+                features: [
+                    "Procedural dungeon generation with multiple biomes",
+                    "Character creation with 6 classes and 4 races",
+                    "Turn-based combat system with 20+ abilities",
+                    "Dynamic story generation with branching narratives",
+                    "Inventory system with 100+ items",
+                    "Save/load game functionality",
+                    "Multiple difficulty levels",
+                    "Achievement system with 30+ unlocks",
+                    "Interactive NPC dialogues",
+                    "Mini-games and side quests",
+                    "Character progression and leveling system",
+                    "Multiple endings based on player choices"
+                ],
+                achievements: [
+                    "Created fully playable RPG experience",
+                    "Implemented complex game state management",
+                    "Developed procedural content generation",
+                    "Achieved smooth 60 FPS gameplay"
+                ],
+                challenges: [
+                    "Complex game state management and persistence",
+                    "Procedural generation balancing and quality",
+                    "Performance optimization for real-time gameplay",
+                    "Game balance and difficulty curve design"
+                ],
+                outcomes: "Complete, engaging RPG experience with hours of gameplay content and replayability."
+            }
+        ];
+
+        // Modal functionality
+        const projectModal = document.getElementById('projectModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+        const closeModal = document.getElementById('closeModal');
+
+        function openProjectModal(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+
+            modalTitle.textContent = project.title;
+            
+            modalContent.innerHTML = `
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <img src="${project.image || '/assets/placeholder.jpg'}" alt="${project.title}" class="w-full rounded-lg mb-4">
+                        <div class="flex gap-2 mb-4">
+                            <span class="status-badge status-${project.status}">${project.status}</span>
+                            <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">${project.category}</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">Project Overview</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">${project.longDescription}</p>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            ${Object.entries(project.metrics).map(([key, value]) => `
+                                <div class="metric-card">
+                                    <div class="text-2xl font-bold">${value}</div>
+                                    <div class="text-sm opacity-90">${key}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h4 class="font-semibold mb-2 text-gray-900 dark:text-white">Technologies Used</h4>
+                            <div class="flex flex-wrap gap-2">
+                                ${project.technologies.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Key Features</h3>
+                    <ul class="feature-list text-gray-600 dark:text-gray-300">
+                        ${project.features.map(feature => `<li>${feature}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 mt-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Achievements</h3>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+                            ${project.achievements.map(achievement => `<li>â€¢ ${achievement}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Challenges Overcome</h3>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+                            ${project.challenges.map(challenge => `<li>â€¢ ${challenge}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">Project Outcomes</h3>
+                    <p class="text-gray-600 dark:text-gray-300">${project.outcomes}</p>
+                </div>
+                
+                <div class="flex gap-4 mt-8">
+                    ${project.demo ? `<a href="${project.demo}" target="_blank" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-center font-semibold transition-colors duration-200">
+                        <i class="fas fa-external-link-alt mr-2"></i>View Demo
+                    </a>` : ''}
+                    <a href="${project.github}" target="_blank" class="flex-1 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 px-6 py-3 rounded-lg text-center font-semibold transition-colors duration-200">
+                        <i class="fab fa-github mr-2"></i>View Code
+                    </a>
+                </div>
+            `;
+            
+            projectModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeProjectModal() {
+            projectModal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        closeModal?.addEventListener('click', closeProjectModal);
+        projectModal?.addEventListener('click', (e) => {
+            if (e.target === projectModal) closeProjectModal();
+        });
+
+        // Filter functionality
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const projectsGrid = document.getElementById('projectsGrid');
+        
+        let currentFilter = 'all';
+        let visibleProjects = 6;
+
+        function renderProjects(filter = 'all', count = visibleProjects) {
+            const filteredProjects = filter === 'all' 
+                ? projects 
+                : projects.filter(project => project.category === filter);
+            
+            projectsGrid.innerHTML = '';
+            
+            filteredProjects.slice(0, count).forEach((project, index) => {
+                const projectElement = document.createElement('div');
+                projectElement.className = `project-card bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden h-full cursor-pointer`;
+                projectElement.onclick = () => openProjectModal(project.id);
+                
+                projectElement.innerHTML = `
+                    <div class="relative h-48 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
+                        ${project.image ? `<img src="${project.image}" alt="${project.title}" class="w-full h-full object-cover">` : `<i class="fas fa-project-diagram text-4xl text-gray-400 dark:text-gray-500"></i>`}
+                        <div class="status-badge status-${project.status}">${project.status}</div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-2">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white flex-1">${project.title}</h3>
+                            ${project.featured ? '<i class="fas fa-star text-yellow-500 ml-2"></i>' : ''}
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">${project.description}</p>
+                        <div class="flex flex-wrap gap-1 mb-4">
+                            ${project.technologies.slice(0, 3).map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                            ${project.technologies.length > 3 ? `<span class="tech-tag">+${project.technologies.length - 3} more</span>` : ''}
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm text-gray-500 dark:text-gray-400">
+                            <div><i class="fas fa-clock mr-1"></i>${project.timeline}</div>
+                            <div><i class="fas fa-users mr-1"></i>${project.teamSize}</div>
+                        </div>
+                    </div>
+                `;
+                
+                projectsGrid.appendChild(projectElement);
+            });
+        }
+
+        // Filter buttons
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                visibleProjects = 6;
+                renderProjects(currentFilter, visibleProjects);
+            });
+        });
+
+        // Initial render
+        renderProjects();
+
+        // Keyboard navigation for modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && projectModal.classList.contains('show')) {
+                closeProjectModal();
+            }
+        });
+
+        console.log('íº€ Enhanced Detailed Portfolio loaded successfully!');
+    </script>
+</body>
+</html>

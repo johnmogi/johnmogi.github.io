@@ -3,6 +3,7 @@ let portfolioChart = null;
 
 function updateChart(coinsData) {
     const ctx = document.getElementById('portfolioChart').getContext('2d');
+    const chartContainer = document.getElementById('chartContainer');
     const colors = [
         'rgba(59, 130, 246, 1)',  // blue
         'rgba(16, 185, 129, 1)',  // green
@@ -21,12 +22,24 @@ function updateChart(coinsData) {
         return;
     }
 
-    // Destroy existing chart if it exists
+    // Add fade-out animation to existing chart
     if (portfolioChart) {
-        portfolioChart.destroy();
-        portfolioChart = null;
-    }
+        chartContainer.style.transition = 'opacity 0.3s ease-in-out';
+        chartContainer.style.opacity = '0.3';
 
+        setTimeout(() => {
+            portfolioChart.destroy();
+            portfolioChart = null;
+
+            // Create new chart with fade-in
+            createChartWithAnimation(ctx, validCoinsData, colors, chartContainer);
+        }, 300);
+    } else {
+        createChartWithAnimation(ctx, validCoinsData, colors, chartContainer);
+    }
+}
+
+function createChartWithAnimation(ctx, validCoinsData, colors, chartContainer) {
     const datasets = validCoinsData.map((coin, index) => ({
         label: coin.id.toUpperCase(),
         data: coin.data.prices.map(([timestamp, price]) => ({
@@ -35,14 +48,14 @@ function updateChart(coinsData) {
         })),
         borderColor: colors[index % colors.length],
         backgroundColor: colors[index % colors.length].replace('1)', '0.1)'),
-        borderWidth: 2,
+        borderWidth: 3,
         fill: true,
-        tension: 0.1,
+        tension: 0.4,
         pointRadius: 0,
-        pointHoverRadius: 6,
+        pointHoverRadius: 8,
         pointBackgroundColor: colors[index % colors.length],
         pointBorderColor: '#ffffff',
-        pointBorderWidth: 2
+        pointBorderWidth: 3
     }));
 
     portfolioChart = new Chart(ctx, {
@@ -52,7 +65,7 @@ function updateChart(coinsData) {
             responsive: true,
             maintainAspectRatio: false,
             animation: {
-                duration: 1000,
+                duration: 1500,
                 easing: 'easeInOutQuart'
             },
             interaction: {
@@ -106,20 +119,22 @@ function updateChart(coinsData) {
                     position: 'top',
                     labels: {
                         usePointStyle: true,
-                        padding: 15,
+                        padding: 20,
                         font: {
-                            size: 11
+                            size: 12,
+                            weight: 'bold'
                         }
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
                     titleColor: '#ffffff',
                     bodyColor: '#ffffff',
-                    borderColor: 'rgba(255, 255, 255, 0.2)',
-                    borderWidth: 1,
-                    cornerRadius: 8,
+                    borderColor: 'rgba(59, 130, 246, 0.5)',
+                    borderWidth: 2,
+                    cornerRadius: 12,
                     displayColors: true,
+                    padding: 12,
                     callbacks: {
                         title: function(context) {
                             return new Date(context[0].parsed.x).toLocaleDateString();
@@ -131,6 +146,15 @@ function updateChart(coinsData) {
             }
         }
     });
+
+    // Fade in the new chart
+    setTimeout(() => {
+        chartContainer.style.opacity = '1';
+        chartContainer.style.transition = 'opacity 0.5s ease-in-out';
+
+        // Add a subtle pulse effect to indicate live data
+        chartContainer.style.animation = 'chartPulse 2s ease-in-out infinite';
+    }, 100);
 
     // Ensure canvas has proper dimensions
     const canvas = ctx.canvas;
@@ -170,18 +194,36 @@ function addLiveDataPoint(coinId, price) {
 function generateDummyData(coinId, hours = 24) {
     const data = [];
     let price = 30000 + Math.random() * 20000; // Random price between 30k-50k
+
+    // Use coin name to create consistent but varied data
+    const hash = coinId.split('').reduce((a, b) => {
+        a = ((a << 5) - a) + b.charCodeAt(0);
+        return a & a;
+    }, 0);
+
+    const basePrice = 10000 + (Math.abs(hash) % 50000); // Base price based on coin name
+    const volatility = 0.02 + (Math.abs(hash) % 0.05); // Volatility based on coin name
+
     const now = Date.now();
 
     for (let i = hours; i >= 0; i--) {
         const timestamp = now - (i * 60 * 60 * 1000);
-        // Add some random variation
-        price += (Math.random() - 0.5) * 1000;
-        price = Math.max(price, 1000); // Ensure price doesn't go too low
+
+        // Create realistic price movement with some trend
+        const trend = Math.sin(i * 0.1) * 1000; // Gentle wave pattern
+        const randomChange = (Math.random() - 0.5) * basePrice * volatility;
+        price = basePrice + trend + randomChange;
+
+        // Ensure price doesn't go negative or too extreme
+        price = Math.max(price, basePrice * 0.1);
+        price = Math.min(price, basePrice * 3);
+
         data.push({
             timestamp,
             price: parseFloat(price.toFixed(2))
         });
     }
+
     return { prices: data.map(d => [d.timestamp, d.price]) };
 }
 
