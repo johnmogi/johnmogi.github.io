@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dungeon Master RPG - Kaboom.js Edition</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+        }
+        #gameCanvas {
+            border: 2px solid #333;
+            background: #000;
+            display: block;
+            margin: 0 auto;
+        }
+        .game-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+        .stats {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+            min-width: 200px;
+        }
+        .health-bar {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff8800, #ffff00);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .mana-bar {
+            width: 100%;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            margin: 5px 0;
+        }
+        .mana-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0088ff, #00aaff, #00ffff);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        .pixel-font {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        .glow {
+            text-shadow: 0 0 10px currentColor;
+        }
+    </style>
+</head>
+<body class="bg-gray-900">
+    <div class="game-info pixel-font">
+        <div>FPS: <span id="fps" class="text-green-400">0</span></div>
+        <div>Objects: <span id="objects" class="text-blue-400">0</span></div>
+        <div>Engine: <span class="text-yellow-400">Kaboom.js</span></div>
+    </div>
+    
+    <canvas id="gameCanvas"></canvas>
+    
+    <div class="controls pixel-font">
+        <h3 class="text-yellow-400 glow mb-2">ÌæÆ CONTROLS</h3>
+        <div class="space-y-1 text-sm">
+            <div><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">W</kbd><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">A</kbd><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">S</kbd><kbd class="bg-gray-700 px-2 py-1 rounded text-green-400">D</kbd> Move</div>
+            <div><kbd class="bg-gray-700 px-2 py-1 rounded text-red-400">SPACE</kbd> Attack</div>
+            <div><kbd class="bg-gray-700 px-2 py-1 rounded text-blue-400">E</kbd> Interact</div>
+            <div><kbd class="bg-gray-700 px-2 py-1 rounded text-purple-400">I</kbd> Inventory</div>
+        </div>
+    </div>
+    
+    <div class="stats pixel-font">
+        <h3 class="text-yellow-400 glow mb-2">Ì≥ä HERO STATS</h3>
+        <div id="heroStats" class="space-y-1 text-sm">
+            <div>Loading hero data...</div>
+        </div>
+        
+        <div class="mt-3">
+            <div class="text-red-400 mb-1">‚ù§Ô∏è HEALTH</div>
+            <div class="health-bar">
+                <div class="health-fill" id="healthFill" style="width: 100%"></div>
+            </div>
+            <div id="healthText" class="text-center text-red-400">100/100</div>
+        </div>
+        
+        <div class="mt-2">
+            <div class="text-blue-400 mb-1">Ì¥Æ MANA</div>
+            <div class="mana-bar">
+                <div class="mana-fill" id="manaFill" style="width: 100%"></div>
+            </div>
+            <div id="manaText" class="text-center text-blue-400">50/50</div>
+        </div>
+    </div>
+
+    <!-- Load Kaboom.js -->
+    <script type="module">
+        // Import the game
+        import "./dungeon-kaboom.js";
+        
+        // Update FPS counter
+        onUpdate(() => {
+            document.getElementById('fps').textContent = Math.round(debug.fps());
+            document.getElementById('objects').textContent = get('*').length;
+        });
+        
+        // Update hero stats
+        setInterval(() => {
+            const statsDiv = document.getElementById('heroStats');
+            const hero = window.gameState?.hero;
+            
+            if (hero) {
+                // Update stats display
+                statsDiv.innerHTML = `
+                    <div><span class="text-green-400">${hero.name}</span></div>
+                    <div><span class="text-blue-400">${hero.race} ${hero.characterClass}</span></div>
+                    <div><span class="text-yellow-400">Level ${hero.level}</span></div>
+                    <div><span class="text-purple-400">XP: ${hero.xp}</span></div>
+                    <div><span class="text-cyan-400">Inventory: ${hero.inventory.length}</span></div>
+                `;
+                
+                // Update health bar
+                const hpPercent = hero.hp / hero.maxHp;
+                document.getElementById('healthFill').style.width = `${hpPercent * 100}%`;
+                document.getElementById('healthText').textContent = `${Math.floor(hero.hp)}/${hero.maxHp}`;
+                
+                // Update mana bar
+                const mpPercent = hero.mp / hero.maxMp;
+                document.getElementById('manaFill').style.width = `${mpPercent * 100}%`;
+                document.getElementById('manaText').textContent = `${Math.floor(hero.mp)}/${hero.maxMp}`;
+                
+                // Color coding for health
+                const healthFill = document.getElementById('healthFill');
+                if (hpPercent > 0.6) {
+                    healthFill.style.background = 'linear-gradient(90deg, #00ff00, #88ff00, #ffff00)';
+                } else if (hpPercent > 0.3) {
+                    healthFill.style.background = 'linear-gradient(90deg, #ff8800, #ffaa00, #ffff00)';
+                } else {
+                    healthFill.style.background = 'linear-gradient(90deg, #ff0000, #ff4400, #ff8800)';
+                }
+            }
+        }, 500);
+        
+        // Add keyboard shortcuts
+        onKeyPress("escape", () => {
+            go("menu");
+        });
+        
+        onKeyPress("m", () => {
+            // Toggle camera lock
+            window.gameState.cameraLocked = !window.gameState.cameraLocked;
+            console.log('Camera lock:', window.gameState.cameraLocked);
+        });
+        
+        // Add visual effects
+        onUpdate(() => {
+            // Add some ambient particles occasionally
+            if (Math.random() < 0.02) {
+                add([
+                    text("*", { size: 12 }),
+                    pos(Math.random() * width(), Math.random() * height()),
+                    color(100, 100, 255, 0.5),
+                    lifespan(3)
+                ]);
+            }
+        });
+        
+        console.log('ÌæÆ Dungeon Master RPG loaded with Kaboom.js!');
+        console.log('ÔøΩÔøΩ Use WASD to move, SPACE to attack!');
+    </script>
+</body>
+</html>
