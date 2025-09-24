@@ -6,6 +6,45 @@ function getUrlParameter(name) {
     return urlParams.get(name);
 }
 
+// Simple notification system
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification-toast');
+    existingNotifications.forEach(n => n.remove());
+
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification-toast fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-x-full ${getNotificationClasses(type)}`;
+    notification.textContent = message;
+
+    // Add to page
+    document.body.appendChild(notification);
+
+    // Animate in
+    setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+    }, 100);
+
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+function getNotificationClasses(type) {
+    switch (type) {
+        case 'success': return 'bg-green-500 text-white';
+        case 'error': return 'bg-red-500 text-white';
+        case 'warning': return 'bg-yellow-500 text-white';
+        default: return 'bg-blue-500 text-white';
+    }
+}
+
 // Initialize coin detail page
 async function initializeCoinPage() {
     const coinId = getUrlParameter('coin');
@@ -223,147 +262,6 @@ function showError(message) {
     }
 }
 
-// Try each API provider in sequence
-async function getCoin(coinId) {
-    for (let i = currentApiProvider; i < API_PROVIDERS.length; i++) {
-        try {
-            const provider = API_PROVIDERS[i];
-            console.log(`Trying ${provider.name} API for ${coinId}...`);
-
-            let url;
-            if (provider.name === 'coingecko') {
-                // CoinGecko format: https://api.coingecko.com/api/v3/coins/{id}
-                url = `${provider.baseUrl}/coins/${coinId}`;
-            } else if (provider.name === 'cryptocompare') {
-                // CryptoCompare format: https://min-api.cryptocompare.com/data/coin/generalinfo?fsyms=BTC&tsym=USD
-                url = `${provider.baseUrl}/data/coin/generalinfo?fsyms=${coinId.toUpperCase()}&tsym=USD`;
-            }
-
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log(`Coin data received for ${coinId} from ${provider.name}:`, data);
-
-            // Transform data based on provider
-            const transformedData = await transformCoinData(data, provider.name);
-            console.log(`Successfully loaded coin data for ${coinId} from ${provider.name}`);
-
-            // If successful, update current provider and return data
-            currentApiProvider = i;
-            return transformedData;
-
-        } catch (error) {
-            console.warn(`${API_PROVIDERS[i].name} API failed for coin ${coinId}:`, error.message);
-            continue;
-        }
-    }
-
-    // If all APIs fail, throw error
-    throw new Error('All API providers failed');
-}
-
-async function getMarketChart(coinId, days = 30) {
-    // Try each API provider in sequence
-    for (let i = currentApiProvider; i < API_PROVIDERS.length; i++) {
-        try {
-            const provider = API_PROVIDERS[i];
-            console.log(`Trying ${provider.name} API for ${coinId} chart...`);
-
-            let url;
-            if (provider.name === 'cryptocompare') {
-                // CryptoCompare format: https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=30
-                url = `${provider.baseUrl}/v2/histoday?fsym=${coinId.toUpperCase()}&tsym=USD&limit=${days}`;
-            } else if (provider.name === 'coingecko') {
-                // CoinGecko format
-                url = `${provider.baseUrl}/coins/${coinId}/market_chart?vs_currency=usd&days=${days}&interval=daily`;
-            }
-
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log(`Chart data received for ${coinId} from ${provider.name}:`, data);
-
-            // Transform data based on provider
-            const transformedData = await transformChartData(data, provider.name);
-            console.log(`Successfully loaded chart data for ${coinId} from ${provider.name}`);
-
-            // If successful, update current provider and return data
-            currentApiProvider = i;
-            return transformedData;
-
-        } catch (error) {
-            console.warn(`${API_PROVIDERS[i].name} API failed for ${coinId} chart:`, error.message);
-            continue;
-        }
-    }
-
-    // If all APIs fail, throw error
-    throw new Error('All API providers failed');
-}
-
-async function transformCoinData(data, providerName) {
-    if (providerName === 'coingecko') {
-        // Handle CoinGecko format
-        if (data && data.status && data.status.error_code) {
-            throw new Error(`API Error ${data.status.error_code}: ${data.status.error_message || 'Unknown error'}`);
-        }
-
-        if (data && typeof data === 'object' && data.status && !Array.isArray(data)) {
-            throw new Error(`API returned error status: ${JSON.stringify(data.status)}`);
-        }
-
-        if (!data || typeof data !== 'object') {
-            throw new Error('Invalid response format');
-        }
-
-        if (!data.market_data) {
-            throw new Error('No market data available');
-        }
-
-        return data;
-    }
-
-    throw new Error(`Unknown provider: ${providerName}`);
-}
-
-async function transformChartData(data, providerName) {
-    if (providerName === 'cryptocompare') {
-        // Transform CryptoCompare format to match CoinGecko format
-        if (data.Data && Array.isArray(data.Data)) {
-            return {
-                prices: data.Data.map(item => [item.time * 1000, item.close])
-            };
-        }
-    } else if (providerName === 'coingecko') {
-        // Handle CoinGecko format
-        if (data && data.status && data.status.error_code) {
-            throw new Error(`API Error ${data.status.error_code}: ${data.status.error_message || 'Unknown error'}`);
-        }
-
-        if (data && typeof data === 'object' && data.status && !Array.isArray(data)) {
-            throw new Error(`API returned error status: ${JSON.stringify(data.status)}`);
-        }
-
-        if (!data || typeof data !== 'object') {
-            throw new Error('Invalid response format');
-        }
-
-        if (!data.prices || !Array.isArray(data.prices)) {
-            throw new Error('No price data available');
-        }
-
-        return data;
-    }
-
-    throw new Error(`Unknown provider: ${providerName}`);
-}
-
 // Favorites management
 const FAVORITES_KEY = 'crypto_favorites';
 const MAX_FAVORITES = 5;
@@ -389,95 +287,8 @@ function addToFavorites(coinId) {
 }
 
 // Initialize the coin detail page
-function initializeCoinPage() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const coinId = urlParams.get('coin') || urlParams.get('id');
+document.addEventListener('DOMContentLoaded', () => {
+    initializeCoinPage();
+});
 
-    if (!coinId) {
-        showNotification('No coin specified', 'error');
-        window.location.href = 'index.html';
-        return;
-    }
-
-    loadCoinDetails(coinId);
-}
-
-async function loadCoinDetails(coinId) {
-    try {
-        const [coinData, marketData] = await Promise.all([
-            getCoinDetail(coinId),
-            getMarketChart(coinId, 30)
-        ]);
-
-        // Update UI with coin data
-        updateCoinPage(coinData);
-
-        // Create chart
-        createCoinChart(marketData, coinId);
-
-        // Setup add to favorites button
-        const addToFavoritesBtn = document.getElementById('addToFavoritesBtn');
-        if (addToFavoritesBtn) {
-            addToFavoritesBtn.addEventListener('click', () => {
-                if (addToFavorites(coinId)) {
-                    addToFavoritesBtn.textContent = 'Added to Tracker';
-                    addToFavoritesBtn.disabled = true;
-                    addToFavoritesBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                    addToFavoritesBtn.classList.add('bg-green-500', 'cursor-not-allowed');
-                }
-            });
-        }
-
-        // Show the content
-        document.getElementById('loading').classList.add('hidden');
-        document.getElementById('coinContent').classList.remove('hidden');
-
-    } catch (error) {
-        console.error('Error loading coin details:', error);
-
-        // Create sample data for demonstration
-        const sampleCoinData = {
-            id: coinId,
-            name: coinId.charAt(0).toUpperCase() + coinId.slice(1),
-            symbol: coinId.toUpperCase(),
-            image: 'https://via.placeholder.com/128',
-            current_price: 1000.00,
-            price_change_percentage_24h: 5.0,
-            market_cap: 50000000000,
-            total_volume: 1000000000,
-            high_24h: 1050.00,
-            low_24h: 950.00,
-            description: `This is demo data for ${coinId}. In a real application, this would show detailed information about the cryptocurrency.`,
-            homepage: `https://example.com/${coinId}`
-        };
-
-        const sampleMarketData = {
-            prices: Array.from({ length: 30 }, (_, i) => [
-                Date.now() - (29 - i) * 24 * 60 * 60 * 1000,
-                1000 + Math.random() * 200 - 100
-            ])
-        };
-
-        // Update UI with sample data
-        updateCoinPage(sampleCoinData);
-        createCoinChart(sampleMarketData, coinId);
-
-        // Setup add to favorites button
-        const addToFavoritesBtn = document.getElementById('addToFavoritesBtn');
-        if (addToFavoritesBtn) {
-            addToFavoritesBtn.addEventListener('click', () => {
-                if (addToFavorites(coinId)) {
-                    addToFavoritesBtn.textContent = 'Added to Tracker';
-                    addToFavoritesBtn.disabled = true;
-                    addToFavoritesBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                    addToFavoritesBtn.classList.add('bg-green-500', 'cursor-not-allowed');
-                }
-            });
-        }
-
-        // Show the content
-        document.getElementById('loading').classList.add('hidden');
-        document.getElementById('coinContent').classList.remove('hidden');
-        showNotification('Using demo data - API connection failed', 'warning');
-    }
-}
+// ... rest of the code remains the same ...

@@ -293,13 +293,35 @@ async function transformChartData(data, providerName) {
             throw new Error(`CryptoCompare API Error: ${data.Message}`);
         }
 
+        // CryptoCompare returns data in different formats, let's handle them
         if (data.Data && Array.isArray(data.Data)) {
+            // Format 1: Direct array of historical data
             return {
                 prices: data.Data.map(item => [item.time * 1000, item.close])
             };
+        } else if (data.Data && data.Data.Data && Array.isArray(data.Data.Data)) {
+            // Format 2: Nested data structure
+            return {
+                prices: data.Data.Data.map(item => [item.time * 1000, item.close])
+            };
+        } else if (data && Array.isArray(data)) {
+            // Format 3: Direct array response
+            return {
+                prices: data.map(item => [item.time * 1000, item.close])
+            };
         }
 
-        throw new Error('Invalid CryptoCompare chart data format');
+        // Debug: Log the actual structure for troubleshooting
+        console.log('🔍 CryptoCompare data structure:', data);
+        console.log('🔍 Available keys:', Object.keys(data));
+        if (data.Data) {
+            console.log('🔍 Data.Data type:', typeof data.Data);
+            console.log('🔍 Data.Data keys:', Object.keys(data.Data));
+            if (Array.isArray(data.Data)) {
+                console.log('🔍 First item keys:', data.Data[0] ? Object.keys(data.Data[0]) : 'No items');
+            }
+        }
+        throw new Error('Invalid CryptoCompare chart data format - check console for structure');
     } else if (providerName === 'coingecko') {
         // Handle CoinGecko chart data format (may be wrapped by proxy)
         if (data.error) {
@@ -316,11 +338,23 @@ async function transformChartData(data, providerName) {
             }
         }
 
+        // Check if it's an error response
+        if (data.status && data.status.error_code) {
+            throw new Error(`CoinGecko API Error: ${data.status.error_message || 'Unknown error'}`);
+        }
+
+        // Check if we have the expected chart data structure
         if (data && data.prices && Array.isArray(data.prices)) {
             return data;
         }
 
-        throw new Error('Invalid CoinGecko chart data format');
+        // Debug: Log the actual structure for troubleshooting
+        console.log('🔍 CoinGecko data structure:', data);
+        console.log('🔍 Available keys:', Object.keys(data));
+        if (data.status) {
+            console.log('🔍 Status object:', data.status);
+        }
+        throw new Error('Invalid CoinGecko chart data format - check console for structure');
     }
 
     throw new Error(`Unknown provider: ${providerName}`);

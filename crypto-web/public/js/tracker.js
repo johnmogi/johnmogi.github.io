@@ -3,6 +3,45 @@ let liveUpdateInterval = null;
 let countdownInterval = null;
 let countdownValue = 30;
 
+// Simple notification system
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification-toast');
+    existingNotifications.forEach(n => n.remove());
+
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification-toast fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-x-full ${getNotificationClasses(type)}`;
+    notification.textContent = message;
+
+    // Add to page
+    document.body.appendChild(notification);
+
+    // Animate in
+    setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+    }, 100);
+
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+function getNotificationClasses(type) {
+    switch (type) {
+        case 'success': return 'bg-green-500 text-white';
+        case 'error': return 'bg-red-500 text-white';
+        case 'warning': return 'bg-yellow-500 text-white';
+        default: return 'bg-blue-500 text-white';
+    }
+}
+
 // Generate dummy data for testing
 function generateDummyData(coinId, days = 30) {
     const basePrice = 1000 + Math.random() * 50000;
@@ -182,7 +221,7 @@ function startLiveUpdates() {
         }
 
         await loadTrackerData();
-        showToast('Live update completed', 'info');
+        showNotification('Live update completed', 'info');
     }, interval);
 
     startCountdown();
@@ -236,18 +275,18 @@ function startCountdown() {
 
             // Add visual feedback when countdown is low
             if (countdownValue <= 5) {
-                countdownEl.classList.add('text-red-600', 'animate-pulse');
+                countdownEl.classList.add('text-red-600', 'animate-pulse', 'font-bold');
                 countdownEl.classList.remove('text-blue-600');
             } else {
                 countdownEl.classList.add('text-blue-600');
-                countdownEl.classList.remove('text-red-600', 'animate-pulse');
+                countdownEl.classList.remove('text-red-600', 'animate-pulse', 'font-bold');
             }
 
             // Add a subtle pulse effect when reaching zero
             if (countdownValue <= 0) {
-                countdownEl.classList.add('live-indicator');
+                countdownEl.classList.add('live-indicator', 'text-green-600', 'animate-bounce');
                 setTimeout(() => {
-                    countdownEl.classList.remove('live-indicator');
+                    countdownEl.classList.remove('live-indicator', 'text-green-600', 'animate-bounce');
                 }, 1000);
             }
         }
@@ -372,12 +411,18 @@ async function loadTrackerData() {
         favoritesContainerEl.classList.remove('hidden');
         chartContainerEl.classList.remove('hidden');
         chartContainerEl.classList.add('chart-fade-in');
-        document.getElementById('lastRefresh').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+        const lastRefreshEl = document.getElementById('lastRefresh');
+        if (lastRefreshEl) {
+            lastRefreshEl.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+        }
 
         // Reset countdown if live updates are enabled
         if (liveUpdateInterval) {
             countdownValue = parseInt(document.getElementById('refreshInterval').value);
-            document.getElementById('countdown').textContent = countdownValue;
+            const countdownEl = document.getElementById('countdown');
+            if (countdownEl) {
+                countdownEl.textContent = countdownValue;
+            }
         }
     } catch (error) {
         console.error('Error loading tracker data:', error);
@@ -411,7 +456,10 @@ async function loadTrackerData() {
         favoritesContainerEl.classList.remove('hidden');
         chartContainerEl.classList.remove('hidden');
         chartContainerEl.classList.add('chart-fade-in');
-        document.getElementById('lastRefresh').textContent = `Last updated: ${new Date().toLocaleTimeString()} (Demo Mode - Network Issues)`;
+        const lastRefreshEl = document.getElementById('lastRefresh');
+        if (lastRefreshEl) {
+            lastRefreshEl.textContent = `Last updated: ${new Date().toLocaleTimeString()} (Demo Mode - Network Issues)`;
+        }
 
         // Show notification about demo mode
         showNotification('All APIs are currently unavailable. Using demo data with beautiful animations!', 'warning');
@@ -438,9 +486,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             await loadTrackerData();
-            showToast('Portfolio updated', 'success');
+            showNotification('Portfolio updated', 'success');
         } catch (error) {
-            showToast('Refresh failed', 'error');
+            showNotification('Refresh failed', 'error');
         } finally {
             // Remove loading animation
             refreshBtn.classList.remove('animate-pulse', 'bg-green-400');
@@ -463,6 +511,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         await loadTrackerData();
-        showToast(`Demo mode ${e.target.checked ? 'enabled' : 'disabled'}`, 'info');
+        showNotification(`Demo mode ${e.target.checked ? 'enabled' : 'disabled'}`, 'info');
     });
 });
