@@ -336,7 +336,7 @@ function viewCoinDetails(coinId) {
 }
 
 // Load and display tracker data
-async function loadTrackerData() {
+async function loadTrackerData(forceRefresh = false) {
     const favorites = getFavorites();
     const loadingEl = document.getElementById('loading');
     const emptyStateEl = document.getElementById('emptyState');
@@ -364,8 +364,8 @@ async function loadTrackerData() {
                     console.log(`🎭 Demo mode enabled, using dummy data for ${coinId}`);
                     return { id: coinId, data: generateDummyData(coinId, 30) };
                 } else {
-                    console.log(`📊 Fetching real data for ${coinId}`);
-                    const data = await getMarketChart(coinId, 30);
+                    console.log(`📊 Fetching${forceRefresh ? ' fresh' : ''} data for ${coinId}`);
+                    const data = await getMarketChart(coinId, 30, forceRefresh);
                     return { id: coinId, data };
                 }
             } catch (error) {
@@ -395,7 +395,8 @@ async function loadTrackerData() {
             console.warn(`⚠️ ${fallbackCoins.length} coins using fallback data:`, fallbackCoins.map(c => c.id));
             showNotification(`Using demo data for ${fallbackCoins.length} coin(s) - API may be unavailable`, 'warning');
         } else if (failedCoins.length === 0 && fallbackCoins.length === 0) {
-            showNotification(`Successfully loaded ${coinsData.length} coins`, 'success');
+            const refreshType = forceRefresh ? 'fresh data loaded' : 'data loaded';
+            showNotification(`Successfully updated with ${refreshType}`, 'success');
         }
 
         // Update favorites pills with enhanced animations
@@ -422,6 +423,14 @@ async function loadTrackerData() {
             `;
         }).join('');
 
+        // Add swipe effect to chart container
+        if (chartContainerEl && coinsData.length > 0) {
+            chartContainerEl.classList.add('chart-swipe-in');
+            setTimeout(() => {
+                chartContainerEl.classList.remove('chart-swipe-in');
+            }, 500);
+        }
+
         // Create or update chart
         updateChart(coinsData);
 
@@ -431,7 +440,8 @@ async function loadTrackerData() {
         chartContainerEl.classList.add('chart-fade-in');
         const lastRefreshEl = document.getElementById('lastRefresh');
         if (lastRefreshEl) {
-            lastRefreshEl.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+            const refreshType = forceRefresh ? 'Manual refresh' : 'Auto update';
+            lastRefreshEl.textContent = `${refreshType}: ${new Date().toLocaleTimeString()}`;
         }
 
         // Reset countdown if live updates are enabled
@@ -498,20 +508,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Set up event listeners
     document.getElementById('refreshBtn').addEventListener('click', async () => {
         const refreshBtn = document.getElementById('refreshBtn');
+        const originalText = refreshBtn.textContent;
 
         // Add loading animation to button
-        refreshBtn.classList.add('animate-pulse', 'bg-green-400');
-        refreshBtn.textContent = 'Refreshing...';
+        refreshBtn.classList.add('loading', 'refresh-button');
+        refreshBtn.innerHTML = '<span class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>Refreshing...';
+        refreshBtn.disabled = true;
 
         try {
             await loadTrackerData();
-            showNotification('Portfolio updated', 'success');
+
+            // Show success state
+            refreshBtn.classList.remove('loading');
+            refreshBtn.classList.add('success');
+            refreshBtn.innerHTML = '<span class="mr-2">✓</span>Updated!';
+
+            showNotification('Portfolio updated successfully!', 'success');
+
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                refreshBtn.classList.remove('success');
+                refreshBtn.innerHTML = originalText;
+                refreshBtn.disabled = false;
+            }, 2000);
+
         } catch (error) {
-            showNotification('Refresh failed', 'error');
-        } finally {
-            // Remove loading animation
-            refreshBtn.classList.remove('animate-pulse', 'bg-green-400');
-            refreshBtn.textContent = 'Refresh Now';
+            // Show error state
+            refreshBtn.classList.remove('loading');
+            refreshBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+            refreshBtn.innerHTML = '<span class="mr-2">✗</span>Failed';
+
+            showNotification('Refresh failed - please try again', 'error');
+
+            // Reset button after 3 seconds
+            setTimeout(() => {
+                refreshBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                refreshBtn.innerHTML = originalText;
+                refreshBtn.disabled = false;
+            }, 3000);
         }
     });
 

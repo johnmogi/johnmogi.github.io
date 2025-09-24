@@ -28,6 +28,16 @@
             50% { opacity: 0.5; }
         }
 
+        @keyframes pulse-refresh {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes slide-in-refresh {
+            0% { transform: translateY(-10px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
         .chart-swipe-in {
             animation: chart-swipe-in 0.5s ease-out;
         }
@@ -54,6 +64,58 @@
             background: #ef4444;
             border-radius: 50%;
             animation: live-indicator 1s ease-in-out infinite;
+        }
+
+        .refresh-button {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .refresh-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .refresh-button:active {
+            transform: translateY(0);
+        }
+
+        .refresh-button.loading {
+            animation: pulse-refresh 1s ease-in-out infinite;
+        }
+
+        .refresh-button.success {
+            background: #10b981;
+            animation: slide-in-refresh 0.5s ease-out;
+        }
+
+        .coin-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .coin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .favorites-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 2px;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
@@ -97,11 +159,11 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <button id="refreshBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                        Refresh Now
+                    <button id="refreshBtn" class="refresh-button bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium shadow-lg">
+                        <span class="mr-2">🔄</span>Refresh Now
                     </button>
                     <div id="nextRefresh" class="text-sm text-gray-600 hidden">
-                        Next update in: <span id="countdown" class="font-mono text-blue-600">5</span>s
+                        Next update in: <span id="countdown" class="font-mono text-blue-600 font-bold">5</span>s
                     </div>
                 </div>
             </div>

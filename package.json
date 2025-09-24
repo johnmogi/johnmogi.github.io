@@ -1,14 +1,20 @@
 {
   "name": "deploy-project",
   "version": "1.0.0",
-  "description": "Project deployment files",
+  "description": "Project deployment files with comprehensive linting",
   "scripts": {
-    "lint": "echo 'Linting JavaScript files...' && find . -name '*.js' -not -path './node_modules/*' -exec echo 'Checking {}' \\;",
-    "lint:fix": "echo 'Auto-fixing linting issues...' && find . -name '*.js' -not -path './node_modules/*' -exec echo 'Fixed {}' \\;",
-    "format": "echo 'Formatting code files...' && find . -name '*.js' -not -path './node_modules/*' -exec echo 'Formatted {}' \\;",
-    "format:check": "echo 'Checking code formatting...' && find . -name '*.js' -not -path './node_modules/*' -exec echo 'Checked {}' \\;"
+    "lint": "echo 'Ì¥ç Running ESLint...' && npx eslint GAMES/Dungeon/assets/dungeon-game.js --format=compact",
+    "lint:fix": "echo 'Ì¥ß Auto-fixing linting issues...' && npx eslint GAMES/Dungeon/assets/dungeon-game.js --fix",
+    "format": "echo 'Ì≤Ö Formatting code...' && npx prettier --write GAMES/Dungeon/assets/dungeon-game.js",
+    "format:check": "echo 'Ì¥ç Checking code formatting...' && npx prettier --check GAMES/Dungeon/assets/dungeon-game.js",
+    "lint:all": "echo 'Ì∫Ä Running comprehensive linting...' && npm run lint && echo '' && npm run format:check",
+    "fix:all": "echo 'Ì¥ß Running comprehensive fixes...' && npm run lint:fix && echo '' && npm run format"
   },
-  "keywords": ["deployment", "games", "dungeon"],
+  "keywords": ["deployment", "games", "dungeon", "linting"],
   "author": "User",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5"
+  }
 }
