@@ -800,6 +800,7 @@ class DungeonGame {
         `;
     }
 
+}
     toggleDarkMode() {
 }
 
