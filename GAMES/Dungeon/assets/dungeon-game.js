@@ -801,8 +801,6 @@ class DungeonGame {
     }
 
 }
-    toggleDarkMode() {
-}
 
 // Initialize game when DOM loads
 document.addEventListener('DOMContentLoaded', () => {
