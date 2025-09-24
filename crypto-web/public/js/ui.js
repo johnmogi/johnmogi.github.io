@@ -18,7 +18,7 @@ function renderCoinsGrid(coins) {
     grid.innerHTML = coins.map(coin => `
         <div class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
             <div class="flex items-center mb-2">
-                <img src="${coin.image}" alt="${coin.name}" class="w-8 h-8 mr-2">
+                <img src="${coin.image || 'https://via.placeholder.com/32x32?text=?'}" alt="${coin.name}" class="w-8 h-8 mr-2 rounded-full" onerror="this.src='https://via.placeholder.com/32x32?text=?'">
                 <div>
                     <h3 class="font-bold text-gray-800">${coin.name}</h3>
                     <p class="text-gray-600 text-sm">${coin.symbol.toUpperCase()}</p>
