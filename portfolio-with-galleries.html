@@ -288,10 +288,168 @@
         .image-modal.show {
             display: flex;
         }
-        .image-modal img {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
+        .whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #25D366;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(37, 211, 102, 0.6);
+        }
+
+        .whatsapp-float::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #25D366, #128C7E);
+            z-index: -1;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .contact-form {
+            background: white;
+            dark:bg-gray-800;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .contact-form {
+            background: #1f2937;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .dark .form-label {
+            color: #d1d5db;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .dark .form-input, .dark .form-textarea {
+            background: #374151;
+            border-color: #4b5563;
+            color: #d1d5db;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            transform: translateY(-1px);
+        }
+
+        .language-option:hover {
+            background: #f3f4f6;
+        }
+
+        .dark .language-option:hover {
+            background: #374151;
+        }
+
+        body.rtl {
+            direction: rtl;
+            text-align: right;
+        }
+
+        body.rtl .nav-item {
+            text-align: right;
+        }
+
+        body.rtl .flex {
+            flex-direction: row-reverse;
+        }
+
+        body.rtl .space-x-8 > * + * {
+            margin-right: 2rem;
+            margin-left: 0;
+        }
+
+        body.rtl .space-x-4 > * + * {
+            margin-right: 1rem;
+            margin-left: 0;
+        }
+
+        body.rtl .text-left {
+            text-align: right;
+        }
+
+        body.rtl .text-right {
+            text-align: left;
+        }
+
+        body.rtl .ml-2 {
+            margin-right: 0.5rem;
+            margin-left: 0;
+        }
+
+        body.rtl .mr-2 {
+            margin-left: 0.5rem;
+            margin-right: 0;
         }
     </style>
 </head>
@@ -312,9 +470,25 @@
 
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="#home" class="nav-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors duration-200">Home</a>
-                    <a href="#projects" class="nav-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors duration-200">Projects</a>
-                    <a href="#contact" class="nav-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors duration-200">Contact</a>
+                    <a href="#home" class="nav-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors duration-200" data-translate="nav.home">Home</a>
+                    <a href="#projects" class="nav-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors duration-200" data-translate="nav.projects">Projects</a>
+                    <a href="#contact" class="nav-item text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors duration-200" data-translate="nav.contact">Contact</a>
+
+                    <!-- Language Selector -->
+                    <div class="relative">
+                        <button id="languageBtn" class="flex items-center space-x-1 text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors duration-200">
+                            <i class="fas fa-globe"></i>
+                            <span id="currentLanguage">EN</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="languageDropdown" class="absolute top-full right-0 mt-2 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg hidden z-50">
+                            <button class="language-option w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" data-lang="en">English</button>
+                            <button class="language-option w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" data-lang="es">Español</button>
+                            <button class="language-option w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" data-lang="fr">Français</button>
+                            <button class="language-option w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" data-lang="he">עברית</button>
+                        </div>
+                    </div>
+
                     <button id="darkModeToggle" class="bg-gray-200 dark:bg-gray-700 p-2 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">
                         <i class="fas fa-moon dark:hidden"></i>
                         <i class="fas fa-sun hidden dark:inline"></i>
@@ -443,34 +617,93 @@
                 </p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-                <div class="text-center">
-                    <i class="fas fa-envelope text-4xl mb-4 text-blue-200"></i>
-                    <h4 class="font-semibold mb-2">Email</h4>
-                    <a href="mailto:dev@johnmogi.com" class="text-blue-200 hover:text-white transition-colors duration-200">
-                        dev@johnmogi.com
-                    </a>
+            <div class="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                <!-- Contact Information -->
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">Get In Touch</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-center space-x-4">
+                            <i class="fas fa-envelope text-2xl text-blue-200"></i>
+                            <div>
+                                <h4 class="font-semibold">Email</h4>
+                                <a href="mailto:dev@johnmogi.com" class="text-blue-200 hover:text-white transition-colors duration-200">
+                                    dev@johnmogi.com
+                                </a>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <i class="fab fa-github text-2xl text-blue-200"></i>
+                            <div>
+                                <h4 class="font-semibold">GitHub</h4>
+                                <a href="https://github.com/johnmogi" target="_blank" class="text-blue-200 hover:text-white transition-colors duration-200">
+                                    github.com/johnmogi
+                                </a>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <i class="fab fa-linkedin text-2xl text-blue-200"></i>
+                            <div>
+                                <h4 class="font-semibold">LinkedIn</h4>
+                                <a href="https://linkedin.com/in/johnmogi" target="_blank" class="text-blue-200 hover:text-white transition-colors duration-200">
+                                    linkedin.com/in/johnmogi
+                                </a>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <i class="fab fa-whatsapp text-2xl text-blue-200"></i>
+                            <div>
+                                <h4 class="font-semibold">WhatsApp</h4>
+                                <a href="https://wa.me/34642210422" target="_blank" class="text-blue-200 hover:text-white transition-colors duration-200">
+                                    +34 642 210 422
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-center">
-                    <i class="fab fa-github text-4xl mb-4 text-blue-200"></i>
-                    <h4 class="font-semibold mb-2">GitHub</h4>
-                    <a href="https://github.com/johnmogi" target="_blank" class="text-blue-200 hover:text-white transition-colors duration-200">
-                        github.com/johnmogi
-                    </a>
-                </div>
-                <div class="text-center">
-                    <i class="fab fa-linkedin text-4xl mb-4 text-blue-200"></i>
-                    <h4 class="font-semibold mb-2">LinkedIn</h4>
-                    <a href="https://linkedin.com/in/johnmogi" target="_blank" class="text-blue-200 hover:text-white transition-colors duration-200">
-                        linkedin.com/in/johnmogi
-                    </a>
+
+                <!-- Contact Form -->
+                <div class="contact-form">
+                    <h3 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Send Message</h3>
+                    <form id="contactForm" class="space-y-4">
+                        <div class="form-group">
+                            <label for="name" class="form-label">Name *</label>
+                            <input type="text" id="name" name="name" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" id="email" name="email" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" id="subject" name="subject" class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message" class="form-label">Message *</label>
+                            <textarea id="message" name="message" class="form-textarea" required></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <i class="fas fa-paper-plane mr-2"></i>Send Message
+                        </button>
+                    </form>
+
+                    <div id="formMessage" class="mt-4 hidden">
+                        <div class="p-3 rounded-lg bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                            <i class="fas fa-check-circle mr-2"></i>Message sent successfully!
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 dark:bg-black text-white py-8">
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/34642210422" target="_blank" class="whatsapp-float" title="Chat on WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="flex items-center space-x-3 mb-4 md:mb-0">
@@ -1345,7 +1578,46 @@
             }
         });
 
-        console.log('��� Enhanced Portfolio with Galleries and Real Projects loaded successfully!');
+        // Contact Form Functionality
+        const contactForm = document.getElementById('contactForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const formMessage = document.getElementById('formMessage');
+
+        contactForm?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+
+            try {
+                // Get form data
+                const formData = new FormData(contactForm);
+                const data = Object.fromEntries(formData);
+
+                // Simulate form submission (replace with actual endpoint)
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Show success message
+                formMessage.classList.remove('hidden');
+                contactForm.reset();
+
+                // Hide message after 5 seconds
+                setTimeout(() => {
+                    formMessage.classList.add('hidden');
+                }, 5000);
+
+            } catch (error) {
+                console.error('Form submission error:', error);
+                alert('Error sending message. Please try again or contact directly via email.');
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Message';
+            }
+        });
+
+        console.log('🚀 Enhanced Portfolio with Contact Form and WhatsApp loaded successfully!');
     </script>
 </body>
 </html>
