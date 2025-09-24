@@ -828,7 +828,7 @@
         <i class="fab fa-whatsapp"></i>
     </a>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="flex flex-col md:flex-row justify-between items-center footer-content">
                 <div class="flex items-center space-x-3 mb-4 md:mb-0">
                     <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                         <i class="fas fa-code text-white text-sm"></i>
@@ -1099,25 +1099,88 @@
             });
         });
 
-        // Handle broken images with placeholders
+        // Handle broken images with placeholders and retry mechanism
         function handleImageErrors() {
             const images = document.querySelectorAll('img');
             images.forEach(img => {
+                // Add loading state
+                img.style.backgroundColor = '#f3f4f6';
+                img.style.minHeight = '200px';
+
                 img.addEventListener('error', function() {
                     // Create placeholder based on context
+                    let placeholderUrl = 'https://via.placeholder.com/400x300/6B7280/FFFFFF?text=Image+Not+Found';
+                    let bgColor = '6B7280';
+                    let textColor = 'FFFFFF';
+
                     if (this.closest('.project-card')) {
                         // Project image placeholder
-                        this.src = `https://via.placeholder.com/400x300/4F46E5/FFFFFF?text=${encodeURIComponent(this.alt || 'Project')}`;
-                        this.style.objectFit = 'contain';
+                        const projectName = this.alt || 'Project';
+                        placeholderUrl = `https://via.placeholder.com/400x300/4F46E5/FFFFFF?text=${encodeURIComponent(projectName)}`;
+                        bgColor = '4F46E5';
+                        textColor = 'FFFFFF';
                     } else if (this.closest('.gallery-item')) {
                         // Gallery image placeholder
-                        this.src = `https://via.placeholder.com/300x200/10B981/FFFFFF?text=${encodeURIComponent(this.alt || 'Gallery')}`;
-                        this.style.objectFit = 'contain';
-                    } else {
-                        // General image placeholder
-                        this.src = 'https://via.placeholder.com/400x300/6B7280/FFFFFF?text=Image+Not+Found';
-                        this.style.objectFit = 'contain';
+                        const galleryName = this.alt || 'Gallery';
+                        placeholderUrl = `https://via.placeholder.com/300x200/10B981/FFFFFF?text=${encodeURIComponent(galleryName)}`;
+                        bgColor = '10B981';
+                        textColor = 'FFFFFF';
+                    } else if (this.closest('.hero-content')) {
+                        // Hero image placeholder
+                        placeholderUrl = 'https://via.placeholder.com/400x300/EF4444/FFFFFF?text=Hero+Image';
+                        bgColor = 'EF4444';
+                        textColor = 'FFFFFF';
                     }
+
+                    // Apply placeholder
+                    this.src = placeholderUrl;
+                    this.style.objectFit = 'contain';
+                    this.style.backgroundColor = '#f3f4f6';
+                    this.style.border = `2px solid #${bgColor}30`;
+
+                    // Add retry button for failed images
+                    if (!this.hasAttribute('data-retry-added')) {
+                        this.setAttribute('data-retry-added', 'true');
+                        const retryBtn = document.createElement('button');
+                        retryBtn.innerHTML = '<i class="fas fa-redo"></i>';
+                        retryBtn.className = 'absolute bottom-2 right-2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 shadow-lg transition-all duration-200';
+                        retryBtn.style.cssText = `
+                            position: absolute;
+                            bottom: 8px;
+                            right: 8px;
+                            background: rgba(255, 255, 255, 0.9);
+                            border: none;
+                            border-radius: 50%;
+                            width: 32px;
+                            height: 32px;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 12px;
+                            color: #374151;
+                            transition: all 0.2s ease;
+                            z-index: 10;
+                        `;
+
+                        retryBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const originalSrc = this.getAttribute('data-original-src') || this.src;
+                            this.src = originalSrc;
+                            retryBtn.remove();
+                        });
+
+                        this.parentElement.style.position = 'relative';
+                        this.parentElement.appendChild(retryBtn);
+                        this.setAttribute('data-original-src', this.src);
+                    }
+                });
+
+                img.addEventListener('load', function() {
+                    // Remove loading state
+                    this.style.backgroundColor = 'transparent';
+                    this.style.minHeight = 'auto';
+                    this.style.border = 'none';
                 });
             });
         }
