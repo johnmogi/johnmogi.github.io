@@ -10,8 +10,8 @@ const API_PROVIDERS = [
     },
     {
         name: 'coingecko',
-        baseUrl: 'https://api.allorigins.win/raw?url=https://api.coingecko.com/api/v3',
-        marketUrl: 'https://api.allorigins.win/raw?url=https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h',
+        baseUrl: 'https://cors-anywhere.herokuapp.com/https://api.coingecko.com/api/v3',
+        marketUrl: 'https://cors-anywhere.herokuapp.com/https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h',
         useProxy: true, // Use CORS proxy to avoid browser CORS issues
         retryDelay: 2000, // 2 second retry delay
         maxRetries: 1 // Reduce retries for faster fallback
@@ -53,6 +53,9 @@ const apiCache = {
 async function fetchWithRetry(url, maxRetries = 3, baseDelay = 1000) {
     let lastError;
 
+    // Check if we're running in a browser environment
+    const isBrowser = typeof window !== 'undefined' && window.location && window.location.protocol === 'file:';
+
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
             console.log(`🌐 Attempt ${attempt + 1}: Fetching ${url}`);
@@ -88,7 +91,13 @@ async function fetchWithRetry(url, maxRetries = 3, baseDelay = 1000) {
             // Check for specific error types
             if (error.message.includes('CORS') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
                 console.log(`🚫 CORS/Network error detected - this is expected in browser environment`);
-                console.log(`🔄 Immediately falling back to demo data for better user experience`);
+
+                // If we're in a browser environment, immediately fallback to demo data
+                if (isBrowser) {
+                    console.log(`🔄 Browser environment detected - immediately falling back to demo data for better user experience`);
+                    throw new Error('BROWSER_ENVIRONMENT'); // Throw specific error for immediate fallback
+                }
+
                 // Don't retry CORS errors, they're not going to work
                 throw new Error('CORS_BLOCKED'); // Throw specific error for immediate fallback
             }

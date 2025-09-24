@@ -78,7 +78,7 @@ async function initializeCoinPage() {
         console.error(`❌ Error loading coin detail for ${coinId}:`, error);
 
         // Check if this is a network/API error
-        const isNetworkError = error.message.includes('CORS') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('429') || error.message.includes('All API providers failed') || error.message.includes('CORS_BLOCKED');
+        const isNetworkError = error.message.includes('CORS') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('429') || error.message.includes('All API providers failed') || error.message.includes('CORS_BLOCKED') || error.message.includes('BROWSER_ENVIRONMENT');
 
         if (isNetworkError) {
             console.log('🌐 Network/API error detected - using demo data');
