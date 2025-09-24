@@ -661,7 +661,7 @@ class DungeonGame {
         const playerSprite = document.getElementById('playerSprite');
         const gameplayArea = document.querySelector('#gameplayScreen .border-2');
         const rect = gameplayArea.getBoundingClientRect();
-                const cellSize = rect && rect.width && rect.height ? Math.min(rect.width, rect.height) / Math.max(this.dungeonSize, 5) : 50;
+const cellSize = rect && rect.width && rect.height ? Math.min(rect.width, rect.height) / Math.max(this.dungeonSize, 5) : 50;
 
         const x = (this.playerPosition.x * cellSize) + (cellSize / 2) - 16;
         const y = (this.playerPosition.y * cellSize) + (cellSize / 2) - 16;
