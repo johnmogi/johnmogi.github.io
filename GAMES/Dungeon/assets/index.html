@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Advanced Dungeon Master RPG Game Generator with immersive gameplay, character creation, and dungeon exploration">
+    <meta name="theme-color" content="#3b82f6">
+
+    <title>Dungeon Master - Advanced RPG Game</title>
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Dungeon Master - Advanced RPG Game" />
+    <meta property="og:description" content="Immersive D&D-style RPG with character creation, dungeon exploration, and real-time combat" />
+    <meta property="og:image" content="/GAMES/Dungeon/assets/og-preview.png" />
+    <meta property="og:url" content="https://johnmogi.github.io/GAMES/Dungeon/" />
+    <meta property="og:type" content="website" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/GAMES/Dungeon/assets/logo.svg" />
+    <link rel="apple-touch-icon" href="/GAMES/Dungeon/assets/icon-192.png" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        success: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d'
+                        },
+                        warning: {
+                            50: '#fffbeb',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309'
+                        },
+                        danger: {
+                            50: '#fef2f2',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                        'shimmer': 'shimmer 1.5s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 5px rgba(59, 130, 246, 0.5)' },
+                            '50%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.8)' }
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom styles -->
+    <style>
+        /* Enhanced Dungeon Grid Styles */
+        .dungeon-grid {
+            display: grid;
+            gap: 2px;
+            border: 2px solid #374151;
+            background: linear-gradient(45deg, #374151, #4b5563);
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dungeon-grid::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .dungeon-room {
+            background: linear-gradient(135deg, #1f2937, #374151);
+            border: 1px solid #4b5563;
+            border-radius: 8px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d1d5db;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .dungeon-room:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            border-color: #60a5fa;
+        }
+
+        .dungeon-room::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(59, 130, 246, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        .dungeon-room:hover::after {
+            opacity: 1;
+        }
+
+        /* Room Type Specific Styles */
+        .dungeon-entrance {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(5, 150, 105, 0.5);
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        .dungeon-treasure {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            color: white;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
+        }
+
+        .dungeon-trap {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+        }
+
+        .dungeon-monster {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: white;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+        }
+
+        .dungeon-empty {
+            background: linear-gradient(135deg, #374151, #4b5563);
+            opacity: 0.7;
+        }
+
+        /* Unexplored/Revealed States */
+        .dungeon-unexplored {
+            background: #000000 !important;
+            color: #000000 !important;
+            opacity: 0.3;
+            filter: grayscale(100%);
+        }
+
+        .dungeon-revealed {
+            background: inherit !important;
+            color: inherit !important;
+            opacity: 1;
+            filter: none;
+        }
+
+        /* Dark Mode Dungeon Styles */
+        .dungeon-dark .dungeon-grid {
+            background: linear-gradient(45deg, #000000, #1f2937);
+            border-color: #374151;
+        }
+
+        .dungeon-dark .dungeon-room {
+            background: linear-gradient(135deg, #000000, #1f2937);
+            border-color: #374151;
+        }
+
+        .dungeon-dark .dungeon-entrance {
+            background: linear-gradient(135deg, #064e3b, #065f46);
+        }
+
+        .dungeon-dark .dungeon-treasure {
+            background: linear-gradient(135deg, #92400e, #78350f);
+        }
+
+        .dungeon-dark .dungeon-trap {
+            background: linear-gradient(135deg, #991b1b, #7f1d1d);
+        }
+
+        .dungeon-dark .dungeon-monster {
+            background: linear-gradient(135deg, #6d28d9, #581c87);
+        }
+
+        .dungeon-dark .dungeon-empty {
+            background: linear-gradient(135deg, #1f2937, #374151);
+        }
+
+        .dungeon-dark .dungeon-unexplored {
+            background: #000000 !important;
+            opacity: 0.1;
+        }
+
+        .dungeon-dark .dungeon-revealed {
+            opacity: 1;
+        }
+
+        /* Enhanced Story Entry Styles */
+        .story-entry {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .story-entry::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .story-entry.success {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.05));
+            border-left: 4px solid #22c55e;
+        }
+
+        .story-entry.success::before {
+            background: linear-gradient(180deg, #22c55e, #16a34a);
+        }
+
+        .story-entry.error {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.05));
+            border-left: 4px solid #ef4444;
+        }
+
+        .story-entry.error::before {
+            background: linear-gradient(180deg, #ef4444, #dc2626);
+        }
+
+        .story-entry.warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.05));
+            border-left: 4px solid #f59e0b;
+        }
+
+        .story-entry.warning::before {
+            background: linear-gradient(180deg, #f59e0b, #d97706);
+        }
+
+        .story-entry.info {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05));
+            border-left: 4px solid #3b82f6;
+        }
+
+        .story-entry.info::before {
+            background: linear-gradient(180deg, #3b82f6, #2563eb);
+        }
+
+        /* Enhanced Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        /* Enhanced Player Sprite */
+        #playerSprite {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+            border: 2px solid #60a5fa;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+
+        #playerSprite:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+        }
+
+        /* Enhanced Modal Styles */
+        .modal-overlay {
+            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dark .modal-content {
+            background: linear-gradient(145deg, #1f2937, #111827);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Enhanced Status Bars */
+        .status-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .health-bar {
+            background: linear-gradient(90deg, #ef4444, #f97316, #eab308);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .mana-bar {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Enhanced Combat Log */
+        #combatLog {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .dungeon-grid {
+                padding: 4px;
+                gap: 1px;
+            }
+
+            .dungeon-room {
+                min-height: 40px;
+                font-size: 0.75rem;
+            }
+
+            .btn-primary, .btn-success, .btn-danger, .btn-warning {
+                padding: 8px 16px;
+                font-size: 0.875rem;
+            }
+
+            .story-entry {
+                padding: 8px 12px;
+                font-size: 0.875rem;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .dungeon-room:hover {
+                transform: none;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+
+            .btn-primary:hover, .btn-success:hover, .btn-danger:hover, .btn-warning:hover {
+                transform: none;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #3b82f6;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Enhanced Toast Styles */
+        .toast {
+            background: linear-gradient(135deg, #1f2937, #374151);
+            border: 1px solid #4b5563;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Accessibility Improvements */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-100 transition-all duration-500 min-h-screen">
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded z-50">
+        Skip to main content
+    </a>
+
+    <!-- Enhanced Navigation -->
+    <nav class="bg-gradient-to-r from-primary-800 to-primary-900 dark:from-gray-800 dark:to-gray-900 border-b border-primary-700 dark:border-gray-700 shadow-lg sticky top-0 z-50 backdrop-blur-sm">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <div class="w-10 h-10 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+                            <i class="fas fa-dragon text-lg"></i>
+                        </div>
+                        <div class="absolute -top-1 -right-1 w-4 h-4 bg-success-500 rounded-full animate-pulse"></div>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-white tracking-tight">Dungeon Master</h1>
+                        <p class="text-xs text-primary-200 font-medium">Advanced RPG Experience</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-3">
+                    <div class="flex items-center space-x-2 bg-white/10 rounded-lg p-1 backdrop-blur-sm">
+                        <button id="darkModeToggle" class="text-white hover:text-yellow-300 p-2 rounded-lg transition-all duration-200 hover:bg-white/10" aria-label="Toggle dark mode">
+                            <i class="fas fa-moon text-sm"></i>
+                        </button>
+                        <button id="saveGameBtn" class="bg-success-600 hover:bg-success-700 text-white px-3 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-save text-sm"></i>
+                        </button>
+                        <button id="loadGameBtn" class="bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-folder-open text-sm"></i>
+                        </button>
+                        <button id="resetGameBtn" class="bg-danger-600 hover:bg-danger-700 text-white px-3 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-redo text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center space-x-2">
+                    <button id="mobileDarkModeToggle" class="text-white hover:text-yellow-300 p-2 rounded-lg transition-all duration-200 hover:bg-white/10" aria-label="Toggle dark mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button id="mobileMenuBtn" class="text-white hover:text-yellow-300 p-2 rounded-lg transition-all duration-200 hover:bg-white/10" aria-label="Open mobile menu">
+                        <i class="fas fa-bars text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="md:hidden hidden border-t border-primary-700 bg-primary-800/95 backdrop-blur-sm">
+                <div class="px-4 pt-2 pb-3 space-y-2">
+                    <button id="mobileSaveGameBtn" class="block w-full text-left bg-success-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-success-700 transition-all duration-200 transform hover:scale-105">
+                        <i class="fas fa-save mr-3"></i>Save Game
+                    </button>
+                    <button id="mobileLoadGameBtn" class="block w-full text-left bg-primary-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-primary-700 transition-all duration-200 transform hover:scale-105">
+                        <i class="fas fa-folder-open mr-3"></i>Load Game
+                    </button>
+                    <button id="mobileResetGameBtn" class="block w-full text-left bg-danger-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-danger-700 transition-all duration-200 transform hover:scale-105">
+                        <i class="fas fa-redo mr-3"></i>New Game
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Game Interface -->
+    <main id="main-content" class="flex flex-col lg:flex-row h-screen pt-4 pb-20 lg:pb-4">
+        <!-- Left Panel: Character Sheet -->
+        <div class="w-full lg:w-80 bg-white dark:bg-gray-800 rounded-xl shadow-xl m-4 p-6 flex flex-col backdrop-blur-sm border border-gray-200 dark:border-gray-700">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold mb-2 bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+                    <i class="fas fa-user-circle mr-2"></i>Character Sheet
+                </h2>
+                <div class="w-20 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl shadow-lg">
+                    <i class="fas fa-user" aria-hidden="true"></i>
+                </div>
+                <h3 id="charName" class="font-bold text-xl text-gray-900 dark:text-white">Adventurer</h3>
+                <p id="charRaceClass" class="text-sm text-gray-600 dark:text-gray-400">Human Fighter</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 p-4 rounded-lg text-center shadow-sm">
+                    <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">Level</div>
+                    <div id="charLevel" class="font-bold text-2xl text-primary-600">1</div>
+                </div>
+                <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 p-4 rounded-lg text-center shadow-sm">
+                    <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">Experience</div>
+                    <div id="charXP" class="font-bold text-lg text-success-600">0/100</div>
+                </div>
+            </div>
+
+            <!-- Health & Resources -->
+            <div class="space-y-4 mb-6">
+                <div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="font-medium">Health</span>
+                        <span id="charHP" class="text-danger-600 font-bold">100/100</span>
+                    </div>
+                    <div class="status-bar">
+                        <div id="charHPBar" class="health-bar h-full rounded-full transition-all duration-500" style="width: 100%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="font-medium">Mana</span>
+                        <span id="charMana" class="text-primary-600 font-bold">50/50</span>
+                    </div>
+                    <div class="status-bar">
+                        <div id="charManaBar" class="mana-bar h-full rounded-full transition-all duration-500" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attributes -->
+            <div class="mb-6">
+                <h4 class="font-semibold mb-3 text-gray-900 dark:text-white">Attributes</h4>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 p-3 rounded-lg text-center">
+                        <div class="text-xl font-bold text-red-600" id="charSTR">12</div>
+                        <div class="text-xs text-gray-600 dark:text-gray-400">STR</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-3 rounded-lg text-center">
+                        <div class="text-xl font-bold text-green-600" id="charDEX">14</div>
+                        <div class="text-xs text-gray-600 dark:text-gray-400">DEX</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-3 rounded-lg text-center">
+                        <div class="text-xl font-bold text-blue-600" id="charINT">10</div>
+                        <div class="text-xs text-gray-600 dark:text-gray-400">INT</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-3 rounded-lg text-center">
+                        <div class="text-xl font-bold text-purple-600" id="charWIS">13</div>
+                        <div class="text-xs text-gray-600 dark:text-gray-400">WIS</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Equipment -->
+            <div class="border-t pt-4 border-gray-200 dark:border-gray-700">
+                <h4 class="font-semibold mb-3 text-gray-900 dark:text-white">Equipment</h4>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                        <span class="text-gray-600 dark:text-gray-400">Weapon:</span>
+                        <span id="charWeapon" class="font-medium">Sword</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                        <span class="text-gray-600 dark:text-gray-400">Armor:</span>
+                        <span id="charArmor" class="font-medium">Leather</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                        <span class="text-gray-600 dark:text-gray-400">Gold:</span>
+                        <span id="charGold" class="font-medium text-yellow-600">100</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Panel Container -->
+        <div id="centerPanelContainer" class="flex-1">
+            <!-- Center Panel: Dungeon Board -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl m-4 p-6 flex flex-col h-full backdrop-blur-sm border border-gray-200 dark:border-gray-700">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-4 border-gray-200 dark:border-gray-700">
+                    <h2 class="text-2xl font-bold mb-3 sm:mb-0 bg-gradient-to-r from-gray-600 to-gray-800 dark:from-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+                        <i class="fas fa-dungeon mr-2"></i>Dungeon Board
+                    </h2>
+                    <div class="flex flex-wrap gap-2">
+                        <select id="dungeonSize" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                            <option value="3">3×3</option>
+                            <option value="4">4×4</option>
+                            <option value="5" selected>5×5</option>
+                            <option value="6">6×6</option>
+                        </select>
+                        <button id="generateDungeonBtn" class="btn-primary px-4 py-2 rounded-lg font-medium">
+                            <i class="fas fa-map mr-2"></i>Generate
+                        </button>
+                        <button id="togglePlayModeBtn" class="btn-warning px-4 py-2 rounded-lg font-medium">
+                            <i class="fas fa-play mr-2"></i>Play Mode
+                        </button>
+                    </div>
+                </div>
+
+                <div id="dungeonContainer" class="flex-1 border-2 border-gray-300 dark:border-gray-600 rounded-xl overflow-hidden">
+                    <div class="dungeon-grid" id="dungeonGrid" role="grid" aria-label="Dungeon map grid"></div>
+                </div>
+
+                <!-- Room Info -->
+                <div id="roomInfo" class="mt-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-lg hidden">
+                    <h4 class="font-bold mb-2 text-gray-900 dark:text-white">Current Room:</h4>
+                    <div id="roomContent" class="text-sm text-gray-700 dark:text-gray-300"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gameplay Screen (Hidden by default) -->
+        <div id="gameplayScreen" class="hidden flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-xl m-4 p-6 flex flex-col h-full backdrop-blur-sm border border-gray-200 dark:border-gray-700">
+            <!-- Gameplay Header -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-4 border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-3 sm:mb-0 bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+                    <i class="fas fa-gamepad mr-2"></i>Dungeon Adventure
+                </h2>
+                <div class="flex gap-2">
+                    <button id="exitPlayModeBtn" class="btn-danger px-4 py-2 rounded-lg font-medium">
+                        <i class="fas fa-times mr-2"></i>Exit
+                    </button>
+                </div>
+            </div>
+
+            <!-- Gameplay Area -->
+            <div class="flex-1 flex flex-col">
+                <!-- Player Status Bar -->
+                <div class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl p-4 mb-6 border border-gray-200 dark:border-gray-700">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                        <div class="bg-white dark:bg-gray-900 p-3 rounded-lg shadow-sm">
+                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">❤️ Health</div>
+                            <div class="text-xl font-bold text-danger-600" id="gameHP">100/100</div>
+                            <div class="status-bar mt-2">
+                                <div id="gameHPBar" class="health-bar h-full rounded-full transition-all duration-500" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-white dark:bg-gray-900 p-3 rounded-lg shadow-sm">
+                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">📍 Position</div>
+                            <div class="text-xl font-bold text-primary-600" id="gamePosition">(1,1)</div>
+                        </div>
+                        <div class="bg-white dark:bg-gray-900 p-3 rounded-lg shadow-sm">
+                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">⭐ Level</div>
+                            <div class="text-xl font-bold text-success-600" id="gameLevel">1</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Gameplay Grid -->
+                <div class="flex-1 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-gradient-to-br from-gray-900 to-black relative overflow-hidden shadow-inner">
+                    <!-- Player Character -->
+                    <div id="playerSprite" class="absolute w-10 h-10 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white font-bold text-lg z-10 transition-all duration-300 border-2 border-white shadow-lg" role="img" aria-label="Player character">
+                        @
+                    </div>
+
+                    <!-- Room Content Display -->
+                    <div id="roomContentDisplay" class="absolute top-3 left-3 text-white text-sm bg-black bg-opacity-70 p-3 rounded-lg hidden backdrop-blur-sm border border-gray-600">
+                        <div id="roomDescription" class="max-w-xs"></div>
+                    </div>
+
+                    <!-- Encounter Modal -->
+                    <div id="encounterModal" class="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden z-20 backdrop-blur-sm">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 text-center relative shadow-2xl border border-gray-200 dark:border-gray-700">
+                            <button id="closeEncounterModal" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200" aria-label="Close encounter">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white" id="encounterTitle">⚔️ Encounter!</h3>
+                            <div id="encounterContent" class="mb-6 text-gray-700 dark:text-gray-300"></div>
+                            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                                <button id="encounterAttack" class="btn-danger px-6 py-3 rounded-lg font-medium flex-1">
+                                    <i class="fas fa-fist-raised mr-2"></i>Attack
+                                </button>
+                                <button id="encounterFlee" class="btn-warning px-6 py-3 rounded-lg font-medium flex-1">
+                                    <i class="fas fa-running mr-2"></i>Flee
+                                </button>
+                                <button id="encounterUseItem" class="btn-primary px-6 py-3 rounded-lg font-medium flex-1">
+                                    <i class="fas fa-flask mr-2"></i>Use Item
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Combat Log -->
+                    <div id="combatLog" class="absolute bottom-3 left-3 right-3 text-white text-sm bg-black bg-opacity-80 p-3 rounded-lg backdrop-blur-sm border border-gray-600 max-h-24 overflow-y-auto"></div>
+                </div>
+
+                <!-- Enhanced Action Controls -->
+                <div class="mt-6 space-y-4">
+                    <!-- Movement Controls -->
+                    <div class="grid grid-cols-3 gap-3 max-w-48 mx-auto">
+                        <div></div>
+                        <button id="moveUp" class="bg-gradient-to-b from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white p-4 rounded-lg font-bold text-xl shadow-lg transition-all duration-200 transform hover:scale-105" aria-label="Move up">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <div></div>
+                        <button id="moveLeft" class="bg-gradient-to-b from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white p-4 rounded-lg font-bold text-xl shadow-lg transition-all duration-200 transform hover:scale-105" aria-label="Move left">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user text-gray-600 dark:text-gray-400 text-lg"></i>
+                        </div>
+                        <button id="moveRight" class="bg-gradient-to-b from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white p-4 rounded-lg font-bold text-xl shadow-lg transition-all duration-200 transform hover:scale-105" aria-label="Move right">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <div></div>
+                        <button id="moveDown" class="bg-gradient-to-b from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white p-4 rounded-lg font-bold text-xl shadow-lg transition-all duration-200 transform hover:scale-105" aria-label="Move down">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                        <div></div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                        <button id="interactBtn" class="btn-primary px-4 py-3 rounded-lg font-medium">
+                            <i class="fas fa-hand-paper mr-2"></i>Interact
+                        </button>
+                        <button id="searchBtn" class="btn-success px-4 py-3 rounded-lg font-medium">
+                            <i class="fas fa-search mr-2"></i>Search
+                        </button>
+                        <button id="restBtn" class="btn-warning px-4 py-3 rounded-lg font-medium">
+                            <i class="fas fa-bed mr-2"></i>Rest
+                        </button>
+                        <button id="inventoryBtn" class="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-backpack mr-2"></i>Inventory
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Adventure Log -->
+        <div class="w-full lg:w-96 bg-white dark:bg-gray-800 rounded-xl shadow-xl m-4 p-6 flex flex-col backdrop-blur-sm border border-gray-200 dark:border-gray-700">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+                    <i class="fas fa-scroll mr-2"></i>Adventure Log
+                </h2>
+            </div>
+
+            <div id="storyPane" class="flex-1 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl p-4 mb-6 overflow-hidden border border-gray-200 dark:border-gray-700">
+                <div id="storyContent" class="h-full overflow-y-auto space-y-3 text-sm">
+                    <div class="text-center text-gray-500 dark:text-gray-400 py-8">
+                        <i class="fas fa-book-open text-3xl mb-3 text-gray-400"></i>
+                        <p class="text-lg font-medium">Your adventure begins...</p>
+                        <p class="text-sm mt-2">Generate a hero and dungeon to start your journey!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-2 gap-3">
+                <button id="generateStoryBtn" class="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-scroll mr-2"></i>Story
+                </button>
+                <button id="rollDiceBtn" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-dice-d20 mr-2"></i>Dice
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Enhanced Bottom Action Bar -->
+    <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-2xl backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3">
+            <div class="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                <button id="generateHeroBtn" class="btn-primary px-6 py-3 rounded-lg font-medium flex-1 sm:flex-none">
+                    <i class="fas fa-user-plus mr-2"></i>Generate Hero
+                </button>
+                <button id="generateMonsterBtn" class="btn-danger px-6 py-3 rounded-lg font-medium flex-1 sm:flex-none">
+                    <i class="fas fa-dragon mr-2"></i>Generate Monster
+                </button>
+                <button id="startCombatBtn" class="btn-warning px-6 py-3 rounded-lg font-medium flex-1 sm:flex-none">
+                    <i class="fas fa-fist-raised mr-2"></i>Combat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Toast Container -->
+    <div class="fixed top-4 right-4 z-50 space-y-3" id="toastContainer"></div>
+
+    <!-- Enhanced Dice Roller Modal -->
+    <div id="diceModal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-50 modal-overlay">
+        <div class="modal-content p-8 max-w-md w-full mx-4 relative">
+            <div class="text-center mb-6">
+                <h3 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">🎲 Dice Roller</h3>
+                <p class="text-gray-600 dark:text-gray-400">Roll the dice for your adventure!</p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <button class="diceBtn bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105" data-sides="4" aria-label="Roll D4">
+                    <i class="fas fa-dice-four mr-2"></i>D4
+                </button>
+                <button class="diceBtn bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105" data-sides="6" aria-label="Roll D6">
+                    <i class="fas fa-dice-six mr-2"></i>D6
+                </button>
+                <button class="diceBtn bg-gradient-to-br from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white p-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105" data-sides="8" aria-label="Roll D8">
+                    <i class="fas fa-dice-d8 mr-2"></i>D8
+                </button>
+                <button class="diceBtn bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white p-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105" data-sides="10" aria-label="Roll D10">
+                    <i class="fas fa-dice-d10 mr-2"></i>D10
+                </button>
+                <button class="diceBtn bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white p-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105" data-sides="12" aria-label="Roll D12">
+                    <i class="fas fa-dice-d12 mr-2"></i>D12
+                </button>
+                <button class="diceBtn bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white p-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 transform hover:scale-105" data-sides="20" aria-label="Roll D20">
+                    <i class="fas fa-dice-d20 mr-2"></i>D20
+                </button>
+            </div>
+
+            <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl p-6 mb-6 border border-gray-200 dark:border-gray-600">
+                <h4 class="font-semibold mb-3 text-gray-900 dark:text-white">Results:</h4>
+                <div id="diceResults" class="text-2xl font-mono text-center text-primary-600 font-bold" role="status" aria-live="polite"></div>
+            </div>
+
+            <button onclick="document.getElementById('diceModal').classList.add('hidden')" class="w-full bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
+                <i class="fas fa-times mr-2"></i>Close
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-8 text-center">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-900 dark:text-white font-medium">Loading...</p>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="assets/dungeon-game.js"></script>
+</body>
+</html>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-primary-800 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-lg">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <img src="/GAMES/Dungeon/assets/logo.svg" alt="Logo" class="w-10 h-10 mr-3">
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Dungeon Master</h1>
+                        <p class="text-xs text-primary-200">RPG Game Generator</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <button id="darkModeToggle" class="text-white hover:text-yellow-300 transition-colors duration-200">
+                        <i class="fas fa-moon"></i>
+                        <span class="ml-2">Dark Mode</span>
+                    </button>
+                    <button id="saveGameBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors duration-200">
+                        <i class="fas fa-save mr-2"></i>Save Game
+                    </button>
+                    <button id="loadGameBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200">
+                        <i class="fas fa-folder-open mr-2"></i>Load Game
+                    </button>
+                    <button id="resetGameBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors duration-200">
+                        <i class="fas fa-redo mr-2"></i>New Game
+                    </button>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobileMenuBtn" class="text-white hover:text-yellow-300 transition-colors duration-200">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="md:hidden hidden border-t border-primary-700">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <button id="mobileDarkModeToggle" class="block w-full text-left text-white hover:text-yellow-300 px-3 py-2 rounded-md transition-colors duration-200">
+                        <i class="fas fa-moon mr-2"></i>Toggle Dark Mode
+                    </button>
+                    <button id="mobileSaveGameBtn" class="block w-full text-left bg-green-600 text-white px-3 py-2 rounded-md font-medium hover:bg-green-700 transition-colors duration-200">
+                        <i class="fas fa-save mr-2"></i>Save Game
+                    </button>
+                    <button id="mobileLoadGameBtn" class="block w-full text-left bg-blue-600 text-white px-3 py-2 rounded-md font-medium hover:bg-blue-700 transition-colors duration-200">
+                        <i class="fas fa-folder-open mr-2"></i>Load Game
+                    </button>
+                    <button id="mobileResetGameBtn" class="block w-full text-left bg-red-600 text-white px-3 py-2 rounded-md font-medium hover:bg-red-700 transition-colors duration-200">
+                        <i class="fas fa-redo mr-2"></i>New Game
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Game Interface -->
+    <div class="flex flex-col lg:flex-row h-screen pt-4">
+        <!-- Left Panel: Player Character Sheet -->
+        <div class="w-full lg:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg m-4 p-4 flex flex-col">
+            <h2 class="text-xl font-bold mb-4 text-center border-b pb-2">
+                <i class="fas fa-user-circle text-blue-600 mr-2"></i>
+                Character Sheet
+            </h2>
+            
+            <div id="characterSheet" class="flex-1">
+                <div class="text-center mb-4">
+                    <div id="charPortrait" class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mx-auto mb-2 flex items-center justify-center text-white text-2xl">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3 id="charName" class="font-bold text-lg">Adventurer</h3>
+                    <p id="charRaceClass" class="text-sm text-gray-600 dark:text-gray-400">Human Fighter</p>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                    <div class="bg-gray-100 dark:bg-gray-700 p-2 rounded">
+                        <div class="text-xs text-gray-600 dark:text-gray-400">Level</div>
+                        <div id="charLevel" class="font-bold">1</div>
+                    </div>
+                    <div class="bg-gray-100 dark:bg-gray-700 p-2 rounded">
+                        <div class="text-xs text-gray-600 dark:text-gray-400">Experience</div>
+                        <div id="charXP" class="font-bold">0/100</div>
+                    </div>
+                </div>
+
+                <!-- Health & Resources -->
+                <div class="space-y-3 mb-4">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Health</span>
+                            <span id="charHP">100/100</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div id="charHPBar" class="bg-red-500 h-2 rounded-full transition-all duration-300" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Mana</span>
+                            <span id="charMana">50/50</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div id="charManaBar" class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attributes -->
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-red-600" id="charSTR">12</div>
+                        <div class="text-xs text-gray-600 dark:text-gray-400">STR</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-green-600" id="charDEX">14</div>
+                        <div class="text-xs text-gray-600 dark:text-gray-400">DEX</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-blue-600" id="charINT">10</div>
+                        <div class="text-xs text-gray-600 dark:text-gray-400">INT</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-purple-600" id="charWIS">13</div>
+                        <div class="text-xs text-gray-600 dark:text-gray-400">WIS</div>
+                    </div>
+                </div>
+
+                <!-- Equipment -->
+                <div class="border-t pt-3">
+                    <h4 class="font-semibold mb-2 text-sm">Equipment</h4>
+                    <div id="charEquipment" class="space-y-1 text-sm">
+                        <div class="flex justify-between">
+                            <span>Weapon:</span>
+                            <span id="charWeapon">Sword</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Armor:</span>
+                            <span id="charArmor">Leather</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Gold:</span>
+                            <span id="charGold">100</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Panel Container -->
+        <div id="centerPanelContainer" class="flex-1">
+            <!-- Center Panel: Dungeon Board -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg m-4 p-4 flex flex-col h-full">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h2 class="text-xl font-bold">
+                        <i class="fas fa-dungeon text-gray-600 mr-2"></i>
+                        Dungeon Board
+                    </h2>
+                    <div class="flex space-x-2">
+                        <select id="dungeonSize" class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm">
+                            <option value="3">3x3</option>
+                            <option value="4">4x4</option>
+                            <option value="5" selected>5x5</option>
+                            <option value="6">6x6</option>
+                        </select>
+                        <button id="generateDungeonBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                            <i class="fas fa-map mr-1"></i>Generate
+                        </button>
+                        <button id="togglePlayModeBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                            <i class="fas fa-play mr-1"></i>Play Mode
+                        </button>
+                    </div>
+                </div>
+
+                <div id="dungeonContainer" class="flex-1 border-2 border-gray-300 dark:border-gray-600 rounded">
+                    <div class="dungeon-grid" id="dungeonGrid"></div>
+                </div>
+
+                <!-- Room Info -->
+                <div id="roomInfo" class="mt-3 p-3 bg-gray-50 dark:bg-gray-700 rounded hidden">
+                    <h4 class="font-bold mb-2">Current Room:</h4>
+                    <div id="roomContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gameplay Screen (Hidden by default) -->
+        <div id="gameplayScreen" class="hidden flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg m-4 p-4 flex flex-col h-full">
+            <!-- Gameplay Header -->
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h2 class="text-xl font-bold">
+                    <i class="fas fa-gamepad text-purple-600 mr-2"></i>
+                    Dungeon Adventure
+                </h2>
+                <div class="flex space-x-2">
+                    <button id="exitPlayModeBtn" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                        <i class="fas fa-times mr-1"></i>Exit
+                    </button>
+                </div>
+            </div>
+
+            <!-- Gameplay Area -->
+            <div class="flex-1 flex flex-col">
+                <!-- Player Status Bar -->
+                <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                        <div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">Health</div>
+                            <div class="text-lg font-bold text-red-600" id="gameHP">100/100</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">Position</div>
+                            <div class="text-lg font-bold text-blue-600" id="gamePosition">(1,1)</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">Level</div>
+                            <div class="text-lg font-bold text-green-600" id="gameLevel">1</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Gameplay Grid -->
+                <div class="flex-1 border-2 border-gray-300 dark:border-gray-600 rounded bg-black relative overflow-hidden">
+                    <!-- Player Character -->
+                    <div id="playerSprite" class="absolute w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm z-10 transition-all duration-300">
+                        @
+                    </div>
+
+                    <!-- Room Content -->
+                    <div id="roomContentDisplay" class="absolute top-2 left-2 text-white text-sm bg-black bg-opacity-50 p-2 rounded hidden">
+                        <div id="roomDescription"></div>
+                    </div>
+
+                    <!-- Encounter Modal -->
+                    <div id="encounterModal" class="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-20">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 text-center relative">
+                            <button id="closeEncounterModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <h3 class="text-xl font-bold mb-4" id="encounterTitle">Encounter!</h3>
+                            <div id="encounterContent" class="mb-4"></div>
+                            <div class="flex space-x-2 justify-center">
+                                <button id="encounterAttack" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Attack</button>
+                                <button id="encounterFlee" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded">Flee</button>
+                                <button id="encounterUseItem" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Use Item</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Combat Log -->
+                    <div id="combatLog" class="absolute bottom-2 left-2 right-2 text-white text-xs bg-black bg-opacity-50 p-2 rounded max-h-20 overflow-y-auto"></div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-4 gap-2 mt-4">
+                    <button id="moveUp" class="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded font-bold text-lg">
+                        <i class="fas fa-arrow-up"></i>
+                    </button>
+                    <button id="moveLeft" class="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded font-bold text-lg">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <button id="moveRight" class="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded font-bold text-lg">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button id="moveDown" class="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded font-bold text-lg">
+                        <i class="fas fa-arrow-down"></i>
+                    </button>
+                </div>
+
+                <!-- Action Row -->
+                <div class="grid grid-cols-4 gap-2 mt-2">
+                    <button id="interactBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm font-medium">
+                        <i class="fas fa-hand-paper mr-1"></i>Interact
+                    </button>
+                    <button id="searchBtn" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm font-medium">
+                        <i class="fas fa-search mr-1"></i>Search
+                    </button>
+                    <button id="restBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded text-sm font-medium">
+                        <i class="fas fa-bed mr-1"></i>Rest
+                    </button>
+                    <button id="inventoryBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded text-sm font-medium">
+                        <i class="fas fa-backpack mr-1"></i>Inventory
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="w-full lg:w-96 bg-white dark:bg-gray-800 rounded-lg shadow-lg m-4 p-4 flex flex-col">
+            <h2 class="text-xl font-bold mb-4 text-center border-b pb-2">
+                <i class="fas fa-scroll text-purple-600 mr-2"></i>
+                Adventure Log
+            </h2>
+            
+            <div id="storyPane" class="flex-1 bg-gray-50 dark:bg-gray-700 rounded p-3 mb-3 overflow-hidden">
+                <div id="storyContent" class="h-full overflow-y-auto space-y-2 text-sm">
+                    <div class="text-center text-gray-500 dark:text-gray-400 py-4">
+                        <i class="fas fa-book-open text-2xl mb-2"></i>
+                        <p>Your adventure begins...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-2 gap-2">
+                <button id="generateStoryBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors duration-200">
+                    <i class="fas fa-scroll mr-1"></i>Story
+                </button>
+                <button id="rollDiceBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors duration-200">
+                    <i class="fas fa-dice-d20 mr-1"></i>Dice
+                </button>
+                <button id="restBtn" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors duration-200">
+                    <i class="fas fa-bed mr-1"></i>Rest
+                </button>
+                <button id="inventoryBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors duration-200">
+                    <i class="fas fa-backpack mr-1"></i>Items
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Action Bar -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg p-3">
+        <div class="max-w-7xl mx-auto flex justify-center space-x-4">
+            <button id="generateHeroBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200">
+                <i class="fas fa-user-plus mr-2"></i>Generate Hero
+            </button>
+            <button id="generateMonsterBtn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200">
+                <i class="fas fa-dragon mr-2"></i>Generate Monster
+            </button>
+            <button id="startCombatBtn" class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200">
+                <i class="fas fa-fist-raised mr-2"></i>Combat
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="fixed top-4 right-4 z-50 space-y-2" id="toastContainer"></div>
+
+    <!-- Dice Roller Modal -->
+    <div id="diceModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4">Dice Roller</h3>
+            <div class="grid grid-cols-3 gap-3 mb-4">
+                <button class="diceBtn bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-bold" data-sides="4">D4</button>
+                <button class="diceBtn bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg font-bold" data-sides="6">D6</button>
+                <button class="diceBtn bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded-lg font-bold" data-sides="8">D8</button>
+                <button class="diceBtn bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-lg font-bold" data-sides="10">D10</button>
+                <button class="diceBtn bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-lg font-bold" data-sides="12">D12</button>
+                <button class="diceBtn bg-purple-500 hover:bg-purple-600 text-white px-4 py-3 rounded-lg font-bold" data-sides="20">D20</button>
+            </div>
+            <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 mb-4">
+                <h4 class="font-semibold mb-2">Results:</h4>
+                <div id="diceResults" class="text-lg font-mono text-center"></div>
+            </div>
+            <button onclick="document.getElementById('diceModal').classList.add('hidden')" class="w-full bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="assets/dungeon-game.js"></script>
+</body>
+</html>
