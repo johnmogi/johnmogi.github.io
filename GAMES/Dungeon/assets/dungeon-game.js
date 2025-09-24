@@ -673,11 +673,20 @@ const cellSize = rect && rect.width && rect.height ? Math.min(rect.width, rect.h
     }
 
     updateGameUI() {
-        document.getElementById('gameHP')?.textContent = `${this.gameHP || 100}/100`;
-        document.getElementById('gamePosition')?.textContent = `(${this.playerPosition.x + 1},${this.playerPosition.y + 1})`;
-        document.getElementById('gameLevel')?.textContent = this.gameLevel;
-        document.getElementById('gameGold')?.textContent = this.gameGold;
-        document.getElementById('gameInventoryCount')?.textContent = this.gameInventory.length;
+        const gameHPElement = document.getElementById('gameHP');
+        if (gameHPElement) gameHPElement.textContent = `${this.gameHP || 100}/100`;
+        
+        const gamePositionElement = document.getElementById('gamePosition');
+        if (gamePositionElement) gamePositionElement.textContent = `(${this.playerPosition.x + 1},${this.playerPosition.y + 1})`;
+        
+        const gameLevelElement = document.getElementById('gameLevel');
+        if (gameLevelElement) gameLevelElement.textContent = this.gameLevel;
+        
+        const gameGoldElement = document.getElementById('gameGold');
+        if (gameGoldElement) gameGoldElement.textContent = this.gameGold;
+        
+        const gameInventoryElement = document.getElementById('gameInventoryCount');
+        if (gameInventoryElement) gameInventoryElement.textContent = this.gameInventory.length;
     }
 
     checkForEncounter() {
