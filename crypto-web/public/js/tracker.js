@@ -61,19 +61,25 @@ function stopLivePriceSimulation() {
 
 // Chart management functions
 let currentChart = null;
+let trackerInitialized = false;
 
 function updateChart(coinsData) {
     const chartContainer = document.getElementById('chartContainer');
     if (!chartContainer) return;
 
-    // Destroy existing chart
-    if (currentChart) {
-        currentChart.destroy();
-    }
+    const canvas = document.getElementById('portfolioChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
-    const ctx = document.createElement('canvas');
-    chartContainer.innerHTML = '';
-    chartContainer.appendChild(ctx);
+    const triggerChartFade = () => {
+        chartContainer.classList.remove('chart-refresh-fade');
+        // Force reflow to restart animation
+        void chartContainer.offsetWidth;
+        chartContainer.classList.add('chart-refresh-fade');
+        setTimeout(() => {
+            chartContainer.classList.remove('chart-refresh-fade');
+        }, 220);
+    };
 
     // Prepare datasets for multiple coins
     const datasets = coinsData.map((coin, index) => {
@@ -85,11 +91,15 @@ function updateChart(coinsData) {
             'rgb(251, 146, 60)'    // Orange
         ];
 
+        const color = colors[index % colors.length];
         return {
             label: coin.id.toUpperCase(),
-            data: coin.data.prices,
-            borderColor: colors[index % colors.length],
-            backgroundColor: colors[index % colors.length].replace('rgb', 'rgba').replace(')', ', 0.1)'),
+            data: coin.data.prices.map(([timestamp, price]) => ({
+                x: timestamp,
+                y: price
+            })),
+            borderColor: color,
+            backgroundColor: color.replace('rgb', 'rgba').replace(')', ', 0.1)'),
             borderWidth: 2,
             fill: false,
             tension: 0.4,
@@ -98,13 +108,60 @@ function updateChart(coinsData) {
         };
     });
 
-    // Create new chart
+    // Update existing chart with animation when available
+    if (currentChart) {
+        const existingDatasets = currentChart.data.datasets;
+        const newLabels = datasets.map(dataset => dataset.label);
+
+        // Update or add datasets
+        datasets.forEach(newDataset => {
+            const existingDataset = existingDatasets.find(dataset => dataset.label === newDataset.label);
+            if (existingDataset) {
+                existingDataset.borderColor = newDataset.borderColor;
+                existingDataset.backgroundColor = newDataset.backgroundColor;
+                existingDataset.tension = newDataset.tension;
+                existingDataset.pointRadius = newDataset.pointRadius;
+                existingDataset.pointHoverRadius = newDataset.pointHoverRadius;
+                existingDataset.data.length = 0;
+                newDataset.data.forEach(point => existingDataset.data.push(point));
+            } else {
+                existingDatasets.push(newDataset);
+            }
+        });
+
+        // Remove datasets no longer present
+        for (let i = existingDatasets.length - 1; i >= 0; i--) {
+            if (!newLabels.includes(existingDatasets[i].label)) {
+                existingDatasets.splice(i, 1);
+            }
+        }
+
+        currentChart.update('refresh');
+        triggerChartFade();
+        return;
+    }
+
+    // Create new chart on first render
     currentChart = new Chart(ctx, {
         type: 'line',
         data: {
             datasets: datasets
         },
         options: {
+            parsing: false,
+            normalized: true,
+            animation: {
+                duration: 800,
+                easing: 'easeOutQuart'
+            },
+            transitions: {
+                refresh: {
+                    animation: {
+                        duration: 1200,
+                        easing: 'easeInOutCubic'
+                    }
+                }
+            },
             responsive: true,
             maintainAspectRatio: false,
             interaction: {
@@ -149,6 +206,8 @@ function updateChart(coinsData) {
             }
         }
     });
+
+    triggerChartFade();
 }
 
 // Live tracking functionality
@@ -166,23 +225,15 @@ function startLiveUpdates() {
     }
 
     liveUpdateInterval = setInterval(async () => {
-        // Add swipe/fade animation to chart container
-        const chartContainer = document.getElementById('chartContainer');
-        if (chartContainer) {
-            // Add swipe effect
-            chartContainer.classList.add('chart-swipe-in');
-            setTimeout(() => {
-                chartContainer.classList.remove('chart-swipe-in');
-                // Add fade effect after swipe
-                chartContainer.classList.add('chart-fade-in');
-                setTimeout(() => {
-                    chartContainer.classList.remove('chart-fade-in');
-                }, 500);
-            }, 300);
+        // Show live update state on chart
+        showChartRefreshState('loading');
+        
+        try {
+            await loadTrackerData();
+            // Success state is handled in loadTrackerData
+        } catch (error) {
+            showChartRefreshState('error');
         }
-
-        await loadTrackerData();
-        showNotification('Live update completed', 'info');
     }, interval);
 
     startCountdown();
@@ -329,6 +380,96 @@ function removeFromFavorites(coinId) {
     return false;
 }
 
+// Enhanced chart refresh UX
+function showChartRefreshState(state) {
+    const chartContainer = document.getElementById('chartContainer');
+    if (!chartContainer) return;
+
+    // Remove all previous states
+    chartContainer.classList.remove('chart-refreshing', 'chart-success');
+    
+    // Remove any existing overlays
+    const existingOverlay = chartContainer.querySelector('.chart-loading-overlay');
+    const existingStream = chartContainer.querySelector('.data-stream');
+    const existingIndicator = chartContainer.querySelector('.refresh-indicator');
+    
+    if (existingOverlay) existingOverlay.remove();
+    if (existingStream) existingStream.remove();
+    if (existingIndicator) existingIndicator.remove();
+
+    switch (state) {
+        case 'loading':
+            chartContainer.classList.add('chart-refreshing');
+            
+            // Add data stream animation
+            const dataStream = document.createElement('div');
+            dataStream.className = 'data-stream';
+            chartContainer.appendChild(dataStream);
+            
+            // Add refresh indicator
+            const refreshIndicator = document.createElement('div');
+            refreshIndicator.className = 'refresh-indicator';
+            refreshIndicator.innerHTML = '🔄 Live Update';
+            chartContainer.appendChild(refreshIndicator);
+            break;
+
+        case 'success':
+            chartContainer.classList.add('chart-success');
+            
+            // Add success indicator
+            const successIndicator = document.createElement('div');
+            successIndicator.className = 'refresh-indicator';
+            successIndicator.style.background = 'rgba(16, 185, 129, 0.9)';
+            successIndicator.innerHTML = '✓ Updated';
+            chartContainer.appendChild(successIndicator);
+            
+            // Remove success state after animation
+            setTimeout(() => {
+                chartContainer.classList.remove('chart-success');
+                if (successIndicator.parentNode) {
+                    successIndicator.remove();
+                }
+            }, 2000);
+            break;
+
+        case 'error':
+            // Add error indicator
+            const errorIndicator = document.createElement('div');
+            errorIndicator.className = 'refresh-indicator';
+            errorIndicator.style.background = 'rgba(239, 68, 68, 0.9)';
+            errorIndicator.innerHTML = '⚠ Error';
+            chartContainer.appendChild(errorIndicator);
+            
+            // Remove error state after delay
+            setTimeout(() => {
+                if (errorIndicator.parentNode) {
+                    errorIndicator.remove();
+                }
+            }, 3000);
+            break;
+
+        case 'manual':
+            chartContainer.classList.add('chart-refreshing');
+            
+            // Add manual refresh overlay
+            const manualOverlay = document.createElement('div');
+            manualOverlay.className = 'chart-loading-overlay';
+            manualOverlay.innerHTML = `
+                <div class="text-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                    <div class="text-blue-600 font-medium">Refreshing Charts...</div>
+                </div>
+            `;
+            chartContainer.appendChild(manualOverlay);
+            break;
+
+        case 'clear':
+        default:
+            // Clear all states - already done above
+            break;
+    }
+}
+
 // View coin details
 function viewCoinDetails(coinId) {
     // Navigate to coin detail page with the selected coin
@@ -344,15 +485,33 @@ async function loadTrackerData(forceRefresh = false) {
     const favoritesContainerEl = document.getElementById('favoritesContainer');
     const errorStateEl = document.getElementById('errorState');
 
-    // Show loading state
-    loadingEl.classList.remove('hidden');
-    emptyStateEl.classList.add('hidden');
-    chartContainerEl.classList.add('hidden');
-    errorStateEl.classList.add('hidden');
+    // Show appropriate loading state
+    const chartVisible = chartContainerEl && !chartContainerEl.classList.contains('hidden');
+
+    if (forceRefresh && chartVisible) {
+        // Manual refresh - show chart overlay
+        showChartRefreshState('manual');
+    } else if (!chartVisible) {
+        // Initial load or returning from empty state - show main loading
+        loadingEl.classList.remove('hidden');
+        emptyStateEl.classList.add('hidden');
+        if (chartContainerEl) {
+            chartContainerEl.classList.add('hidden');
+        }
+        errorStateEl.classList.add('hidden');
+    } else {
+        loadingEl.classList.add('hidden');
+        errorStateEl.classList.add('hidden');
+    }
 
     if (favorites.length === 0) {
         loadingEl.classList.add('hidden');
         emptyStateEl.classList.remove('hidden');
+        if (chartContainerEl) {
+            chartContainerEl.classList.add('hidden');
+        }
+        trackerInitialized = false;
+        showChartRefreshState('clear');
         return;
     }
 
@@ -389,14 +548,15 @@ async function loadTrackerData(forceRefresh = false) {
         if (failedCoins.length > 0) {
             console.warn(`❌ ${failedCoins.length} coins failed completely:`, failedCoins.map(c => c.id));
             showNotification(`${failedCoins.length} coin(s) failed to load - using demo data`, 'warning');
-        }
-
-        if (fallbackCoins.length > 0 && failedCoins.length === 0) {
+            showChartRefreshState('error');
+        } else if (fallbackCoins.length > 0) {
             console.warn(`⚠️ ${fallbackCoins.length} coins using fallback data:`, fallbackCoins.map(c => c.id));
             showNotification(`Using demo data for ${fallbackCoins.length} coin(s) - API may be unavailable`, 'warning');
-        } else if (failedCoins.length === 0 && fallbackCoins.length === 0) {
+            showChartRefreshState('success');
+        } else {
             const refreshType = forceRefresh ? 'fresh data loaded' : 'data loaded';
             showNotification(`Successfully updated with ${refreshType}`, 'success');
+            showChartRefreshState('success');
         }
 
         // Update favorites pills with enhanced animations
@@ -423,14 +583,6 @@ async function loadTrackerData(forceRefresh = false) {
             `;
         }).join('');
 
-        // Add swipe effect to chart container
-        if (chartContainerEl && coinsData.length > 0) {
-            chartContainerEl.classList.add('chart-swipe-in');
-            setTimeout(() => {
-                chartContainerEl.classList.remove('chart-swipe-in');
-            }, 500);
-        }
-
         // Create or update chart
         updateChart(coinsData);
 
@@ -438,6 +590,7 @@ async function loadTrackerData(forceRefresh = false) {
         favoritesContainerEl.classList.remove('hidden');
         chartContainerEl.classList.remove('hidden');
         chartContainerEl.classList.add('chart-fade-in');
+        trackerInitialized = true;
         const lastRefreshEl = document.getElementById('lastRefresh');
         if (lastRefreshEl) {
             const refreshType = forceRefresh ? 'Manual refresh' : 'Auto update';
@@ -465,6 +618,8 @@ async function loadTrackerData(forceRefresh = false) {
             showNotification('API unavailable. Using demo data as fallback.', 'warning');
         }
 
+        showChartRefreshState('error');
+
         // Use dummy data as complete fallback
         console.warn('🚨 Using complete dummy data fallback for all coins due to network/API issues');
         const dummyData = favorites.map(coinId => ({
@@ -485,6 +640,7 @@ async function loadTrackerData(forceRefresh = false) {
         favoritesContainerEl.classList.remove('hidden');
         chartContainerEl.classList.remove('hidden');
         chartContainerEl.classList.add('chart-fade-in');
+        trackerInitialized = true;
         const lastRefreshEl = document.getElementById('lastRefresh');
         if (lastRefreshEl) {
             lastRefreshEl.textContent = `Last updated: ${new Date().toLocaleTimeString()} (Demo Mode - Network Issues)`;
@@ -494,6 +650,12 @@ async function loadTrackerData(forceRefresh = false) {
         showNotification('All APIs are currently unavailable. Using demo data with beautiful animations!', 'warning');
     } finally {
         loadingEl.classList.add('hidden');
+        // Clear manual refresh overlay after a delay
+        if (forceRefresh) {
+            setTimeout(() => {
+                showChartRefreshState('clear');
+            }, 1000);
+        }
     }
 }
 
