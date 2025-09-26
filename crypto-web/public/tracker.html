@@ -59,34 +59,6 @@
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             }
         }
-        @keyframes chart-refresh-fade {
-            0% {
-                opacity: 0.88;
-                transform: translateY(4px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes chart-refresh-sweep {
-            0% {
-                left: -25%;
-                opacity: 0;
-            }
-            35% {
-                opacity: 0.18;
-            }
-            65% {
-                opacity: 0.12;
-            }
-            100% {
-                left: 105%;
-                opacity: 0;
-            }
-        }
-
         @keyframes data-flow {
             0% { 
                 transform: translateX(-100%);
@@ -143,23 +115,6 @@
 
         .chart-success {
             animation: chart-success-glow 1s ease-out;
-        }
-
-        .chart-refresh-fade {
-            animation: chart-refresh-fade 0.15s ease-out;
-        }
-
-        .chart-refresh-sweep::after {
-            content: '';
-            position: absolute;
-            top: 12px;
-            bottom: 12px;
-            width: 22%;
-            left: -28%;
-            background: linear-gradient(90deg, rgba(59, 130, 246, 0), rgba(59, 130, 246, 0.16), rgba(59, 130, 246, 0));
-            pointer-events: none;
-            border-radius: 6px;
-            animation: chart-refresh-sweep 0.7s ease-out;
         }
 
         .chart-loading-overlay {
@@ -367,7 +322,6 @@
                 <canvas id="portfolioChart" width="400" height="300"></canvas>
             </div>
             <div id="lastRefresh" class="text-sm text-gray-600 mt-2 text-center">
-                <!-- Last refresh time will be populated by JavaScript -->
             </div>
         </div>
     </main>

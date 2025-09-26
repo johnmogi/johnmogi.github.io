@@ -86,19 +86,6 @@ function updateChart(coinsData) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    const triggerChartEffects = () => {
-        chartContainer.classList.remove('chart-refresh-fade', 'chart-refresh-sweep');
-        // Force reflow to restart animation
-        void chartContainer.offsetWidth;
-        chartContainer.classList.add('chart-refresh-fade', 'chart-refresh-sweep');
-        setTimeout(() => {
-            chartContainer.classList.remove('chart-refresh-fade');
-        }, 240);
-        setTimeout(() => {
-            chartContainer.classList.remove('chart-refresh-sweep');
-        }, 960);
-    };
-
     // Prepare datasets for multiple coins
     const datasets = coinsData.map((coin, index) => {
         const colors = [
@@ -154,8 +141,7 @@ function updateChart(coinsData) {
             }
         }
 
-        currentChart.update('refresh');
-        triggerChartEffects();
+        currentChart.update('none');
         return;
     }
 
@@ -168,18 +154,7 @@ function updateChart(coinsData) {
         options: {
             parsing: false,
             normalized: true,
-            animation: {
-                duration: 800,
-                easing: 'easeOutQuart'
-            },
-            transitions: {
-                refresh: {
-                    animation: {
-                        duration: 1200,
-                        easing: 'easeInOutCubic'
-                    }
-                }
-            },
+            animation: false,
             responsive: true,
             maintainAspectRatio: false,
             interaction: {
@@ -224,8 +199,6 @@ function updateChart(coinsData) {
             }
         }
     });
-
-    triggerChartEffects();
 }
 
 // Live tracking functionality
