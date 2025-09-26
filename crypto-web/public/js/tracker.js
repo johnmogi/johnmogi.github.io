@@ -44,6 +44,224 @@ let priceSimulationInterval = null;
 const notificationCooldowns = new Map();
 const DEFAULT_NOTIFICATION_COOLDOWN = 2 * 60 * 1000; // 2 minutes
 
+const lineSweepDefaults = {
+    duration: 750,
+    trail: 0.22,
+    lineWidth: 2.6
+};
+
+let lineSweepOverlayPluginRegistered = false;
+
+function parseRgbColor(color) {
+    if (typeof color !== 'string') {
+        return { r: 59, g: 130, b: 246 };
+    }
+    const match = color.match(/rgba?\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/i);
+    if (!match) {
+        return { r: 59, g: 130, b: 246 };
+    }
+    return {
+        r: Math.min(255, parseInt(match[1], 10)),
+        g: Math.min(255, parseInt(match[2], 10)),
+        b: Math.min(255, parseInt(match[3], 10))
+    };
+}
+
+function buildLineSweepCache(meta) {
+    if (!meta || !meta.data) return null;
+    const points = meta.data
+        .filter(point => point && !point.skip && Number.isFinite(point.x) && Number.isFinite(point.y))
+        .map(point => ({ x: point.x, y: point.y }));
+
+    if (points.length < 2) {
+        return null;
+    }
+
+    const segmentLengths = [];
+    let totalLength = 0;
+    for (let i = 1; i < points.length; i++) {
+        const prev = points[i - 1];
+        const curr = points[i];
+        const length = Math.hypot(curr.x - prev.x, curr.y - prev.y);
+        segmentLengths.push(length);
+        totalLength += length;
+    }
+
+    if (totalLength === 0) {
+        return null;
+    }
+
+    return {
+        points,
+        segmentLengths,
+        totalLength
+    };
+}
+
+function drawLineSweepSegment(ctx, cache, tailT, headT, colorComponents, lineWidth) {
+    if (!cache || cache.totalLength <= 0) return;
+
+    const total = cache.totalLength;
+    const startLen = tailT * total;
+    const endLen = headT * total;
+    if (endLen <= 0 || endLen <= startLen) return;
+
+    let traversed = 0;
+    for (let i = 1; i < cache.points.length; i++) {
+        const prev = cache.points[i - 1];
+        const curr = cache.points[i];
+        const segLen = cache.segmentLengths[i - 1];
+        const segStart = traversed;
+        const segEnd = traversed + segLen;
+
+        const overlapStart = Math.max(segStart, startLen);
+        const overlapEnd = Math.min(segEnd, endLen);
+
+        if (overlapEnd > overlapStart) {
+            const startRatio = (overlapStart - segStart) / segLen;
+            const endRatio = (overlapEnd - segStart) / segLen;
+
+            const sx = prev.x + (curr.x - prev.x) * startRatio;
+            const sy = prev.y + (curr.y - prev.y) * startRatio;
+            const ex = prev.x + (curr.x - prev.x) * endRatio;
+            const ey = prev.y + (curr.y - prev.y) * endRatio;
+
+            const gradient = ctx.createLinearGradient(sx, sy, ex, ey);
+            gradient.addColorStop(0, `rgba(${colorComponents.r}, ${colorComponents.g}, ${colorComponents.b}, 0)`);
+            gradient.addColorStop(0.5, `rgba(${colorComponents.r}, ${colorComponents.g}, ${colorComponents.b}, 0.85)`);
+            gradient.addColorStop(1, `rgba(${colorComponents.r}, ${colorComponents.g}, ${colorComponents.b}, 0)`);
+
+            ctx.save();
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = lineWidth;
+            ctx.strokeStyle = gradient;
+            ctx.beginPath();
+            ctx.moveTo(sx, sy);
+            ctx.lineTo(ex, ey);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        traversed = segEnd;
+        if (traversed > endLen) {
+            break;
+        }
+    }
+}
+
+const lineSweepOverlayPlugin = {
+    id: 'lineSweepOverlay',
+    beforeInit(chart, _args, opts) {
+        const config = Object.assign({}, lineSweepDefaults, opts || {});
+        chart.$lineSweep = {
+            config,
+            active: false,
+            cache: [],
+            dirty: true,
+            startTime: 0,
+            duration: config.duration,
+            trail: config.trail,
+            lineWidth: config.lineWidth,
+            raf: null,
+            markDirty() {
+                this.dirty = true;
+            },
+            requestFrame(instance) {
+                if (this.raf) return;
+                this.raf = requestAnimationFrame(() => {
+                    this.raf = null;
+                    instance.draw();
+                });
+            },
+            start(customOptions = {}) {
+                const merged = Object.assign({}, this.config, customOptions);
+                this.duration = Math.max(120, merged.duration || this.config.duration);
+                this.trail = Math.min(0.5, Math.max(0.05, merged.trail || this.config.trail));
+                this.lineWidth = merged.lineWidth || this.config.lineWidth;
+                this.startTime = performance.now();
+                this.active = true;
+                this.dirty = true;
+                this.requestFrame(chart);
+            },
+            stop() {
+                this.active = false;
+            }
+        };
+    },
+    afterDatasetsDraw(chart) {
+        const sweep = chart.$lineSweep;
+        if (!sweep || !sweep.active) {
+            return;
+        }
+
+        if (sweep.dirty) {
+            sweep.cache = chart.data.datasets.map((_dataset, index) => {
+                const meta = chart.getDatasetMeta(index);
+                if (!meta || chart.isDatasetVisible(index) === false) {
+                    return null;
+                }
+                return buildLineSweepCache(meta);
+            });
+            sweep.dirty = false;
+        }
+
+        const now = performance.now();
+        let progress = (now - sweep.startTime) / sweep.duration;
+        if (progress >= 1) {
+            progress = 1;
+        } else {
+            sweep.requestFrame(chart);
+        }
+
+        const headT = progress;
+        const tailT = Math.max(0, headT - sweep.trail);
+
+        chart.data.datasets.forEach((dataset, index) => {
+            const cache = sweep.cache[index];
+            if (!cache || !dataset || !dataset.borderColor) {
+                return;
+            }
+            const colorComponents = parseRgbColor(dataset.borderColor);
+            drawLineSweepSegment(chart.ctx, cache, tailT, headT, colorComponents, sweep.lineWidth);
+        });
+
+        if (progress >= 1) {
+            sweep.stop();
+        }
+    },
+    beforeDatasetDraw(chart) {
+        const sweep = chart.$lineSweep;
+        if (sweep && sweep.active) {
+            sweep.requestFrame(chart);
+        }
+    },
+    beforeDestroy(chart) {
+        const sweep = chart.$lineSweep;
+        if (sweep && sweep.raf) {
+            cancelAnimationFrame(sweep.raf);
+            sweep.raf = null;
+        }
+    }
+};
+
+function ensureLineSweepOverlayPlugin() {
+    if (!lineSweepOverlayPluginRegistered) {
+        Chart.register(lineSweepOverlayPlugin);
+        lineSweepOverlayPluginRegistered = true;
+    }
+}
+
+function triggerLineSweep(chart, options = {}) {
+    if (!chart || !chart.$lineSweep || typeof chart.$lineSweep.start !== 'function') {
+        return;
+    }
+    if (typeof chart.$lineSweep.markDirty === 'function') {
+        chart.$lineSweep.markDirty();
+    }
+    chart.$lineSweep.start(options);
+}
+
 function startLivePriceSimulation() {
     if (priceSimulationInterval) {
         clearInterval(priceSimulationInterval);
@@ -85,6 +303,8 @@ function updateChart(coinsData) {
     const canvas = document.getElementById('portfolioChart');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+
+    ensureLineSweepOverlayPlugin();
 
     const triggerScanSweep = () => {
         chartContainer.classList.remove('chart-scan-active');
@@ -152,6 +372,7 @@ function updateChart(coinsData) {
 
         currentChart.update('none');
         triggerScanSweep();
+        triggerLineSweep(currentChart, { duration: 680, trail: 0.18, lineWidth: 3 });
         return;
     }
 
@@ -195,6 +416,11 @@ function updateChart(coinsData) {
                 }
             },
             plugins: {
+                lineSweepOverlay: {
+                    duration: 680,
+                    trail: 0.18,
+                    lineWidth: 3
+                },
                 legend: {
                     display: true,
                     position: 'top'
@@ -211,6 +437,7 @@ function updateChart(coinsData) {
     });
 
     triggerScanSweep();
+    triggerLineSweep(currentChart, { duration: 680, trail: 0.18, lineWidth: 3 });
 }
 
 // Live tracking functionality
