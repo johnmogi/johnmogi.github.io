@@ -1,3 +1,16 @@
+function throttleNotification(message, type = 'info', cooldown = DEFAULT_NOTIFICATION_COOLDOWN) {
+    const key = `${type}:${message}`;
+    const now = Date.now();
+    const lastShown = notificationCooldowns.get(key) || 0;
+
+    if (now - lastShown < cooldown) {
+        return;
+    }
+
+    notificationCooldowns.set(key, now);
+    showNotification(message, type);
+}
+
 // Portfolio Tracker Functions - Uses shared API module
 let liveUpdateInterval = null;
 let countdownInterval = null;
@@ -28,6 +41,8 @@ function generateDummyData(coinId, days = 30) {
 
 // Live price simulation for demo mode
 let priceSimulationInterval = null;
+const notificationCooldowns = new Map();
+const DEFAULT_NOTIFICATION_COOLDOWN = 2 * 60 * 1000; // 2 minutes
 
 function startLivePriceSimulation() {
     if (priceSimulationInterval) {
@@ -71,14 +86,17 @@ function updateChart(coinsData) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    const triggerChartFade = () => {
-        chartContainer.classList.remove('chart-refresh-fade');
+    const triggerChartEffects = () => {
+        chartContainer.classList.remove('chart-refresh-fade', 'chart-refresh-sweep');
         // Force reflow to restart animation
         void chartContainer.offsetWidth;
-        chartContainer.classList.add('chart-refresh-fade');
+        chartContainer.classList.add('chart-refresh-fade', 'chart-refresh-sweep');
         setTimeout(() => {
             chartContainer.classList.remove('chart-refresh-fade');
-        }, 220);
+        }, 240);
+        setTimeout(() => {
+            chartContainer.classList.remove('chart-refresh-sweep');
+        }, 960);
     };
 
     // Prepare datasets for multiple coins
@@ -137,7 +155,7 @@ function updateChart(coinsData) {
         }
 
         currentChart.update('refresh');
-        triggerChartFade();
+        triggerChartEffects();
         return;
     }
 
@@ -207,7 +225,7 @@ function updateChart(coinsData) {
         }
     });
 
-    triggerChartFade();
+    triggerChartEffects();
 }
 
 // Live tracking functionality
@@ -528,9 +546,20 @@ async function loadTrackerData(forceRefresh = false) {
                     return { id: coinId, data };
                 }
             } catch (error) {
-                console.error(`❌ Failed to load data for ${coinId}:`, error.message);
-                // Return dummy data as fallback for failed coins
-                return { id: coinId, data: generateDummyData(coinId, 30), fallback: true };
+                if (error && (error.code === 'MARKET_CHART_RECENT_FAILURE' || error.code === 'MARKET_CHART_FORBIDDEN')) {
+                    console.warn(`⚠️ Skipping API call for ${coinId} due to recent ${error.status || 'error'} from ${error.provider || 'provider'}`);
+                } else {
+                    console.error(`❌ Failed to load data for ${coinId}:`, error.message);
+                }
+
+                const fallbackData = generateDummyData(coinId, 30);
+                const fallbackInfo = {
+                    id: coinId,
+                    data: fallbackData,
+                    fallback: true,
+                    failure: error && (error.code || error.message)
+                };
+                return fallbackInfo;
             }
         });
 
@@ -547,11 +576,11 @@ async function loadTrackerData(forceRefresh = false) {
 
         if (failedCoins.length > 0) {
             console.warn(`❌ ${failedCoins.length} coins failed completely:`, failedCoins.map(c => c.id));
-            showNotification(`${failedCoins.length} coin(s) failed to load - using demo data`, 'warning');
+            throttleNotification(`${failedCoins.length} coin(s) failed to load - using demo data`, 'warning');
             showChartRefreshState('error');
         } else if (fallbackCoins.length > 0) {
             console.warn(`⚠️ ${fallbackCoins.length} coins using fallback data:`, fallbackCoins.map(c => c.id));
-            showNotification(`Using demo data for ${fallbackCoins.length} coin(s) - API may be unavailable`, 'warning');
+            throttleNotification(`Using demo data for ${fallbackCoins.length} coin(s) - API may be unavailable`, 'warning');
             showChartRefreshState('success');
         } else {
             const refreshType = forceRefresh ? 'fresh data loaded' : 'data loaded';
@@ -613,7 +642,7 @@ async function loadTrackerData(forceRefresh = false) {
 
         if (isNetworkError) {
             console.log('🌐 Network/CORS/API error detected - switching to demo mode');
-            showNotification('Network issues detected. Using demo data for reliable experience.', 'warning');
+            throttleNotification('Network issues detected. Using demo data for reliable experience.', 'warning');
         } else {
             showNotification('API unavailable. Using demo data as fallback.', 'warning');
         }

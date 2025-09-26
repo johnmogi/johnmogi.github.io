@@ -49,6 +49,33 @@ const apiCache = {
     }
 };
 
+// Cache recent API failures to avoid spamming providers when they block us
+const apiFailureCache = {
+    data: {},
+    ttl: 5 * 60 * 1000, // 5 minutes
+    set: function(key, info) {
+        this.data[key] = {
+            info,
+            timestamp: Date.now()
+        };
+    },
+    get: function(key) {
+        const entry = this.data[key];
+        if (!entry) return null;
+        if (Date.now() - entry.timestamp > this.ttl) {
+            delete this.data[key];
+            return null;
+        }
+        return entry.info;
+    },
+    delete: function(key) {
+        delete this.data[key];
+    },
+    clear: function() {
+        this.data = {};
+    }
+};
+
 // Enhanced fetch with retry logic and exponential backoff
 async function fetchWithRetry(url, maxRetries = 3, baseDelay = 1000) {
     let lastError;
@@ -264,6 +291,17 @@ async function getMarketChart(coinId, days = 30, forceRefresh = false) {
             console.log(`📦 Using cached chart data for ${coinId} (${days} days)`);
             return cachedData;
         }
+
+        const cachedFailure = apiFailureCache.get(cacheKey);
+        if (cachedFailure) {
+            const error = new Error('MARKET_CHART_RECENT_FAILURE');
+            error.code = cachedFailure.code || 'MARKET_CHART_RECENT_FAILURE';
+            error.status = cachedFailure.status;
+            error.provider = cachedFailure.provider;
+            error.coinId = coinId;
+            error.message = cachedFailure.message || error.message;
+            throw error;
+        }
     }
 
     // Try each API provider in sequence
@@ -283,6 +321,20 @@ async function getMarketChart(coinId, days = 30, forceRefresh = false) {
 
             const response = await fetchWithRetry(url, provider.maxRetries, provider.retryDelay);
             if (!response.ok) {
+                if (response.status === 403) {
+                    apiFailureCache.set(cacheKey, {
+                        code: 'MARKET_CHART_FORBIDDEN',
+                        status: response.status,
+                        provider: provider.name,
+                        message: `Provider ${provider.name} returned 403 for ${coinId}`
+                    });
+                    const error = new Error('MARKET_CHART_FORBIDDEN');
+                    error.code = 'MARKET_CHART_FORBIDDEN';
+                    error.status = response.status;
+                    error.provider = provider.name;
+                    error.coinId = coinId;
+                    throw error;
+                }
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
@@ -295,6 +347,7 @@ async function getMarketChart(coinId, days = 30, forceRefresh = false) {
 
             // Cache the successful data
             apiCache.set(cacheKey, transformedData);
+            apiFailureCache.delete(cacheKey);
 
             // Switch to this provider for future requests
             currentApiProvider = i;
@@ -318,6 +371,13 @@ async function getMarketChart(coinId, days = 30, forceRefresh = false) {
         console.log(`🚨 All APIs failed for ${coinId} chart, using cached data`);
         return cachedData;
     }
+
+    apiFailureCache.set(cacheKey, {
+        code: 'MARKET_CHART_ALL_FAILED',
+        status: 0,
+        provider: 'all',
+        message: `All providers failed for ${coinId} chart data`
+    });
 
     throw new Error(`All API providers failed for ${coinId} chart data and no cached data available`);
 }
