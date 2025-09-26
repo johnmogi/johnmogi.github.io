@@ -86,6 +86,15 @@ function updateChart(coinsData) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
+    const triggerScanSweep = () => {
+        chartContainer.classList.remove('chart-scan-active');
+        void chartContainer.offsetWidth;
+        chartContainer.classList.add('chart-scan-active');
+        setTimeout(() => {
+            chartContainer.classList.remove('chart-scan-active');
+        }, 700);
+    };
+
     // Prepare datasets for multiple coins
     const datasets = coinsData.map((coin, index) => {
         const colors = [
@@ -142,6 +151,7 @@ function updateChart(coinsData) {
         }
 
         currentChart.update('none');
+        triggerScanSweep();
         return;
     }
 
@@ -199,6 +209,8 @@ function updateChart(coinsData) {
             }
         }
     });
+
+    triggerScanSweep();
 }
 
 // Live tracking functionality
